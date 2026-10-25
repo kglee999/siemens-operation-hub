@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>724 Call SMS 수신 관리</title>
+    <link rel="stylesheet" th:href="@{/assets/css/cswt/egn-assign.css}">
+</head>
+<body>
+<!-- CS Webtool egn/egn_sms_manager.jsp: 알림 종류별 수신자 표(구분 / 수신자 + X / 추가)
+     1. RPA 모니터링, 2. 724 Call 모니터링, 3. 724 Call 지연 모니터링 (1)~(5).
+     표 한 줄 = [type, 구분 이름, 수신자('|' 구분)] -->
+<main layout:fragment="content">
+    <div class="page-title"><h3>724 Call SMS 수신 관리</h3></div>
+
+    <div class="x_panel" id="smsBoard" th:attr="data-add-url=@{/sample/cswt/egn/modal/sms-manager-add}">
+        <div class="x_content">
+            <h3 class="section-title">1. RPA 모니터링
+                <i class="bi bi-question-circle" data-bs-toggle="tooltip" data-bs-html="true" tabindex="0"
+                   data-bs-title="RPA 작동 여부 문자 안내&lt;br&gt;RPA1-TeamPlay Fleet, 120분 마다&lt;br&gt;RPA2-52시간 관리, 120분 마다&lt;br&gt;RPA4-웹툴 IVK data, 1,600분 마다"></i>
+            </h3>
+            <th:block th:with="rows=${ { {'RPALIVE1','RPA1 PC LIVE','홍길동|김철수'}, {'RPALIVE2','RPA2 PC LIVE','홍길동'}, {'RPALIVE4','RPA4 PC LIVE','홍길동|이영희'} } }">
+                <div class="table-responsive" th:insert="~{sample/cswt/egn/sms-manager :: smsTable}"></div>
+            </th:block>
+
+            <h3 class="section-title mt-3">2. 724 Call 모니터링
+                <i class="bi bi-question-circle" data-bs-toggle="tooltip" tabindex="0"
+                   data-bs-title="724 Call 접수 시 각 모달리티 별로 안내 문자 발송"></i>
+            </h3>
+            <th:block th:with="rows=${ { {'ZZ_DX','DX - All','박민수|최지원|정하늘'}, {'ZZ_DI','DI - AX','강서준'}, {'ZZ_DI','DI - CT/SY','윤지우|임도윤'}, {'ZZ_DI','DI - MR','한예린'}, {'ZZ_DI','DI - MI/RO',''}, {'ZZ_DI','DI - XP','오세훈'}, {'ZZ_DI','DI - US','서다은|김태현'} } }">
+                <div class="table-responsive" th:insert="~{sample/cswt/egn/sms-manager :: smsTable}"></div>
+            </th:block>
+
+            <h3 class="section-title mt-3">3. 724 Call 지연 모니터링</h3>
+
+            <h4 class="section-subtitle">(1) CS HEAD (DI &amp; DX)
+                <i class="bi bi-question-circle" data-bs-toggle="tooltip" tabindex="0"
+                   data-bs-title="접수 된 724 Call의 CSE 응대 2시간 이상 지연될 경우 2시간 마다 문자 안내"></i>
+            </h4>
+            <th:block th:with="rows=${ { {'CSHEAD','CS HEAD','이재훈'} } }">
+                <div class="table-responsive" th:insert="~{sample/cswt/egn/sms-manager :: smsTable}"></div>
+            </th:block>
+
+            <h4 class="section-subtitle">(2) SO
+                <i class="bi bi-question-circle" data-bs-toggle="tooltip" tabindex="0"
+                   data-bs-title="접수 된 724 Call의 CSE 응대 1시간 이상 지연될 경우 1시간 마다 문자 안내 (최대 3회 발송 - DI만 해당)"></i>
+            </h4>
+            <th:block th:with="rows=${ { {'SO_DX','DX - All','배준호'}, {'SO_DI','DI - AX','신유진'}, {'SO_DI','DI - CT/SY','조민재|권나래'}, {'SO_DI','DI - MR','류승우'}, {'SO_DI','DI - MI/RO','문가영'}, {'SO_DI','DI - XP',''}, {'SO_DI','DI - US','백승민'} } }">
+                <div class="table-responsive" th:insert="~{sample/cswt/egn/sms-manager :: smsTable}"></div>
+            </th:block>
+
+            <h4 class="section-subtitle">(3) ASM (DX)
+                <i class="bi bi-question-circle" data-bs-toggle="tooltip" tabindex="0"
+                   data-bs-title="접수 된 724 Call의 CSE 응대 1시간 이상 지연될 경우 1시간 마다 문자 안내"></i>
+            </h4>
+            <th:block th:with="rows=${ { {'DX_ASM','부산/경남/울산','송지호'}, {'DX_ASM','대구/경북','안소희'}, {'DX_ASM','전북','황보람'}, {'DX_ASM','전남/광주','남궁민'}, {'DX_ASM','대전/충청','장우진'}, {'DX_ASM','서울/경기/강원','노하은|하지훈'}, {'DX_ASM','제주도',''} } }">
+                <div class="table-responsive" th:insert="~{sample/cswt/egn/sms-manager :: smsTable}"></div>
+            </th:block>
+
+            <h4 class="section-subtitle">(4) ASM (DI)
+                <i class="bi bi-question-circle" data-bs-toggle="tooltip" tabindex="0"
+                   data-bs-title="접수 된 724 Call의 CSE 응대 1시간 이상 지연될 경우 1시간 마다 문자 안내 (최대 3회 발송)"></i>
+            </h4>
+            <th:block th:with="rows=${ { {'DI_ASM','부산/경남/울산','고은비'}, {'DI_ASM','대구/경북','양재원'}, {'DI_ASM','전북','문태호'}, {'DI_ASM','전남/광주','유가은'}, {'DI_ASM','대전/충청','노현우'}, {'DI_ASM','서울/경기/강원','김도현|이준서'}, {'DI_ASM','제주도','고은비'} } }">
+                <div class="table-responsive" th:insert="~{sample/cswt/egn/sms-manager :: smsTable}"></div>
+            </th:block>
+
+            <h4 class="section-subtitle">(5) MODALITY LEAD (DI)
+                <i class="bi bi-question-circle" data-bs-toggle="tooltip" tabindex="0"
+                   data-bs-title="접수 된 724 Call의 CSE 응대 1시간 이상 지연될 경우 1시간 마다 문자 안내 (최대 3회 발송)"></i>
+            </h4>
+            <th:block th:with="rows=${ { {'MSM','CT/SY','박서연'}, {'MSM','MR','최민호'}, {'MSM','AX','정유나'}, {'MSM','MI','한지민'}, {'MSM','XP/US','오승현|강다인'} } }">
+                <div class="table-responsive mb-0" th:insert="~{sample/cswt/egn/sms-manager :: smsTable}"></div>
+            </th:block>
+        </div>
+    </div>
+</main>
+
+<!-- 수신자 표 조각 (위 th:insert 가 가져다 씀; 이 자리에는 그려지지 않음) -->
+<th:block th:if="${false}">
+    <table class="table table-striped jambo_table duty-table" th:fragment="smsTable">
+        <colgroup>
+            <col style="width: 200px;">
+            <col>
+            <col style="width: 70px;">
+        </colgroup>
+        <tbody>
+        <tr th:each="r : ${rows}" th:attr="data-sms-type=${r[0]},data-label=${r[1]}"
+            th:with="names=${#strings.arraySplit(r[2], '|')}">
+            <td><h4 th:text="${r[1]}">RPA1 PC LIVE</h4></td>
+            <td class="a-left duty-engineers">
+                <div class="btn-group duty-chip" role="group" th:each="n : ${names}">
+                    <button type="button" class="btn btn-default" th:text="${n}">홍길동</button>
+                    <button type="button" class="btn btn-default btn-duty-delete" th:attr="aria-label=|${n} 삭제|">X</button>
+                </div>
+                <span class="duty-empty" th:classappend="${names.length > 0} ? 'd-none'">등록된 수신자가 없습니다.</span>
+            </td>
+            <td><button type="button" class="btn btn-success btn-duty-add">추가</button></td>
+        </tr>
+        </tbody>
+    </table>
+</th:block>
+
+<th:block layout:fragment="script">
+    <script>
+        (function () {
+            const board = document.getElementById('smsBoard');
+
+            const refreshEmpty = cell => cell.querySelector('.duty-empty')
+                .classList.toggle('d-none', !!cell.querySelector('.duty-chip'));
+
+            // 모달(_sms-manager-add)에서 저장하면 호출: 해당 줄에 수신자 칩 추가
+            window.smsAddChip = (tr, name) => {
+                const cell = tr.querySelector('.duty-engineers');
+                const chip = document.createElement('div');
+                chip.className = 'btn-group duty-chip';
+                chip.setAttribute('role', 'group');
+                chip.innerHTML = '<button type="button" class="btn btn-default"></button>' +
+                    '<button type="button" class="btn btn-default btn-duty-delete">X</button>';
+                chip.firstChild.textContent = name;
+                chip.lastChild.setAttribute('aria-label', name + ' 삭제');
+                cell.insertBefore(chip, cell.querySelector('.duty-empty'));
+                refreshEmpty(cell);
+            };
+
+            board.addEventListener('click', e => {
+                const add = e.target.closest('.btn-duty-add');
+                if (add) {
+                    const tr = add.closest('tr');
+                    window.smsTarget = { tr: tr, type: tr.dataset.smsType, label: tr.dataset.label };
+                    oh.modal.open(board.dataset.addUrl);
+                    return;
+                }
+                const del = e.target.closest('.btn-duty-delete');
+                if (del) {
+                    oh.confirm('삭제하시겠습니까?', { okText: '삭제' }).then(ok => {
+                        if (!ok) return;
+                        const cell = del.closest('.duty-engineers');
+                        del.closest('.duty-chip').remove();
+                        refreshEmpty(cell);
+                        oh.toast('삭제가 완료되었습니다.');
+                    });
+                }
+            });
+        })();
+    </script>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 파트너사 추가 정보(KeyMan) 등록/수정 모달 (CS Webtool mng/mng_vendor_user_add.jsp).
+     파트너사 정보는 읽기 전용, Key Man Name / Mobile Number 만 입력. mode=modify 면 삭제 버튼 -->
+<div class="modal fade" tabindex="-1" aria-labelledby="vendorUserTitle" aria-hidden="true" th:fragment="modal"
+     th:with="modify=${param.mode != null and param.mode[0] == 'modify'},
+              plant=${param.plant != null ? param.plant[0] : '96E6'},
+              area=${param.area != null ? param.area[0] : ''}">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" id="vendorUserForm" novalidate>
+            <input type="hidden" name="mode" th:value="${modify} ? 'modify' : 'insert'">
+            <input type="hidden" name="vendor_seq" th:value="${param.seq}">
+            <div class="modal-header">
+                <h5 class="modal-title" id="vendorUserTitle">
+                    <th:block th:text="${modify} ? '파트너사 추가 정보 수정' : '파트너사 추가 정보 등록'">파트너사 추가 정보 수정</th:block>
+                    <small class="text-navy d-block ms-0 mt-1" th:text="${modify} ? '파트너사 정보를 수정하실 수 있습니다.' : '파트너사 정보를 추가 등록하실 수 있습니다.'">파트너사 정보를 수정하실 수 있습니다.</small>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4"><label class="col-form-label" for="userPlant">PLANT CD</label></div>
+                    <div class="col-8">
+                        <select class="form-select" id="userPlant" name="plant_cd" disabled>
+                            <option value="96E6" th:selected="${plant == '96E6'}">DI</option>
+                            <option value="94E6" th:selected="${plant == '94E6'}">DX</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4"><label class="col-form-label" for="userVendorNo">Partner NO</label></div>
+                    <div class="col-8"><input type="text" class="form-control" id="userVendorNo" name="vendor_no" placeholder="파트너사 아이디" readonly th:value="${param.vendorNo}"></div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4"><label class="col-form-label" for="userVendorNm">Partner name (영문)</label></div>
+                    <div class="col-8"><input type="text" class="form-control" id="userVendorNm" name="vendor_nm" placeholder="파트너사 영문 명칭" readonly th:value="${param.nameEn}"></div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4"><label class="col-form-label" for="userVendorNm2">Partner name (한글)</label></div>
+                    <div class="col-8"><input type="text" class="form-control" id="userVendorNm2" name="vendor_nm2" placeholder="파트너사 한글 명칭" readonly th:value="${param.nameKo}"></div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4"><label class="col-form-label" for="userArea">Region</label></div>
+                    <div class="col-8">
+                        <select class="form-select" id="userArea" name="vendor_area_cd" disabled>
+                            <option value="">지역선택</option>
+                            <option th:each="a : ${ {'서울/경기','강원','충청','호남','영남','제주'} }" th:value="${a}" th:text="${a}"
+                                    th:selected="${area == a}">서울/경기</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4"><label class="col-form-label" for="userKeyman">Key Man Name</label></div>
+                    <div class="col-8">
+                        <input type="text" class="form-control" id="userKeyman" name="vnd_eng_nm" placeholder="엔지니어 대표 성명" required th:value="${param.keyman}">
+                        <div class="invalid-feedback">Key Man Name을 입력해주세요.</div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center">
+                    <div class="col-4"><label class="col-form-label" for="userTel">Mobile Number</label></div>
+                    <div class="col-8">
+                        <input type="tel" class="form-control" id="userTel" name="vnd_tel_no" placeholder="Call 대응 연락번호" required th:value="${param.tel}">
+                        <div class="invalid-feedback">Mobile Number를 입력해주세요.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success">등록/수정 완료</button>
+                <button type="button" class="btn btn-danger" id="btnVendorUserDelete" th:if="${modify}">삭제</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            const form = document.getElementById('vendorUserForm');
+            const close = () => bootstrap.Modal.getInstance(form.closest('.modal')).hide();
+
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                form.classList.add('was-validated');
+                if (!form.checkValidity()) { form.querySelector(':invalid').focus(); return; }
+                close();
+                oh.toast('저장이 완료되었습니다.');
+            });
+
+            const del = document.getElementById('btnVendorUserDelete');
+            if (del) del.addEventListener('click', () => {
+                oh.confirm('삭제하시겠습니까?', { okText: '삭제' }).then(ok => {
+                    if (!ok) return;
+                    close();
+                    oh.toast('삭제가 완료되었습니다.');
+                });
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

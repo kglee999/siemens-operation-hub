@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- SYSTEM ID 변경 모달 (CS Webtool noti/call_systemId_add.jsp).
+     SYSTEM ID 를 검색해 확인완료 상태가 되어야 저장할 수 있음. 샘플: 400- 로 시작하는 6자리 번호면 확인완료. -->
+<div class="modal fade" tabindex="-1" aria-labelledby="systemIdTitle" aria-hidden="true" th:fragment="modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" id="callSystemIdForm" novalidate>
+            <input type="hidden" name="system_id">
+            <div class="modal-header">
+                <h5 class="modal-title" id="systemIdTitle">SYSTEM ID 변경</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 align-items-start">
+                    <div class="col-sm-4"><label class="col-form-label" for="modalSystemIdData">SYSTEM ID</label></div>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="modalSystemIdData" name="system_id_data" placeholder="SYSTEM ID" required autocomplete="off">
+                        <div class="invalid-feedback">SYSTEM ID 를 검색해서 확인하세요.</div>
+                    </div>
+                    <div class="col-sm-2"><button type="button" class="btn btn-success w-100" id="btnSystemIdSearch">검색</button></div>
+                    <div class="col-sm-2"><span class="col-form-label d-block check-status text-danger" id="systemIdSearchResult">미확인</span></div>
+                </div>
+                <p class="form-text mb-0">샘플: 400-123456 처럼 400- 뒤 6자리 숫자이면 확인완료됩니다.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+                <button type="submit" class="btn btn-success">저장하기</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            const form = document.getElementById('callSystemIdForm');
+            const input = form.system_id_data;
+            const status = document.getElementById('systemIdSearchResult');
+
+            function setChecked(systemId) {
+                form.system_id.value = systemId || '';
+                status.textContent = systemId ? '확인완료' : '미확인';
+                status.className = 'col-form-label d-block check-status ' + (systemId ? 'text-confirm' : 'text-danger');
+                input.setCustomValidity(systemId ? '' : 'unchecked');
+            }
+
+            function search() {
+                const v = input.value.trim();
+                if (!v) { oh.toast('SYSTEM ID를 입력해주세요.', 'warning'); input.focus(); return; }
+                const ok = /^400-\d{6}$/.test(v);
+                setChecked(ok ? v : null);
+                form.classList.add('was-validated');
+                oh.toast(ok ? 'SYSTEM ID 가 확인되었습니다.' : 'SYSTEM ID 가 확인되지 않습니다.', ok ? 'success' : 'danger');
+            }
+
+            setChecked(null);
+            document.getElementById('btnSystemIdSearch').addEventListener('click', search);
+            // 값을 바꾸면 다시 미확인, Enter 는 검색
+            input.addEventListener('input', () => setChecked(null));
+            input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); search(); } });
+
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                form.classList.add('was-validated');
+                if (!form.checkValidity()) { oh.toast('SYSTEM ID 가 확인되지 않았습니다.', 'danger'); return; }
+                bootstrap.Modal.getInstance(form.closest('.modal')).hide();
+                oh.toast('저장이 완료되었습니다.');
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

@@ -1,0 +1,12 @@
+/* 724 Call 화면 (noti/call-*, test/call-monitoring) 전용 */
+
+/* 관리 아이콘 버튼 (엔지니어 추가 / 지정 / 종료, TEST 수락 / 거절): 한 줄로 */
+table.jambo_table td.call-admin { padding-top: 4px; padding-bottom: 4px; }
+td.call-admin .btn { padding-left: 10px; padding-right: 10px; }
+td.call-admin .btn + .btn { margin-left: 2px; }
+
+/* Call 1건 = <tbody> 1개 (공통 칸은 rowspan 병합).
+   줄무늬를 줄 단위가 아니라 Call 단위로 넣어 병합 칸과 배정 줄이 한 덩어리로 보이게 함. */
+table.call-table > tbody + tbody { border-top: 0; }
+table.call-table > tbody:nth-of-type(even) > tr > td { --bs-table-bg-type: #f9f9f9; }
+table.call-table > tbody > tr > td[rowspan] { border-bottom-color: #ddd; }

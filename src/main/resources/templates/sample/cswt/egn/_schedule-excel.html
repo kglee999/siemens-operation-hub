@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 스케쥴 관리 엑셀 업로드 모달 (CS Webtool egn/egn_schedule_excel_add.jsp).
+     파일 선택 -> 등록 을 누르면 업로드 결과 영역으로 바뀜 (샘플: 실제 업로드 없음) -->
+<div class="modal fade" tabindex="-1" aria-labelledby="scheduleExcelTitle" aria-hidden="true" th:fragment="modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" id="scheduleExcelForm" novalidate>
+            <div class="modal-header">
+                <h5 class="modal-title" id="scheduleExcelTitle">스케쥴 관리 엑셀 업로드
+                    <small class="text-navy">신규 스케쥴 관리 엑셀을 업로드 하실 수 있습니다.</small></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-sm-3"><span class="col-form-label search-label">업로드 양식</span></div>
+                    <div class="col-sm-9"><a href="#" id="sampleDown"><i class="bi bi-download"></i> 다운로드</a></div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-sm-3"><label class="col-form-label search-label" for="excelFile">파일명</label></div>
+                    <div class="col-sm-9">
+                        <input type="file" class="form-control" id="excelFile" name="excelFile" accept=".xlsx,.xls" required>
+                        <div class="invalid-feedback">엑셀 파일을 입력해주세요.</div>
+                    </div>
+                </div>
+                <div class="row g-2 d-none" id="resultArea">
+                    <div class="col-sm-3"><span class="col-form-label search-label">업로드 결과</span></div>
+                    <div class="col-sm-9"><pre class="upload-result" id="excelUploadResult"></pre></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success">등록</button>
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            const form = document.getElementById('scheduleExcelForm');
+            document.getElementById('sampleDown').addEventListener('click', e => {
+                e.preventDefault();
+                oh.toast('업로드 양식을 내려받습니다. (샘플)', 'info');
+            });
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                form.classList.add('was-validated');
+                if (!form.checkValidity()) return;
+                oh.loading.show();
+                setTimeout(() => {
+                    oh.loading.hide();
+                    document.getElementById('excelUploadResult').textContent = [
+                        ' 총 업로드 건수 : 12',
+                        ' 등록 성공 건수 : 10',
+                        ' 등록 실패 건수 : 2',
+                        ' 에러 상세 내용 : ',
+                        '[5행] Plant Code 가 올바르지 않습니다. (96E7)',
+                        '[9행] Planned start time 형식이 올바르지 않습니다. (25:00)'
+                    ].join('\n');
+                    document.getElementById('resultArea').classList.remove('d-none');
+                    form.classList.remove('was-validated');
+                    oh.toast('업로드가 완료되었습니다.');
+                }, 500);
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

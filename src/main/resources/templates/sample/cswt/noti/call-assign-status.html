@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>724 엔지니어 배정 현황</title>
+    <link rel="stylesheet" th:href="@{/assets/css/cswt/call.css}">
+</head>
+<body>
+<!-- CS Webtool noti/call_assign_status.jsp
+     기간설정 + 검색하기/엑셀받기 한 줄. 목록은 Call 1건 = <tbody> 1개,
+     Call 일시 ~ GG 는 rowspan 병합 (siemens.util.mergeRow('call-row', 5) 결과), 순번 ~ 최근 배정시간은 후보 엔지니어별 한 줄 -->
+<main layout:fragment="content">
+    <div class="page-title">
+        <h3>724 엔지니어 배정 현황</h3>
+    </div>
+
+    <form id="searchForm" method="get" th:action="@{/sample/cswt/noti/call-assign-status}">
+        <input type="hidden" name="pageNo" value="1">
+        <div class="x_panel">
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto"><label class="search-label" for="firstDate">기간설정</label></div>
+                    <div class="col-auto">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                            <input type="date" class="form-control" id="firstDate" name="firstDate" value="2026-10-17">
+                            <span class="input-group-text">~</span>
+                            <input type="date" class="form-control" name="lastDate" value="2026-10-24" aria-label="기간 종료">
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <div class="btn-row">
+                            <button class="btn btn-success" type="submit">검색하기</button>
+                            <button class="btn btn-success" type="button" id="btnExcel">엑셀받기</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="x_panel">
+        <div class="x_content">
+            <div class="table-responsive">
+                <table class="table jambo_table call-table" id="tableList">
+                    <thead>
+                    <tr>
+                        <th>Call 일시</th>
+                        <th>고객사명</th>
+                        <th>장비명</th>
+                        <th>지역</th>
+                        <th>GG</th>
+                        <th>순번</th>
+                        <th>엔지니어</th>
+                        <th>당직순번</th>
+                        <th>지역순위</th>
+                        <th>가용여부</th>
+                        <th>업무시간</th>
+                        <th>특기사항</th>
+                        <th>최근<br>배정시간</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td rowspan="3">2026-10-24<br>09:12:35<br>(24518)</td>
+                        <td rowspan="3">서울대학교병원</td>
+                        <td rowspan="3">MAGNETOM Vida</td>
+                        <td rowspan="3">서울</td>
+                        <td rowspan="3">MR</td>
+                        <td>1</td><td>김민준</td><td>1</td><td>1</td><td>가용</td><td>08:00 ~ 18:00</td><td></td><td>2026-10-23 15:40</td>
+                    </tr>
+                    <tr>
+                        <td>2</td><td>이서연</td><td>2</td><td>1</td><td>가용</td><td>08:00 ~ 18:00</td><td></td><td>2026-10-22 10:05</td>
+                    </tr>
+                    <tr>
+                        <td>3</td><td>박지훈</td><td>3</td><td>2</td><td>가용</td><td>09:00 ~ 18:00</td><td></td><td>2026-10-20 17:22</td>
+                    </tr>
+                    </tbody>
+                    <tbody>
+                    <tr>
+                        <td rowspan="2">2026-10-24<br>08:41:02<br>(24517)</td>
+                        <td rowspan="2">세브란스병원</td>
+                        <td rowspan="2">SOMATOM Force</td>
+                        <td rowspan="2">서울</td>
+                        <td rowspan="2">CT</td>
+                        <td>1</td><td>정하늘</td><td>1</td><td>1</td><td>불가</td><td>08:00 ~ 18:00</td><td>휴가</td><td>2026-10-21 09:30</td>
+                    </tr>
+                    <tr>
+                        <td>2</td><td>강서준</td><td>2</td><td>1</td><td>가용</td><td>08:00 ~ 18:00</td><td></td><td>2026-10-24 08:52</td>
+                    </tr>
+                    </tbody>
+                    <tbody>
+                    <tr>
+                        <td>2026-10-23<br>22:05:48<br>(24516)</td>
+                        <td>삼성서울병원</td>
+                        <td>ARTIS icono</td>
+                        <td>서울</td>
+                        <td>AT</td>
+                        <td>1</td><td>윤지우</td><td>1</td><td>1</td><td>가용</td><td>18:00 ~ 08:00</td><td>당직</td><td>2026-10-23 22:07</td>
+                    </tr>
+                    </tbody>
+                    <tbody>
+                    <tr>
+                        <td rowspan="2">2026-10-23<br>19:30:11<br>(24515)</td>
+                        <td rowspan="2">분당서울대학교병원</td>
+                        <td rowspan="2">MAGNETOM Skyra</td>
+                        <td rowspan="2">경기</td>
+                        <td rowspan="2">MR</td>
+                        <td>1</td><td>임도윤</td><td>1</td><td>1</td><td>가용</td><td>18:00 ~ 08:00</td><td>당직</td><td>2026-10-23 19:33</td>
+                    </tr>
+                    <tr>
+                        <td>2</td><td>한예린</td><td>2</td><td>2</td><td>불가</td><td>08:00 ~ 18:00</td><td>교육</td><td>2026-10-19 13:10</td>
+                    </tr>
+                    </tbody>
+                    <tbody>
+                    <tr>
+                        <td rowspan="3">2026-10-22<br>23:47:55<br>(24512)</td>
+                        <td rowspan="3">전남대학교병원</td>
+                        <td rowspan="3">SOMATOM go.Top</td>
+                        <td rowspan="3">호남</td>
+                        <td rowspan="3">CT</td>
+                        <td>1</td><td>오세훈</td><td>1</td><td>1</td><td>가용</td><td>18:00 ~ 08:00</td><td>당직</td><td>2026-10-22 23:48</td>
+                    </tr>
+                    <tr>
+                        <td>2</td><td>서다은</td><td>2</td><td>1</td><td>가용</td><td>18:00 ~ 08:00</td><td>당직</td><td>2026-10-22 23:55</td>
+                    </tr>
+                    <tr>
+                        <td>3</td><td>최지원</td><td></td><td>2</td><td>불가</td><td>08:00 ~ 18:00</td><td>출장 (제주)</td><td>2026-10-18 11:45</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <nav aria-label="페이지 이동">
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" href="#" aria-label="처음">&laquo;</a></li>
+                    <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#" aria-label="마지막">&raquo;</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script>
+        (function () {
+            document.getElementById('btnExcel').addEventListener('click', () => oh.toast('엑셀 다운로드는 샘플에서 지원하지 않습니다.', 'warning'));
+            document.getElementById('searchForm').addEventListener('submit', e => {
+                e.preventDefault();
+                oh.toast('검색되었습니다.');
+            });
+        })();
+    </script>
+</th:block>
+</body>
+</html>

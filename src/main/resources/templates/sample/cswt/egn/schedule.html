@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>내 스케줄 관리</title>
+    <link rel="stylesheet" th:href="@{/assets/vendor/fullcalendar-7.1.3/skeleton.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendor/fullcalendar-7.1.3/themes/classic/theme.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendor/fullcalendar-7.1.3/themes/classic/palette.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/cswt/egn-schedule.css}">
+</head>
+<body>
+<!-- CS Webtool egn/egn_schedule.jsp: 월 제목 well / 왼쪽 필터 + 일별 스케쥴 카드 / 오른쪽 월 달력 + 입력·엑셀 버튼 -->
+<main layout:fragment="content">
+    <div class="page-title"><h3>내 스케줄 관리</h3></div>
+
+    <div class="x_panel">
+        <div class="x_content">
+            <div class="well sched-well">
+                <p class="sched-personal"><strong>홍길동</strong> 님의 <span id="titleMonth">10</span>월 스케쥴</p>
+                <div class="legend">
+                    <span class="legend-title">표시항목</span>
+                    <span><i class="unit bg-sn"></i>CSE</span>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <!-- 왼쪽: 필터 + 일별 카드 -->
+                <div class="col-lg-8">
+                    <form class="x_panel sched-filter" id="scheduleFilter">
+                        <div class="x_content">
+                            <div class="row g-2 align-items-center">
+                                <div class="col-auto"><span class="search-label">구분</span></div>
+                                <div class="col">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="type6All" value="all" checked>
+                                        <label class="form-check-label" for="type6All">ALL</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="searchType6" id="type601" value="01" checked>
+                                        <label class="form-check-label" for="type601">Service</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="searchType6" id="type602" value="02" checked>
+                                        <label class="form-check-label" for="type602">Compen</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="searchType6" id="type603" value="03" checked>
+                                        <label class="form-check-label" for="type603">Office(Standby)</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="searchType6" id="type607" value="07" checked>
+                                        <label class="form-check-label" for="type607">Office(Standby불가)</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="searchType6" id="type604" value="04" checked>
+                                        <label class="form-check-label" for="type604">Training(국내)</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="searchType6" id="type606" value="06" checked>
+                                        <label class="form-check-label" for="type606">Training(해외)</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="searchType6" id="type605" value="05" checked>
+                                        <label class="form-check-label" for="type605">Leave</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row g-2 align-items-center mt-1">
+                                <div class="col-auto"><label class="search-label" for="searchType2">노출 조건</label></div>
+                                <div class="col-auto">
+                                    <select class="form-select sched-select" id="searchType2" name="searchType2">
+                                        <option value="all">All</option>
+                                        <option value="N">Hidden</option>
+                                        <option value="Y">Unmarked</option>
+                                    </select>
+                                </div>
+                                <div class="col-auto">
+                                    <button class="btn btn-success" type="button" id="btnSearch">검색하기</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="x_panel">
+                        <label class="schedule_title" id="scheduleTitle">10월 24일 스케쥴</label>
+                        <div class="schedule_day" id="scheduleDay"
+                             th:attr="data-add-url=@{/sample/cswt/egn/modal/schedule-add},data-memo-url=@{/sample/cswt/egn/modal/schedule-memo}">
+                            <div class="row g-1">
+                                <div class="col-md-6 col-xl-4" data-type="01" data-marked="Y">
+                                    <div class="item_card">
+                                        <div class="count_num bg-sn">1</div>
+                                        <dl>
+                                            <dt>엔지니어명</dt><dd>홍길동</dd>
+                                            <dt>구분</dt><dd>Service</dd>
+                                            <dt>병원</dt><dd class="memos">서울대학교병원</dd>
+                                            <dt>장비</dt><dd class="memos">SOMATOM Force</dd>
+                                            <dt>FL</dt><dd>1000234517</dd>
+                                            <dt>System #</dt><dd>400-123456</dd>
+                                            <dt>Serial #</dt><dd>73512</dd>
+                                            <dt>계약상태</dt><dd>유상계약</dd>
+                                            <dt>Travel to</dt><dd>08:00 ~ 09:00</dd>
+                                            <dt>OSR</dt><dd>09:00 ~ 12:00</dd>
+                                            <dt>Description</dt><dd class="memos">정기 PM (Tube 점검 포함)</dd>
+                                            <dt>MEMO</dt><dd class="memos"></dd>
+                                            <dd class="count_setting">
+                                                <button type="button" class="btn btn-xs btn-default btn-memo" data-id="101" title="메모 수정"><i class="bi bi-eraser"></i></button>
+                                                <button type="button" class="btn btn-xs btn-default btn-modify" data-id="101" title="스케쥴 변경"><i class="bi bi-pencil-square"></i></button>
+                                            </dd>
+                                        </dl>
+                                        <button type="button" class="marked" data-marked="Y" title="숨기기"><i class="bi bi-eye-fill"></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-xl-4" data-type="01" data-marked="Y">
+                                    <div class="item_card">
+                                        <div class="count_num bg-sn">2</div>
+                                        <dl>
+                                            <dt>엔지니어명</dt><dd>홍길동</dd>
+                                            <dt>구분</dt><dd>Service</dd>
+                                            <dt>병원</dt><dd class="memos">세브란스병원</dd>
+                                            <dt>장비</dt><dd class="memos">MAGNETOM Vida</dd>
+                                            <dt>FL</dt><dd>1000318842</dd>
+                                            <dt>System #</dt><dd>400-215873</dd>
+                                            <dt>Serial #</dt><dd>175642</dd>
+                                            <dt>Travel to</dt><dd>12:30 ~ 13:30</dd>
+                                            <dt>OSR</dt><dd>13:30 ~ 17:00</dd>
+                                            <dt>Description</dt><dd class="memos">Body Coil 교체</dd>
+                                            <dt>MEMO</dt><dd class="memos">부품 입고 확인 후 방문</dd>
+                                            <dd class="count_setting">
+                                                <button type="button" class="btn btn-xs btn-default btn-memo" data-id="102" title="메모 수정"><i class="bi bi-eraser"></i></button>
+                                                <button type="button" class="btn btn-xs btn-default btn-modify" data-id="102" title="스케쥴 변경"><i class="bi bi-pencil-square"></i></button>
+                                            </dd>
+                                        </dl>
+                                        <button type="button" class="marked" data-marked="Y" title="숨기기"><i class="bi bi-eye-fill"></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-xl-4" data-type="03" data-marked="N">
+                                    <div class="item_card">
+                                        <div class="count_num bg-sn">3</div>
+                                        <dl>
+                                            <dt>엔지니어명</dt><dd>홍길동<br>(김민준)</dd>
+                                            <dt>구분</dt><dd>Office(Standby)</dd>
+                                            <dt>병원</dt><dd class="memos"></dd>
+                                            <dt>장비</dt><dd class="memos"></dd>
+                                            <dt>FL</dt><dd>.</dd>
+                                            <dt>System #</dt><dd>.</dd>
+                                            <dt>Serial #</dt><dd>.</dd>
+                                            <dt>시간</dt><dd>17:00 ~ 18:00</dd>
+                                            <dt>Description</dt><dd class="memos">사무실 대기</dd>
+                                            <dt>MEMO</dt><dd class="memos"></dd>
+                                            <dd class="count_setting">
+                                                <button type="button" class="btn btn-xs btn-default btn-memo" data-id="103" title="메모 수정"><i class="bi bi-eraser"></i></button>
+                                                <button type="button" class="btn btn-xs btn-default btn-modify" data-id="103" title="스케쥴 변경"><i class="bi bi-pencil-square"></i></button>
+                                            </dd>
+                                        </dl>
+                                        <button type="button" class="marked" data-marked="N" title="표시하기"><i class="bi bi-eye-slash"></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-xl-4" data-type="04" data-marked="Y">
+                                    <div class="item_card">
+                                        <div class="count_num bg-sn">4</div>
+                                        <dl>
+                                            <dt>엔지니어명</dt><dd>홍길동</dd>
+                                            <dt>구분</dt><dd>Training(국내)</dd>
+                                            <dt>병원</dt><dd class="memos"></dd>
+                                            <dt>장비</dt><dd class="memos"></dd>
+                                            <dt>FL</dt><dd>.</dd>
+                                            <dt>System #</dt><dd>.</dd>
+                                            <dt>Serial #</dt><dd>.</dd>
+                                            <dt>시간</dt><dd>Real time 미노출</dd>
+                                            <dt>Description</dt><dd class="memos">NAEOTOM Alpha 신규 교육 (온라인)</dd>
+                                            <dt>MEMO</dt><dd class="memos"></dd>
+                                            <dd class="count_setting">
+                                                <button type="button" class="btn btn-xs btn-default btn-memo" data-id="104" title="메모 수정"><i class="bi bi-eraser"></i></button>
+                                                <button type="button" class="btn btn-xs btn-default btn-modify" data-id="104" title="스케쥴 변경"><i class="bi bi-pencil-square"></i></button>
+                                            </dd>
+                                        </dl>
+                                        <button type="button" class="marked" data-marked="Y" title="숨기기"><i class="bi bi-eye-fill"></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-12 sched-empty d-none">등록된 스케쥴이 없습니다.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 오른쪽: 월 달력 + 버튼 -->
+                <div class="col-lg-4 sched-calendar-wrap">
+                    <div id="calendarArea"></div>
+                    <div class="ln_solid"></div>
+                    <div class="btn-row center">
+                        <button type="button" class="btn btn-success" id="btnScheduleAdd"
+                                th:attr="data-modal-url=@{/sample/cswt/egn/modal/schedule-add}">스케쥴 입력하기</button>
+                        <button type="button" class="btn btn-primary" id="btnExcelUpload"
+                                th:attr="data-modal-url=@{/sample/cswt/egn/modal/schedule-excel}">엑셀 업로드</button>
+                        <button type="button" class="btn btn-success" id="btnExcelDown">엑셀 다운로드</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/assets/vendor/fullcalendar-7.1.3/fullcalendar.global.js}"></script>
+    <script th:src="@{/assets/vendor/fullcalendar-7.1.3/themes/classic/classic.global.js}"></script>
+    <script th:src="@{/assets/vendor/fullcalendar-7.1.3/locales/ko.global.js}"></script>
+    <script th:src="@{/assets/js/oh-calendar.js}"></script>
+    <script th:inline="none">
+        (function () {
+            const day = document.getElementById('scheduleDay');
+            const pad = n => String(n).padStart(2, '0');
+            let currentDay = new Date(2026, 9, 24);
+
+            // 내 스케쥴 (병원명 + 시간). end 는 다음날 0시 (FullCalendar 종일 일정 규칙)
+            const events = [
+                { start: '2026-10-02', title: '삼성서울병원', time: '09:00~12:00' },
+                { start: '2026-10-06', end: '2026-10-08', title: '서울아산병원', time: '10:00~17:00' },
+                { start: '2026-10-13', title: '분당서울대병원', time: '13:00~16:00' },
+                { start: '2026-10-16', title: 'Compen', time: '09:00~18:00' },
+                { start: '2026-10-20', title: '고려대학교안암병원', time: '09:30~11:30' },
+                { start: '2026-10-24', title: '서울대학교병원', time: '09:00~12:00' },
+                { start: '2026-10-24', title: '세브란스병원', time: '13:30~17:00' },
+                { start: '2026-10-28', end: '2026-10-31', title: 'Training(국내)', time: '09:00~18:00' }
+            ];
+
+            let picked = null;
+            const cal = oh.calendar('#calendarArea', {
+                initialDate: '2026-10-24',
+                headerToolbar: { left: 'prev', center: 'title', right: 'next' },
+                eventColor: '#3a87ad',
+                dayMaxEvents: false,
+                events: events,
+                eventContent: arg => {
+                    const box = document.createElement('div');
+                    box.className = 'sched-ev';
+                    box.innerHTML = '<span class="sched-ev-time"></span><span></span>';
+                    box.firstChild.textContent = arg.event.extendedProps.time;
+                    box.lastChild.textContent = arg.event.title;
+                    return { domNodes: [box] };
+                },
+                eventClick: () => openAdd(true, 0),
+                dateClick: info => {
+                    if (picked) picked.classList.remove('sched-picked');
+                    picked = info.dayEl;
+                    picked.classList.add('sched-picked');
+                    currentDay = info.date;
+                    titleLoad();
+                },
+                datesSet: arg => {
+                    picked = null;
+                    document.getElementById('titleMonth').textContent = arg.view.currentStart.getMonth() + 1;
+                }
+            });
+
+            function titleLoad() {
+                document.getElementById('titleMonth').textContent = currentDay.getMonth() + 1;
+                document.getElementById('scheduleTitle').textContent =
+                    pad(currentDay.getMonth() + 1) + '월 ' + pad(currentDay.getDate()) + '일 스케쥴';
+            }
+
+            // 구분 ALL 체크 = 전체 선택/해제, 하나라도 빠지면 ALL 해제
+            const all = document.getElementById('type6All');
+            const types = [...document.querySelectorAll('input[name=searchType6]')];
+            all.addEventListener('change', () => types.forEach(t => { t.checked = all.checked; }));
+            types.forEach(t => t.addEventListener('change', () => { all.checked = types.every(x => x.checked); }));
+
+            // 검색하기: 구분 + 노출 조건으로 카드 거르기
+            function filterCards() {
+                const on = types.filter(t => t.checked).map(t => t.value);
+                const mark = document.getElementById('searchType2').value;
+                let n = 0;
+                day.querySelectorAll('[data-type]').forEach(col => {
+                    const show = on.includes(col.dataset.type) && (mark === 'all' || col.dataset.marked === mark);
+                    col.classList.toggle('d-none', !show);
+                    if (show) col.querySelector('.count_num').textContent = ++n;
+                });
+                day.querySelector('.sched-empty').classList.toggle('d-none', n > 0);
+            }
+            document.getElementById('btnSearch').addEventListener('click', filterCards);
+
+            function openAdd(modify, id) {
+                oh.modal.open(day.dataset.addUrl, modify ? { mode: 'modify', scheNum: id } : { startDate: currentDay.getFullYear() + '-' + pad(currentDay.getMonth() + 1) + '-' + pad(currentDay.getDate()) });
+            }
+
+            day.addEventListener('click', e => {
+                const memo = e.target.closest('.btn-memo');
+                if (memo) { oh.modal.open(day.dataset.memoUrl, { scheNum: memo.dataset.id }); return; }
+                const mod = e.target.closest('.btn-modify');
+                if (mod) { openAdd(true, mod.dataset.id); return; }
+                // 표시/숨김 전환 (Y = Unmarked 표시, N = Hidden)
+                const mk = e.target.closest('.marked');
+                if (mk) {
+                    const hidden = mk.dataset.marked !== 'N';
+                    mk.dataset.marked = hidden ? 'N' : 'Y';
+                    mk.closest('[data-type]').dataset.marked = mk.dataset.marked;
+                    mk.title = hidden ? '표시하기' : '숨기기';
+                    mk.firstElementChild.className = hidden ? 'bi bi-eye-slash' : 'bi bi-eye-fill';
+                }
+            });
+
+            document.getElementById('btnScheduleAdd').addEventListener('click', () => openAdd(false));
+            document.getElementById('btnExcelUpload').addEventListener('click', e => oh.modal.open(e.currentTarget.dataset.modalUrl));
+            document.getElementById('btnExcelDown').addEventListener('click', () => oh.toast('엑셀 파일을 내려받습니다. (샘플)', 'info'));
+            titleLoad();
+        })();
+    </script>
+</th:block>
+</body>
+</html>

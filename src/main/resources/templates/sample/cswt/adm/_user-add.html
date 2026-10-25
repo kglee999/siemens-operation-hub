@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 사용자 정보 추가/변경 모달 (CS Webtool adm/adm_user_add.jsp).
+     목록의 사용자NO 를 누르면 mode=modify 와 그 줄의 값(param.*)이 넘어옴. 추가하기는 mode=add. -->
+<div class="modal fade" tabindex="-1" aria-labelledby="userAddTitle" aria-hidden="true" th:fragment="modal"
+     th:with="modify=${param.mode != null and param.mode[0] == 'modify'},
+              plant=${param.plant != null ? param.plant[0] : ''},
+              team=${param.team != null ? param.team[0] : ''},
+              modality=${param.modality != null ? param.modality[0] : ''},
+              region=${param.region != null ? param.region[0] : ''},
+              status=${param.status != null ? param.status[0] : 'ON'},
+              grade=${param.grade != null ? param.grade[0] : '1'},
+              schedule=${param.schedule != null ? param.schedule[0] : 'N'}">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" id="userAddForm" novalidate>
+            <input type="hidden" name="mode" th:value="${modify} ? 'modify' : 'add'">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userAddTitle" th:if="${modify}">사용자 정보 변경 <small class="text-navy">사용자 정보를 변경하실 수 있습니다.</small></h5>
+                <h5 class="modal-title" id="userAddTitle" th:unless="${modify}">사용자 정보 추가 <small class="text-navy">사용자 정보를 추가하실 수 있습니다.</small></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-4"><label class="col-form-label" for="uEmplNum">사용자 NO</label></div>
+                    <div class="col-8">
+                        <input type="text" class="form-control" id="uEmplNum" name="EmplNum" placeholder="사용자 NO" required
+                               th:value="${param.emplNum}" th:readonly="${modify}">
+                        <div class="invalid-feedback">사용자 NO을 입력하세요.</div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-4"><label class="col-form-label" for="uEmplNumP58">사용자 NO (NEW)</label></div>
+                    <div class="col-8">
+                        <input type="text" class="form-control" id="uEmplNumP58" name="EmplNumP58" placeholder="사용자 NO (NEW)" required
+                               th:value="${param.emplNumP58}">
+                        <div class="invalid-feedback">사용자 NO (NEW)을 입력하세요.</div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-4"><label class="col-form-label" for="uGid">GID</label></div>
+                    <div class="col-8">
+                        <input type="text" class="form-control" id="uGid" name="EmployeeGID" placeholder="GID" required th:value="${param.gid}">
+                        <div class="invalid-feedback">GID를 입력하세요.</div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-4"><label class="col-form-label" for="uEmplName">사용자명(E)</label></div>
+                    <div class="col-8">
+                        <input type="text" class="form-control" id="uEmplName" name="EmplName" placeholder="사용자명(E)" required th:value="${param.emplName}">
+                        <div class="invalid-feedback">사용자명(E)을 입력하세요.</div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-4"><label class="col-form-label" for="uKorName">사용자명(K)</label></div>
+                    <div class="col-8">
+                        <input type="text" class="form-control" id="uKorName" name="KorName" placeholder="사용자명(K)" required th:value="${param.korName}">
+                        <div class="invalid-feedback">사용자명(K)을 입력하세요.</div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-4"><label class="col-form-label" for="uPhone">Mobile</label></div>
+                    <div class="col-8">
+                        <input type="text" class="form-control" id="uPhone" name="Phone" placeholder="010-0000-0000" required th:value="${param.phone}">
+                        <div class="invalid-feedback">Mobile을 입력하세요.</div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-4"><label class="col-form-label" for="uEmail">E-mail</label></div>
+                    <div class="col-8">
+                        <input type="text" class="form-control" id="uEmail" name="Email" placeholder="E-mail" required th:value="${param.email}">
+                        <div class="invalid-feedback">E-mail을 입력하세요.</div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-4"><label class="col-form-label" for="uPlant">Plant / Team</label></div>
+                    <div class="col-8">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <select class="form-select" id="uPlant" name="PlantNum" required>
+                                    <option value="">Plant 선택</option>
+                                    <option value="96E6" th:selected="${plant == '96E6'}">DI</option>
+                                    <option value="94E6" th:selected="${plant == '94E6'}">DX</option>
+                                    <option value="ETC" th:selected="${plant == 'ETC'}">ETC</option>
+                                </select>
+                                <div class="invalid-feedback">Plant를 선택하세요.</div>
+                            </div>
+                            <div class="col-6">
+                                <select class="form-select" name="TeamCode" aria-label="Team" required>
+                                    <option value="">Team 선택</option>
+                                    <option data-plant="96E6" th:each="t : ${ {'AX','CT','MI','MR','XP'} }" th:value="${t}" th:text="${t}" th:selected="${team == t}">CT</option>
+                                    <option data-plant="96E6" value="APPS" th:selected="${team == 'APPS'}">Apps</option>
+                                    <option data-plant="94E6" value="FSE" th:selected="${team == 'FSE'}">FSE</option>
+                                    <option data-plant="94E6" value="ACA" th:selected="${team == 'ACA'}">학술</option>
+                                    <option data-plant="ETC" value="CCC" th:selected="${team == 'CCC'}">CCC</option>
+                                </select>
+                                <div class="invalid-feedback">Team을 선택하세요.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start mb-2" id="uModalityRow">
+                    <div class="col-4"><label class="col-form-label" for="uModality">Modality</label></div>
+                    <div class="col-8">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <select class="form-select" id="uModality" name="modality">
+                                    <option value="">Modality 선택</option>
+                                    <option value="E65310" th:selected="${modality == 'E65310'}">AX</option>
+                                    <option value="E65340" th:selected="${modality == 'E65340'}">CT</option>
+                                    <option value="E65330" th:selected="${modality == 'E65330'}">MR</option>
+                                    <option value="E65352" th:selected="${modality == 'E65352'}">MI</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-4"><label class="col-form-label" for="uRegion">Region / Office</label></div>
+                    <div class="col-8">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <select class="form-select" id="uRegion" name="Region">
+                                    <option value="">Region 선택</option>
+                                    <option data-plant="96E6" th:each="r : ${ {'SG','RE','RW'} }" th:value="${r}" th:text="${r}"
+                                            th:selected="${plant == '96E6' and region == r}">SG</option>
+                                    <option data-plant="94E6" th:each="r : ${ {'SN','SS','RE','RW'} }" th:value="${r}" th:text="${r}"
+                                            th:selected="${plant == '94E6' and region == r}">SN</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4"><span class="col-form-label d-block">Status</span></div>
+                    <div class="col-8">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="Status" id="uStatusOn" value="ON" th:checked="${status != 'OFF'}">
+                                    <label class="form-check-label" for="uStatusOn">ON</label>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="Status" id="uStatusOff" value="OFF" th:checked="${status == 'OFF'}">
+                                    <label class="form-check-label" for="uStatusOff">OFF</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4"><span class="col-form-label d-block">권한</span></div>
+                    <div class="col-8">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="grade" id="uGrade1" value="1" th:checked="${grade == '1'}">
+                            <label class="form-check-label" for="uGrade1">일반</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="grade" id="uGrade2" value="2" th:checked="${grade == '2'}">
+                            <label class="form-check-label" for="uGrade2">당직 관리</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="grade" id="uGrade9" value="9" th:checked="${grade == '9' or grade == '10'}">
+                            <label class="form-check-label" for="uGrade9">관리자</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4"><span class="col-form-label d-block">스케쥴 권한</span></div>
+                    <div class="col-8">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="ScheduleYn" id="uScheduleY" value="Y" th:checked="${schedule == 'Y'}">
+                            <label class="form-check-label" for="uScheduleY">Y</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="ScheduleYn" id="uScheduleN" value="N" th:checked="${schedule != 'Y'}">
+                            <label class="form-check-label" for="uScheduleN">N</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center">
+                    <div class="col-4"><span class="col-form-label d-block">잠김여부</span></div>
+                    <div class="col-8"><p class="form-static" th:text="${param.lock != null ? param.lock[0] : 'N'}">N</p></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="btnUserDelete" th:if="${modify}">사용자 삭제</button>
+                <button type="submit" class="btn btn-success">저장하기</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            const form = document.getElementById('userAddForm');
+            const modal = form.closest('.modal');
+            const plant = form.PlantNum;
+
+            // Plant 에 맞는 Team / Region 만 표시, DI 일 때만 Modality 줄 표시
+            function plantLoad() {
+                const p = plant.value;
+                [form.TeamCode, form.Region].forEach(sel => {
+                    [...sel.options].forEach(o => { o.hidden = !!p && !!o.dataset.plant && o.dataset.plant !== p; });
+                    if (!p || (sel.selectedOptions[0] && sel.selectedOptions[0].hidden)) sel.value = '';
+                });
+                const showModality = p === '96E6';
+                document.getElementById('uModalityRow').hidden = !showModality;
+                if (!showModality) form.modality.value = '';
+            }
+            plant.addEventListener('change', plantLoad);
+            // 처음에는 선택값을 지우지 않고 보이는 옵션만 정리
+            [...form.TeamCode.options, ...form.Region.options].forEach(o => {
+                o.hidden = !!plant.value && !!o.dataset.plant && o.dataset.plant !== plant.value;
+            });
+            document.getElementById('uModalityRow').hidden = plant.value !== '96E6';
+
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                form.classList.add('was-validated');
+                const invalid = form.querySelector(':invalid');
+                if (invalid) { invalid.focus(); return; }
+                bootstrap.Modal.getInstance(modal).hide();
+                oh.toast('사용자 저장이 완료되었습니다.');
+            });
+
+            const del = document.getElementById('btnUserDelete');
+            if (del) del.addEventListener('click', () => {
+                oh.confirm('사용자를 삭제하시겠습니까?', { okText: '삭제' }).then(ok => {
+                    if (!ok) return;
+                    bootstrap.Modal.getInstance(modal).hide();
+                    oh.toast('삭제가 완료되었습니다.');
+                });
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

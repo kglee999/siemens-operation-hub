@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- CS Webtool egn/egn_sms_manager_add.jsp: 엔지니어 이름 검색 → 확인완료 후 저장 -->
+<div class="modal fade" tabindex="-1" aria-labelledby="smsAddTitle" aria-hidden="true" th:fragment="modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" id="smsAddForm" novalidate>
+            <div class="modal-header">
+                <h5 class="modal-title" id="smsAddTitle">SMS 담당자 추가하기 <small class="text-navy" id="smsAddSub">RPA1 PC LIVE</small></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 align-items-start">
+                    <div class="col-sm-3"><label class="col-form-label search-label" for="smsKorName">엔지니어 이름</label></div>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="smsKorName" name="korName" placeholder="엔지니어 이름" required autocomplete="off">
+                        <div class="invalid-feedback">엔지니어 이름을 검색해서 확인하세요.</div>
+                    </div>
+                    <div class="col-sm-2"><button type="button" class="btn btn-success w-100" id="btnSmsEngSearch">검색</button></div>
+                    <div class="col-sm-2"><span class="col-form-label d-block check-status text-danger" id="smsEngStatus">미확인</span></div>
+                </div>
+                <p class="form-text mb-0">샘플 엔지니어: 홍길동, 김철수, 이영희, 박민수, 최지원, 정하늘, 강서준, 윤지우, 이재훈, 송지호</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+                <button type="submit" class="btn btn-success">저장하기</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            // 샘플 엔지니어 (원본은 /egn/disp/callEgn/getEmplNum 으로 사번 확인)
+            const ENGINEERS = ['홍길동', '김철수', '이영희', '박민수', '최지원', '정하늘', '강서준', '윤지우', '이재훈', '송지호'];
+            const target = window.smsTarget || { label: 'RPA1 PC LIVE' };
+            const form = document.getElementById('smsAddForm');
+            const name = form.korName;
+            const status = document.getElementById('smsEngStatus');
+            document.getElementById('smsAddSub').textContent = target.label;
+
+            function setChecked(ok) {
+                status.textContent = ok ? '확인완료' : '미확인';
+                status.className = 'col-form-label d-block check-status ' + (ok ? 'text-confirm' : 'text-danger');
+                name.setCustomValidity(ok ? '' : 'unchecked');
+            }
+            function search() {
+                form.classList.add('was-validated');
+                if (!name.value.trim()) {
+                    form.querySelector('.invalid-feedback').textContent = '엔지니어 이름을 입력해주세요.';
+                    setChecked(false); name.focus(); return;
+                }
+                const ok = ENGINEERS.includes(name.value.trim());
+                setChecked(ok);
+                if (ok) oh.toast('엔지니어가 확인되었습니다.');
+                else form.querySelector('.invalid-feedback').textContent = '엔지니어가 확인되지 않습니다.';
+            }
+
+            setChecked(false);
+            document.getElementById('btnSmsEngSearch').addEventListener('click', search);
+            name.addEventListener('input', () => setChecked(false));
+            name.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); search(); } });
+
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                form.classList.add('was-validated');
+                if (!form.checkValidity()) {
+                    form.querySelector('.invalid-feedback').textContent = '엔지니어 이름이 확인되지 않았습니다.';
+                    return;
+                }
+                if (target.tr && window.smsAddChip) window.smsAddChip(target.tr, name.value.trim());
+                bootstrap.Modal.getInstance(form.closest('.modal')).hide();
+                oh.toast('저장이 완료되었습니다.');
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

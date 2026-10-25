@@ -1,0 +1,10 @@
+/* 당직/순번 관리 · SMS 수신 관리 (CS Webtool egn_assign_*, vendor_assign_*, egn_sms_manager) */
+
+/* 지역/파트너 정보 표 (순번 표 위 key/value 표, DX 화면은 버튼으로 펼치고 접음) */
+.info-title { margin: 0 0 8px; font-size: 16px; color: var(--oh-heading); }
+.info-table { margin-bottom: 15px; }
+table.jambo_table.info-table tbody td.info-key { font-weight: 700; background: #f7f7f7; }
+
+/* SMS 수신 관리: 3. 지연 모니터링 아래 (1)~(5) 소제목 */
+.section-subtitle { margin: 5px 0 8px 10px; font-size: 14px; font-weight: 700; color: var(--oh-heading); }
+.section-subtitle .bi-question-circle { font-size: 14px; color: #73879c; cursor: help; margin-left: 2px; }

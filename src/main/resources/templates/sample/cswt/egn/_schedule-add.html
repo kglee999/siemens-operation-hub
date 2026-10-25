@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 스케쥴 입력/변경 모달 (CS Webtool egn/egn_schedule_add.jsp).
+     구분에 따라 영역 표시: Service 만 병원/장비/Serial, DI + CSE/RSC + Service 면 Travel to 시간 추가 (OSR/Travel to).
+     ?mode=modify 면 "스케쥴 변경" + Memo 입력, Description 은 Office(Standby불가) 일 때만 수정 가능. -->
+<div class="modal fade modal-sched" tabindex="-1" aria-labelledby="scheduleAddTitle" aria-hidden="true" th:fragment="modal"
+     th:with="modify=${param.mode != null and param.mode[0] == 'modify'},startDate=${param.startDate != null ? param.startDate[0] : '2026-10-24'}">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" id="scheduleAddForm" novalidate>
+            <input type="hidden" name="PlantNum" value="96E6">
+            <input type="hidden" name="TeamCode" value="CSE">
+            <input type="hidden" name="EquipmentNo">
+            <input type="hidden" name="mode" th:value="${modify} ? 'modify' : ''">
+            <div class="modal-header">
+                <h5 class="modal-title" id="scheduleAddTitle">
+                    <th:block th:text="${modify} ? '스케쥴 변경' : '신규 스케쥴 등록'">신규 스케쥴 등록</th:block>
+                    <small class="text-navy" th:text="${modify} ? '등록 정보를 수정하실 수 있습니다.' : '스케쥴 등록을 위해 아래 내용을 입력해 주십시오.'">스케쥴 등록을 위해 아래 내용을 입력해 주십시오.</small>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <!-- 스케쥴 관리자(scheduleYn=Y) 화면: 관리자 + 엔지니어 검색 -->
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-sm-3"><span class="col-form-label search-label">관리자</span></div>
+                    <div class="col-sm-9"><p class="form-static">김민준</p></div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-sm-3"><label class="col-form-label search-label" for="schEgnNm">엔지니어</label></div>
+                    <div class="col-sm-9">
+                        <div class="row g-2 align-items-center">
+                            <div class="col-7">
+                                <input type="text" class="form-control" id="schEgnNm" name="egn_nm" placeholder="사번/한글이름/영문이름"
+                                       th:value="${modify} ? '홍길동' : ''" autocomplete="off">
+                            </div>
+                            <div class="col-2"><button type="button" class="btn btn-success w-100" id="btnHrSearch">검색</button></div>
+                            <div class="col-3"><span class="check-status text-danger" id="egnSearchResult">미확인</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sched-sva">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="isSva" id="schIsSva" value="Y">
+                        <label class="form-check-label" for="schIsSva">Real time 미노출</label>
+                    </div>
+                </div>
+
+                <div class="row g-2 align-items-center">
+                    <div class="col-sm-3"><label class="col-form-label search-label" for="schType">구분</label></div>
+                    <div class="col-sm-9">
+                        <select class="form-select" id="schType" name="scheduleType">
+                            <option value="01" selected>Service</option>
+                            <option value="02">Compen</option>
+                            <option value="03">Office(Standby)</option>
+                            <option value="07">Office(Standby불가)</option>
+                            <option value="04">Training(국내)</option>
+                            <option value="06">Training(해외)</option>
+                            <option value="05">Leave</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="ln_solid"></div>
+
+                <!-- Travel to 날짜/시간 (DI + CSE/RSC + Service 일 때만) -->
+                <div class="date-time-2 d-none">
+                    <div class="row g-2 align-items-center mb-2">
+                        <div class="col-sm-3"><label class="col-form-label search-label" for="schDate2From">날짜</label></div>
+                        <div class="col-sm-9">
+                            <div class="input-group sched-date">
+                                <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                                <input type="date" class="form-control" id="schDate2From" name="StartDate2" th:value="${startDate}">
+                                <span class="input-group-text">~</span>
+                                <input type="date" class="form-control" name="FinishDate2" th:value="${startDate}" aria-label="Travel to 종료일">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-2 align-items-center mb-2">
+                        <div class="col-sm-3"><span class="col-form-label search-label">Travel to</span></div>
+                        <div class="col-sm-9 time-range">
+                            <span th:replace="~{sample/cswt/egn/_schedule-add :: timeSel('StartHour2', 'StartMin2')}"></span>
+                            <span>~</span>
+                            <span th:replace="~{sample/cswt/egn/_schedule-add :: timeSel('EndHour2', 'EndMin2')}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- OSR / 일반 날짜·시간 -->
+                <div class="date-time-1">
+                    <div class="row g-2 align-items-center mb-2">
+                        <div class="col-sm-3"><label class="col-form-label search-label" for="schDateFrom">날짜</label></div>
+                        <div class="col-sm-9">
+                            <div class="input-group sched-date">
+                                <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                                <input type="date" class="form-control" id="schDateFrom" name="StartDate" th:value="${startDate}">
+                                <span class="input-group-text">~</span>
+                                <input type="date" class="form-control" name="FinishDate" th:value="${startDate}" aria-label="종료일">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-2 align-items-center mb-2">
+                        <div class="col-sm-3"><span class="col-form-label search-label" id="timeLabel">시간</span></div>
+                        <div class="col-sm-9 time-range">
+                            <span th:replace="~{sample/cswt/egn/_schedule-add :: timeSel('StartHour', 'StartMin')}"></span>
+                            <span>~</span>
+                            <span th:replace="~{sample/cswt/egn/_schedule-add :: timeSel('EndHour', 'EndMin')}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service 일 때만: 병원 / 장비 / Serial -->
+                <div id="scheduleTypeArea">
+                    <div class="row g-2 align-items-center mb-2">
+                        <div class="col-sm-3"><label class="col-form-label search-label" for="schHospital">병원</label></div>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="schHospital" name="Hospital" placeholder="병원명 입력"
+                                   th:value="${modify} ? '서울대학교병원' : ''">
+                        </div>
+                    </div>
+                    <div class="row g-2 align-items-center mb-2">
+                        <div class="col-sm-3"><label class="col-form-label search-label" for="schMachine">장비</label></div>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="schMachine" name="Machine" placeholder="장비명 입력"
+                                   th:value="${modify} ? 'SOMATOM Force' : ''">
+                        </div>
+                    </div>
+                    <div class="row g-2 align-items-start mb-2">
+                        <div class="col-sm-3"><label class="col-form-label search-label" for="schSerial">Serial</label></div>
+                        <div class="col-sm-9">
+                            <div class="mb-1">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="KeyType" id="keySerial" value="SERIAL" checked>
+                                    <label class="form-check-label" for="keySerial">Serial NO</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="KeyType" id="keySystem" value="SYSTEM">
+                                    <label class="form-check-label" for="keySystem">System ID</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="KeyType" id="keyFl" value="FL">
+                                    <label class="form-check-label" for="keyFl">FL</label>
+                                </div>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-8">
+                                    <input type="text" class="form-control" id="schSerial" name="Serial" placeholder="시리얼 넘버 입력"
+                                           th:value="${modify} ? '73512' : ''">
+                                </div>
+                                <div class="col-4"><button type="button" class="btn btn-success w-100" id="btnSerialSearch">검색</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-sm-3"><label class="col-form-label search-label" for="schDesc">Description</label></div>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="schDesc" name="Description" placeholder="간단한 설명"
+                               th:value="${modify} ? '정기 PM (Tube 점검 포함)' : ''" th:disabled="${modify}">
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center mb-2" th:if="${modify}">
+                    <div class="col-sm-3"><label class="col-form-label search-label" for="schMemo">Memo</label></div>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="schMemo" name="Memo" placeholder="추가 사항">
+                    </div>
+                </div>
+
+                <!-- Serial 검색 결과 선택 -->
+                <div class="d-none" id="hospitalList">
+                    <p class="modal-result-title text-center">해당하는 내역을 선택해 주십시오</p>
+                    <div class="scroll-box">
+                        <table class="table table-striped jambo_table">
+                            <thead>
+                            <tr>
+                                <th id="keyTypeTitle">시리얼 넘버</th>
+                                <th>병원명</th>
+                                <th>장비명</th>
+                            </tr>
+                            </thead>
+                            <tbody id="hospitalRows"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="btnScheduleDelete" th:if="${modify}">삭제</button>
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+                <button type="submit" class="btn btn-success">저장하기</button>
+            </div>
+        </form>
+    </div>
+    <script th:inline="none">
+        (function () {
+            const form = document.getElementById('scheduleAddForm');
+            const modal = form.closest('.modal');
+            const type = form.scheduleType;
+            const modify = form.mode.value === 'modify';
+            const desc = form.Description;
+            const oriDesc = desc.value;
+            const $ = sel => form.querySelector(sel);
+            const setTime = (name, v) => { form.elements[name].value = v; };
+
+            // 시작값: 신규는 09:00 ~ 18:00, Travel to 08:00 ~ 09:00
+            [['StartHour', '09'], ['EndHour', '18'], ['StartHour2', '08'], ['EndHour2', '09']].forEach(a => setTime(a[0], a[1]));
+
+            // 24시를 고르면 분은 00 만
+            function validMinute(hour) {
+                const min = hour.closest('.time-select').querySelector('.minuteselect');
+                const is24 = hour.value === '24';
+                if (is24) min.value = '00';
+                [...min.options].forEach(o => { o.disabled = is24 && o.value !== '00'; });
+            }
+            form.querySelectorAll('.hourselect').forEach(h => {
+                h.addEventListener('change', () => validMinute(h));
+                validMinute(h);
+            });
+            // Travel to 종료 시각 = OSR 시작 시각
+            form.EndHour2.addEventListener('change', () => { form.StartHour.value = form.EndHour2.value; validMinute(form.StartHour); });
+            form.EndMin2.addEventListener('change', () => { form.StartMin.value = form.EndMin2.value; });
+
+            // DI + CSE/RSC + Service 이면 Travel to / OSR 두 줄
+            function secondTimeDisplay() {
+                const active = form.PlantNum.value === '96E6' && ['CSE', 'RSC'].includes(form.TeamCode.value) && type.value === '01';
+                $('.date-time-2').classList.toggle('d-none', !active);
+                $('#timeLabel').textContent = active ? 'OSR' : '시간';
+            }
+
+            function changeServiceType() {
+                const v = type.value;
+                $('#scheduleTypeArea').classList.toggle('d-none', v !== '01');
+                if (v !== '01') $('#hospitalList').classList.add('d-none');
+                // Leave 는 09:00 ~ 18:00 자동
+                if (v === '05') { setTime('StartHour', '09'); setTime('StartMin', '00'); setTime('EndHour', '18'); setTime('EndMin', '00'); }
+                // 변경 화면: Description 은 Office(Standby불가) 일 때만 수정
+                if (modify) { desc.value = oriDesc; desc.disabled = v !== '07'; }
+                secondTimeDisplay();
+            }
+            type.addEventListener('change', changeServiceType);
+            changeServiceType();
+
+            // 엔지니어 검색 (샘플: 입력하면 확인됨)
+            const result = $('#egnSearchResult');
+            let egnChecked = false;
+            function checkEgn(alert) {
+                const name = form.egn_nm.value.trim();
+                egnChecked = !!name;
+                result.textContent = name || '미확인';
+                result.className = 'check-status ' + (name ? 'text-confirm' : 'text-danger');
+                if (alert) oh.toast(name ? '엔지니어가 확인되었습니다.' : '엔지니어가 확인되지 않습니다.', name ? 'success' : 'warning');
+            }
+            $('#btnHrSearch').addEventListener('click', () => {
+                if (!form.egn_nm.value.trim()) { oh.toast('엔지니어 사번/한글이름/영문이름을 입력해주세요.', 'warning'); form.egn_nm.focus(); return; }
+                checkEgn(true);
+            });
+            form.egn_nm.addEventListener('input', () => { egnChecked = false; result.textContent = '미확인'; result.className = 'check-status text-danger'; });
+            if (modify) checkEgn(false);
+
+            // Serial 키 종류에 따라 입력 안내 바꿈
+            const KEY_TEXT = { SERIAL: '시리얼 넘버', SYSTEM: '시스템 아이디', FL: 'FUNC LOC' };
+            form.querySelectorAll('[name=KeyType]').forEach(r => r.addEventListener('change', () => {
+                form.Serial.value = '';
+                form.Serial.placeholder = KEY_TEXT[r.value] + ' 입력';
+            }));
+
+            // Serial 검색 -> 결과 목록에서 선택하면 병원/장비/Serial 채움 (샘플 데이터)
+            const ROWS = [
+                { serial: '73512', system: '400-123456', fl: '1000234517', hosp: '서울대학교병원', equip: 'SOMATOM Force', no: '30018842' },
+                { serial: '73518', system: '400-123519', fl: '1000234602', hosp: '분당서울대학교병원', equip: 'SOMATOM Drive', no: '30018907' },
+                { serial: '73540', system: '400-124077', fl: '1000235011', hosp: '서울아산병원', equip: 'NAEOTOM Alpha', no: '30019230' },
+                { serial: '73577', system: '400-124390', fl: '', hosp: '강남세브란스병원', equip: 'SOMATOM go.Top', no: '30019518' }
+            ];
+            $('#btnSerialSearch').addEventListener('click', () => {
+                if (form.Serial.value.trim().length < 3) { oh.toast('3글자 이상 넣으세요.', 'warning'); form.Serial.focus(); return; }
+                const key = form.querySelector('[name=KeyType]:checked').value;
+                const field = key === 'SYSTEM' ? 'system' : key === 'FL' ? 'fl' : 'serial';
+                $('#keyTypeTitle').textContent = KEY_TEXT[key];
+                const tbody = $('#hospitalRows');
+                tbody.innerHTML = '';
+                ROWS.forEach(r => {
+                    const tr = document.createElement('tr');
+                    tr.dataset.no = r.no;
+                    tr.innerHTML = '<td><button type="button" class="btn btn-info btn-sm"></button></td><td></td><td></td>';
+                    tr.cells[0].firstChild.textContent = r[field] || '없음';
+                    tr.cells[1].textContent = r.hosp;
+                    tr.cells[2].textContent = r.equip;
+                    tbody.appendChild(tr);
+                });
+                $('#hospitalList').classList.remove('d-none');
+            });
+            $('#hospitalRows').addEventListener('click', e => {
+                const tr = e.target.closest('tr');
+                if (!tr) return;
+                form.EquipmentNo.value = tr.dataset.no;
+                form.Serial.value = tr.cells[0].textContent;
+                form.Hospital.value = tr.cells[1].textContent;
+                form.Machine.value = tr.cells[2].textContent;
+                tr.parentNode.querySelectorAll('tr.selected').forEach(x => x.classList.remove('selected'));
+                tr.classList.add('selected');
+            });
+
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                if (!modify && form.egn_nm.value.trim() && !egnChecked) { oh.toast('엔지니어가 확인되지 않았습니다.', 'warning'); return; }
+                if (type.value === '07' && !desc.value.trim()) { oh.toast('Description 작성이 필요합니다.', 'warning'); desc.focus(); return; }
+                bootstrap.Modal.getInstance(modal).hide();
+                oh.toast(modify ? '스케쥴이 업데이트 되었습니다.' : '스케쥴이 저장되었습니다.');
+            });
+
+            const del = $('#btnScheduleDelete');
+            if (del) del.addEventListener('click', () => {
+                oh.confirm('스케쥴을 삭제하시겠습니까?', { okText: '삭제' }).then(ok => {
+                    if (!ok) return;
+                    bootstrap.Modal.getInstance(modal).hide();
+                    oh.toast('스케쥴이 삭제되었습니다.');
+                });
+            });
+        })();
+    </script>
+</div>
+
+<!-- 시:분 선택 (CS Webtool calendar-time). 위 모달에서 4번 씀 -->
+<span class="time-select" th:fragment="timeSel(h, m)">
+    <select class="form-select hourselect" th:name="${h}" th:attr="aria-label=${h}">
+        <option th:each="i : ${#numbers.sequence(0, 24)}" th:text="${#numbers.formatInteger(i, 2)}">00</option>
+    </select>
+    <span>:</span>
+    <select class="form-select minuteselect" th:name="${m}" th:attr="aria-label=${m}">
+        <option th:each="i : ${#numbers.sequence(0, 50, 10)}" th:text="${#numbers.formatInteger(i, 2)}">00</option>
+    </select>
+</span>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 파트너사 이관 (CS Webtool egn/disp/call_partner_esc.jsp). 파트너사를 고르면 그 회사의 당직 엔지니어 표시.
+     nosid=1 이면 SYSTEM ID 입력칸 표시 -->
+<div class="modal fade" tabindex="-1" aria-labelledby="dispPartnerEscTitle" aria-hidden="true" th:fragment="modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" novalidate>
+            <div class="modal-header">
+                <h5 class="modal-title" id="dispPartnerEscTitle">파트너사 이관</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 align-items-start mb-2" th:if="${param.nosid != null}">
+                    <div class="col-sm-3"><label class="col-form-label text-sm-end d-block" for="peSystemId">SYSTEM ID</label></div>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="peSystemId" name="system_id" placeholder="SYSTEM_ID 입력" required>
+                        <div class="invalid-feedback">SYSTEM_ID 를 입력해주세요.</div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-sm-3"><label class="col-form-label text-sm-end d-block" for="peVendor">파트너사 선택</label></div>
+                    <div class="col-sm-9">
+                        <select class="form-select" id="peVendor" name="reassgn_vendor" required>
+                            <option value="">선택</option>
+                            <option value="V1001">[DI] 메디텍솔루션</option>
+                            <option value="V1002">[DI] 한빛메디칼</option>
+                            <option value="V1003">[DI] 영남의료기술</option>
+                            <option value="V2001">[DX] 바이오랩서비스</option>
+                            <option value="V2002">[DX] 진단엔지니어링</option>
+                        </select>
+                        <div class="invalid-feedback">파트너사를 선택해주세요.</div>
+                    </div>
+                </div>
+                <div class="row g-2 mb-2">
+                    <div class="col-sm-3"><span class="col-form-label text-sm-end d-block fw-bold">엔지니어</span></div>
+                    <div class="col-sm-9">
+                        <div class="scroll-box disp-vendor-box">
+                            <table class="table table-striped jambo_table">
+                                <colgroup>
+                                    <col style="width: 40%;">
+                                    <col style="width: 20%;">
+                                    <col>
+                                </colgroup>
+                                <tbody id="peVendorRows"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-2">
+                    <div class="col-sm-3"><label class="col-form-label text-sm-end d-block" for="peOsrRem">처리내역</label></div>
+                    <div class="col-sm-9">
+                        <textarea class="form-control" rows="10" id="peOsrRem" name="osr_rem" placeholder="처리내역을 입력하세요" required></textarea>
+                        <div class="invalid-feedback">처리내역을 입력해주세요.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+                <button type="submit" class="btn btn-success">저장하기</button>
+            </div>
+        </form>
+    </div>
+    <script th:inline="none">
+        (function () {
+            var modal = document.currentScript.closest('.modal');
+            var form = modal.querySelector('form');
+            var rows = modal.querySelector('#peVendorRows');
+            // 샘플 파트너사 당직 엔지니어 (실제로는 /egn/disp/getPartnerSchedule 조회): [순번, 이름, 연락처]
+            var SCHEDULE = {
+                V1001: [['1순위', '송재원', '010-2211-3344'], ['2순위', '배성호', '010-5566-7788']],
+                V1002: [['1순위', '문태식', '010-3141-5926']],
+                V1003: [['1순위', '조형준', '010-2718-2818'], ['2순위', '권나래', '010-1618-0339'], ['3순위', '류승범', '010-4142-1356'], ['4순위', '장민호', '010-7788-1122']],
+                V2001: [['1순위', '신동훈', '010-9876-5432']],
+                V2002: []
+            };
+            form.reassgn_vendor.addEventListener('change', function () {
+                rows.replaceChildren();
+                (SCHEDULE[this.value] || []).forEach(function (item) {
+                    var tr = document.createElement('tr');
+                    item.forEach(function (v) { var td = document.createElement('td'); td.textContent = v; tr.appendChild(td); });
+                    rows.appendChild(tr);
+                });
+            });
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                form.classList.add('was-validated');
+                var bad = form.querySelector(':invalid');
+                if (bad) { bad.focus(); return; }
+                bootstrap.Modal.getInstance(modal).hide();
+                oh.toast('저장이 완료되었습니다.', 'success');
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

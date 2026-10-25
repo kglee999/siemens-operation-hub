@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>RPA 작동 현황</title>
+    <link rel="stylesheet" th:href="@{/assets/css/cswt/mng.css}">
+</head>
+<body>
+<!-- CS Webtool mng/mng_batch_info.jsp: 다섯 구역(RPA 동작 현황 / IVK 정보 업데이트 주기 / RPA4 배치 수행 결과 /
+     IVK 배치 수행 결과(기간) / CSE·Apps 업무현황 배치 수행 결과(RPA2, 날짜)) -->
+<main layout:fragment="content">
+    <div class="page-title"><h3>RPA 작동 현황</h3></div>
+
+    <!-- RPA 동작 현황 -->
+    <div class="x_panel">
+        <div class="x_content">
+            <h3 class="section-title">RPA 동작 현황</h3>
+            <div class="table-responsive">
+                <table class="table table-striped jambo_table batch-table">
+                    <colgroup>
+                        <col style="width: 80px;">
+                        <col style="width: 180px;">
+                        <col style="width: 180px;">
+                        <col style="width: 110px;">
+                        <col style="width: 110px;">
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>PC_ID</th>
+                        <th>RPA 작업종료시간</th>
+                        <th>SMS 문자발송시간</th>
+                        <th>RPA 동작체크<br>주기(분)</th>
+                        <th>문자 발송횟수<br>(최대 4회)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr><td>RPA1</td><td>2026-10-24 10:41:07</td><td>2026-10-21 03:15:00</td><td>30</td><td>0</td></tr>
+                    <tr><td>RPA2</td><td>2026-10-24 10:38:52</td><td>2026-10-18 22:45:00</td><td>30</td><td>0</td></tr>
+                    <tr><td>RPA3</td><td>2026-10-24 10:40:19</td><td>-</td><td>60</td><td>0</td></tr>
+                    <tr><td>RPA4</td><td>2026-10-24 10:03:45</td><td>2026-10-24 06:30:00</td><td>20</td><td>2</td></tr>
+                    <tr class="row-note">
+                        <td colspan="5" class="a-left">※ 현재시간 &gt; RPA작업종료시간+체크주기 일 경우 RPA 가 동작하지 않는 것으로 판단하여 문자를 최대 4회까지 발송합니다.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- IVK 정보 업데이트 주기 -->
+    <div class="x_panel">
+        <div class="x_content">
+            <h3 class="section-title">IVK 정보 업데이트 주기</h3>
+            <div class="table-responsive">
+                <table class="table table-striped jambo_table batch-table info-table">
+                    <colgroup>
+                        <col class="info-key">
+                        <col>
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <td class="a-left a-bold">RPA → WEB-TOOL 장비 배치</td>
+                        <td class="a-left">근무날 9시 ~ 오후 5시 30분 실행<br>RPA4 종료 이후 5분 이내 실행</td>
+                    </tr>
+                    <tr>
+                        <td class="a-left a-bold">SI CLOUD → WEB-TOOL 장비 배치</td>
+                        <td class="a-left">근무날 10시, 14시, 16시 실행</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- RPA4 배치 수행 결과 -->
+    <div class="x_panel">
+        <div class="x_content">
+            <h3 class="section-title">RPA4 배치 수행 결과</h3>
+            <div class="table-responsive">
+                <table class="table table-striped jambo_table batch-table info-table">
+                    <colgroup>
+                        <col class="info-key">
+                        <col>
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <td class="a-left a-bold">RPA_UPLOAD_INFO 시간</td>
+                        <td class="a-left">2026-10-24 10:00:12</td>
+                    </tr>
+                    <tr>
+                        <td class="a-left a-bold">PC_LIVE 수행시간</td>
+                        <td class="a-left">2026-10-24 10:03:45</td>
+                    </tr>
+                    <tr>
+                        <td class="a-left a-bold">RPA_UPLOAD_INFO 수행여부</td>
+                        <td class="a-left">N</td>
+                    </tr>
+                    <tr>
+                        <td class="a-left a-bold">WEB-TOOL 실행 가능여부 조건</td>
+                        <td class="a-left">RPA_UPLOAD_INFO 시간과 PC_LIVE 수행시간이 10분이내여야 하고,<br>RPA_UPLOAD_INFO 수행여부가 N 이 되어야 수행됩니다.</td>
+                    </tr>
+                    <tr>
+                        <td class="a-left a-bold">WEB-TOOL 실행 가능여부 (OK 시 곧 실행됩니다.)</td>
+                        <td class="a-left a-bold"><span class="text-blue">OK</span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- IVK 배치 수행 결과 (기간 선택) -->
+    <div class="x_panel">
+        <div class="x_content">
+            <h3 class="section-title">IVK 배치 수행 결과</h3>
+            <div class="row g-2 mb-3">
+                <div class="col-lg-4 col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                        <input type="date" class="form-control" id="ivkFrom" value="2026-10-20" aria-label="시작일">
+                        <span class="input-group-text">~</span>
+                        <input type="date" class="form-control" id="ivkTo" value="2026-10-24" aria-label="종료일">
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped jambo_table batch-table">
+                    <colgroup>
+                        <col style="width: 80px;">
+                        <col style="width: 110px;">
+                        <col style="width: 180px;">
+                        <col style="width: 90px;">
+                        <col>
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>순번</th>
+                        <th>TYPE</th>
+                        <th>실행시간</th>
+                        <th>작업결과</th>
+                        <th>작업내용</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr><td>1842</td><td>RPA</td><td>2026-10-24 10:05:31</td><td><span class="text-blue">성공</span></td><td class="a-left">장비 정보 12,418건 반영 (신규 1건, 변경 3건)</td></tr>
+                    <tr><td>1841</td><td>SI CLOUD</td><td>2026-10-24 10:00:08</td><td><span class="text-blue">성공</span></td><td class="a-left">SI CLOUD 계약/상태 정보 12,402건 반영</td></tr>
+                    <tr><td>1840</td><td>RPA</td><td>2026-10-23 16:04:12</td><td><span class="text-blue">성공</span></td><td class="a-left">장비 정보 12,417건 반영 (신규 1건, 변경 2건)</td></tr>
+                    <tr><td>1839</td><td>SI CLOUD</td><td>2026-10-23 16:00:05</td><td><span class="text-red">실패</span></td><td class="a-left">SI CLOUD 응답 시간 초과 (Read timed out)</td></tr>
+                    <tr><td>1838</td><td>SI CLOUD</td><td>2026-10-23 14:00:07</td><td><span class="text-blue">성공</span></td><td class="a-left">SI CLOUD 계약/상태 정보 12,399건 반영</td></tr>
+                    <tr><td>1837</td><td>RPA</td><td>2026-10-23 10:04:58</td><td><span class="text-blue">성공</span></td><td class="a-left">장비 정보 12,416건 반영 (변경 1건)</td></tr>
+                    <tr><td>1836</td><td>RPA</td><td>2026-10-22 16:03:40</td><td><span class="text-red">실패</span></td><td class="a-left">RPA_UPLOAD_INFO 파일 없음</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- CSE/Apps 업무현황 배치 수행 결과 (RPA2, 날짜 선택) -->
+    <div class="x_panel">
+        <div class="x_content">
+            <h3 class="section-title">CSE/Apps 업무현황 배치 수행 결과 (RPA2)</h3>
+            <div class="row g-2 mb-3">
+                <div class="col-lg-4 col-md-6">
+                    <div class="input-group input-date">
+                        <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                        <input type="date" class="form-control" id="rpa2date" value="2026-10-24" aria-label="RPA 수행날짜">
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped jambo_table batch-table" id="rpa2Status">
+                    <thead>
+                    <tr>
+                        <th>순번</th>
+                        <th>RPA 수행날짜</th>
+                        <th>RPA 시작날짜</th>
+                        <th>RPA 종료날짜</th>
+                        <th>WEB<br>수행여부</th>
+                        <th>WEB<br>시작날짜 (당일)</th>
+                        <th>WEB<br>종료날짜 (당일)</th>
+                        <th>WEB<br>처리건수 (당일)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr><td>3</td><td>2026-10-24</td><td>2026-10-24 09:00:02</td><td>2026-10-24 09:41:37</td><td>Y</td><td>2026-10-24 09:45:00</td><td>2026-10-24 09:46:12</td><td>1,284</td></tr>
+                    <tr><td>2</td><td>2026-10-24</td><td>2026-10-24 06:00:01</td><td>2026-10-24 06:39:55</td><td>Y</td><td>2026-10-24 06:45:00</td><td>2026-10-24 06:45:58</td><td>1,127</td></tr>
+                    <tr><td>1</td><td>2026-10-24</td><td>2026-10-24 03:00:03</td><td>2026-10-24 03:42:18</td><td>Y</td><td>2026-10-24 03:45:00</td><td>2026-10-24 03:46:05</td><td>1,098</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script>
+        (function () {
+            // 원본은 날짜를 바꾸면 다시 조회. 샘플은 안내만 표시
+            ['ivkTo', 'rpa2date'].forEach(id => document.getElementById(id).addEventListener('change', e => {
+                if (e.target.value) oh.toast('조회 기간이 변경되었습니다.');
+            }));
+        })();
+    </script>
+</th:block>
+</body>
+</html>

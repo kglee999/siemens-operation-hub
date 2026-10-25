@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>통합 IVK 정보관리</title>
+</head>
+<body>
+<!-- CS Webtool mng/mng_ivk_info.jsp: GG 검색 / 장비 변경 이력 목록 / 페이징.
+     신규 장비(A1) 이력은 작업 칸의 "신규 장비 확인" 으로 IVK 상세현황 모달을 연다 -->
+<main layout:fragment="content">
+    <div class="page-title"><h3>통합 IVK 정보관리</h3></div>
+
+    <form id="searchForm" method="get" th:action="@{/sample/cswt/mng/ivk-info}">
+        <input type="hidden" name="pageNo" value="1">
+        <div class="x_panel">
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-1 col-md-2"><label class="search-label" for="searchNum">GG</label></div>
+                    <div class="col-lg-3 col-md-4"><input type="text" class="form-control" id="searchNum" name="searchNum" placeholder="GG 입력"></div>
+                    <div class="col-auto">
+                        <div class="btn-row">
+                            <button class="btn btn-success" type="submit">검색하기</button>
+                            <button class="btn btn-success" type="button" id="btnExcel">엑셀받기</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="x_panel">
+        <div class="x_content">
+            <div class="table-responsive">
+                <table class="table table-striped jambo_table" id="tableList">
+                    <thead>
+                    <tr>
+                        <th>작업일자</th>
+                        <th style="width: 100px;">Serial NO</th>
+                        <th style="width: 100px;">System ID</th>
+                        <th>장비명</th>
+                        <th>고객사명</th>
+                        <th style="width: 100px;">GG</th>
+                        <th>변경사항</th>
+                        <th style="width: 100px;">작업</th>
+                    </tr>
+                    </thead>
+                    <tbody th:with="detailUrl=@{/sample/cswt/mng/modal/ivk-detail}">
+                    <tr>
+                        <td>2026-10-24 10:05</td><td>182044</td><td>400-127310</td><td>SOMATOM X.cite</td><td>강남세브란스병원</td><td>CT</td>
+                        <td>신규 장비 등록</td>
+                        <td><a href="#" class="ivk-detail-view" th:attr="data-modal-url=${detailUrl}">신규 장비 확인</a></td>
+                    </tr>
+                    <tr>
+                        <td>2026-10-24 10:05</td><td>175023</td><td>400-123987</td><td>MAGNETOM Vida</td><td>세브란스병원</td><td>MR</td>
+                        <td>System Status 변경 (Maint → On Call)</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>2026-10-23 16:02</td><td>A3188</td><td>400-127295</td><td>Atellica CH 930</td><td>삼성서울병원</td><td>LAB</td>
+                        <td>신규 장비 등록</td>
+                        <td><a href="#" class="ivk-detail-view" th:attr="data-modal-url=${detailUrl}">신규 장비<br>확인완료</a></td>
+                    </tr>
+                    <tr>
+                        <td>2026-10-23 14:01</td><td>108452</td><td>400-123456</td><td>SOMATOM Force</td><td>서울대학교병원</td><td>CT</td>
+                        <td>1st CSE 변경 (홍길동 → 김철수)</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>2026-10-23 10:04</td><td>SN30482</td><td>400-125398</td><td>ACUSON Sequoia</td><td>경북대학교병원</td><td>US</td>
+                        <td>Service By 변경 (Siemens → 한빛메디칼)</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>2026-10-22 16:03</td><td>20871</td><td>400-124733</td><td>ARTIS icono</td><td>서울아산병원</td><td>AX</td>
+                        <td>Contract hnm 변경 (계약 → 미계약)</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>2026-10-22 10:02</td><td>1187</td><td>400-127188</td><td>Biograph Vision Quadra</td><td>분당서울대학교병원</td><td>MI</td>
+                        <td>신규 장비 등록</td>
+                        <td><a href="#" class="ivk-detail-view" th:attr="data-modal-url=${detailUrl}">신규 장비<br>확인완료</a></td>
+                    </tr>
+                    <tr>
+                        <td>2026-10-21 14:05</td><td>40917</td><td>400-125712</td><td>YSIO X.pree</td><td>전남대학교병원</td><td>XP</td>
+                        <td>Func Loc 변경 (KR03 → KR04)</td>
+                        <td></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <nav aria-label="페이지 이동">
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" href="#" aria-label="처음">&laquo;</a></li>
+                    <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#" aria-label="마지막">&raquo;</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script>
+        (function () {
+            document.addEventListener('click', e => {
+                const view = e.target.closest('.ivk-detail-view');
+                if (view) { e.preventDefault(); oh.modal.open(view.dataset.modalUrl); return; }
+                if (e.target.closest('#btnExcel')) oh.toast('엑셀 파일을 내려받습니다.');
+            });
+        })();
+    </script>
+</th:block>
+</body>
+</html>

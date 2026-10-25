@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- TpF/근무시간 SMS 수신 관리 추가/수정 모달 (CS Webtool adm/adm_manager_add.jsp).
+     사용자 NO 검색으로 인사정보를 채우고, 담당 Plant 라디오에 따라 담당 Team / Modality(DI만) / Region 체크박스를 고름.
+     수정(mode=modify)은 목록 줄의 값(param.*)으로 채우고 Manager Type · 사용자 NO 는 바꿀 수 없음. -->
+<div class="modal fade" tabindex="-1" aria-labelledby="managerAddTitle" aria-hidden="true" th:fragment="modal"
+     th:with="modify=${param.mode != null and param.mode[0] == 'modify'},
+              sendType=${param.sendType != null ? param.sendType[0] : 'CC'},
+              sendPlant=${param.sendPlant != null ? param.sendPlant[0] : '96E6'},
+              pEmpl=${param.emplNum != null ? param.emplNum[0] : null},
+              pTeam=${param.sendTeam != null ? param.sendTeam[0] : null},
+              pModality=${param.sendModality != null ? param.sendModality[0] : null},
+              pRegion=${param.sendRegion != null ? param.sendRegion[0] : null},
+              pAll=${param.sendAll != null ? param.sendAll[0] : null}">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" id="managerAddForm" novalidate
+              th:data-empl-num="${pEmpl}" th:data-send-team="${pTeam}" th:data-send-modality="${pModality}"
+              th:data-send-region="${pRegion}" th:data-send-all="${pAll}">
+            <div class="modal-header">
+                <h5 class="modal-title" id="managerAddTitle">TpF/근무시간 SMS 수신 관리 <small class="text-navy d-block ms-0 mt-1">TpF/근무시간 SMS 수신 관리 설정을 추가/수정하실 수 있습니다.</small></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4"><label class="col-form-label" for="mgSendType">Manager Type</label></div>
+                    <div class="col-8">
+                        <select class="form-select" id="mgSendType" name="send_type" th:disabled="${modify}">
+                            <option value="CC" th:selected="${sendType == 'CC'}">TpF 발송</option>
+                            <option value="WN" th:selected="${sendType == 'WN'}">근무시간 안내</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-4"><label class="col-form-label" for="mgEmplNum">사용자 NO</label></div>
+                    <div class="col-5">
+                        <input type="text" class="form-control" id="mgEmplNum" name="empl_num" placeholder="사용자 NO" th:readonly="${modify}">
+                        <div class="invalid-feedback">사용자 NO 를 검색해 주세요.</div>
+                    </div>
+                    <div class="col-3">
+                        <button type="button" class="btn btn-success" id="btnManagerSearch" th:disabled="${modify}">검색</button>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4"><label class="col-form-label" for="mgEmplName">사용자명</label></div>
+                    <div class="col-8"><input type="text" class="form-control" id="mgEmplName" name="EmplName" disabled></div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4"><label class="col-form-label" for="mgPlantName">Plant</label></div>
+                    <div class="col-8"><input type="text" class="form-control" id="mgPlantName" name="PlantName" readonly></div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4"><label class="col-form-label" for="mgTeamName">Team</label></div>
+                    <div class="col-8"><input type="text" class="form-control" id="mgTeamName" name="TeamName" disabled></div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4"><label class="col-form-label" for="mgRegion">Region</label></div>
+                    <div class="col-8"><input type="text" class="form-control" id="mgRegion" name="region" disabled></div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4"><label class="col-form-label" for="mgPhone">Mobile</label></div>
+                    <div class="col-8"><input type="text" class="form-control" id="mgPhone" name="Phone" disabled></div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4"><label class="col-form-label" for="mgEmail">E-mail</label></div>
+                    <div class="col-8"><input type="text" class="form-control" id="mgEmail" name="Email" disabled></div>
+                </div>
+
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-4"><span class="col-form-label d-block">담당 Plant</span></div>
+                    <div class="col-8">
+                        <div class="check-panel plant-area">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="send_plant_num" id="mgPlantDi" value="96E6" th:checked="${sendPlant != '94E6'}">
+                                <label class="form-check-label" for="mgPlantDi">DI</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="send_plant_num" id="mgPlantDx" value="94E6" th:checked="${sendPlant == '94E6'}">
+                                <label class="form-check-label" for="mgPlantDx">DX</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-4"><span class="col-form-label d-block">담당 Team</span></div>
+                    <div class="col-8">
+                        <div class="check-panel check-area" data-name="team">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="mgTeamAll" value="ALL">
+                                <label class="form-check-label" for="mgTeamAll">ALL</label>
+                            </div>
+                            <div class="form-check form-check-inline" data-plant="96E6" th:each="t, s : ${ {'AX','CT','MI','MR','XP','Apps'} }">
+                                <input class="form-check-input" type="checkbox" name="send_team" th:id="|mgTeamI${s.count}|" th:value="${t}">
+                                <label class="form-check-label" th:for="|mgTeamI${s.count}|" th:text="${t}">AX</label>
+                            </div>
+                            <div class="form-check form-check-inline" data-plant="94E6" th:each="t, s : ${ {'FSE','학술'} }">
+                                <input class="form-check-input" type="checkbox" name="send_team" th:id="|mgTeamX${s.count}|" th:value="${t}">
+                                <label class="form-check-label" th:for="|mgTeamX${s.count}|" th:text="${t}">FSE</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start mb-2" id="mgModalityRow">
+                    <div class="col-4"><span class="col-form-label d-block">담당 Modality</span></div>
+                    <div class="col-8">
+                        <div class="check-panel check-area" data-name="modality">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="mgModAll" value="ALL">
+                                <label class="form-check-label" for="mgModAll">ALL</label>
+                            </div>
+                            <div class="form-check form-check-inline" data-plant="96E6" th:each="t, s : ${ {'AX','CT','MR','MI'} }">
+                                <input class="form-check-input" type="checkbox" name="send_modality" th:id="|mgMod${s.count}|" th:value="${t}">
+                                <label class="form-check-label" th:for="|mgMod${s.count}|" th:text="${t}">AX</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-4"><span class="col-form-label d-block">담당 Region</span></div>
+                    <div class="col-8">
+                        <div class="check-panel check-area" data-name="region">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="mgRegAll" value="ALL">
+                                <label class="form-check-label" for="mgRegAll">ALL</label>
+                            </div>
+                            <div class="form-check form-check-inline" data-plant="96E6" th:each="t, s : ${ {'SG','RE','RW'} }">
+                                <input class="form-check-input" type="checkbox" name="send_region" th:id="|mgRegI${s.count}|" th:value="${t}">
+                                <label class="form-check-label" th:for="|mgRegI${s.count}|" th:text="${t}">SG</label>
+                            </div>
+                            <div class="form-check form-check-inline" data-plant="94E6" th:each="t, s : ${ {'SN','SS','RE','RW'} }">
+                                <input class="form-check-input" type="checkbox" name="send_region" th:id="|mgRegX${s.count}|" th:value="${t}">
+                                <label class="form-check-label" th:for="|mgRegX${s.count}|" th:text="${t}">SN</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start">
+                    <div class="col-4"><label class="col-form-label" for="mgSendAll">DI, DX 모두 발송</label></div>
+                    <div class="col-8">
+                        <div class="check-panel">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" name="send_all_yn" id="mgSendAll" value="Y" aria-label="DI, DX 모두 발송">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="btnManagerDelete">삭제</button>
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+                <button type="submit" class="btn btn-success">저장하기</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            const form = document.getElementById('managerAddForm');
+            const modal = form.closest('.modal');
+            // 인사정보 (CS Webtool /adm/admManager/getHrData 대신)
+            const HR = {
+                '100231': ['홍길동', 'DI', 'CT', 'SG', '010-2345-1001', 'gildong.hong@example.com'],
+                '100245': ['김철수', 'DI', 'CT', 'RE', '010-2345-1002', 'cheolsu.kim@example.com'],
+                '100318': ['이영희', 'DI', 'CT', 'RW', '010-2345-1003', 'younghee.lee@example.com'],
+                '100402': ['박민수', 'DI', 'MR', 'SG', '010-2345-1004', 'minsu.park@example.com'],
+                '100417': ['최지원', 'DI', 'MR', 'RE', '010-2345-1005', 'jiwon.choi@example.com'],
+                '200114': ['강서준', 'DX', 'FSE', 'SN', '010-3456-2001', 'seojun.kang@example.com'],
+                '200127': ['윤지우', 'DX', 'FSE', 'SS', '010-3456-2002', 'jiwoo.yoon@example.com'],
+                '200231': ['임도윤', 'DX', '학술', 'RE', '010-3456-2003', 'doyun.lim@example.com']
+            };
+            const HR_FIELDS = ['EmplName', 'PlantName', 'TeamName', 'region', 'Phone', 'Email'];
+            let found = null;
+
+            function fillHr(no) {
+                const row = HR[no];
+                found = row ? no : null;
+                HR_FIELDS.forEach((n, i) => { form[n].value = row ? row[i] : ''; });
+                form.empl_num.classList.toggle('is-invalid', !row);
+                return !!row;
+            }
+
+            // 체크박스 묶음: Plant 필터 + ALL 전체 선택
+            const areas = [...form.querySelectorAll('.check-area')];
+            const items = area => [...area.querySelectorAll('.form-check[data-plant]')].filter(fc => !fc.hidden).map(fc => fc.querySelector('input'));
+            const allBox = area => area.querySelector('input[value=ALL]');
+            const sync = area => { const l = items(area); allBox(area).checked = l.length > 0 && l.every(i => i.checked); };
+            function loadCheckbox() {
+                const p = form.querySelector('[name=send_plant_num]:checked').value;
+                form.querySelectorAll('.form-check[data-plant]').forEach(fc => {
+                    fc.hidden = fc.dataset.plant !== p;
+                    if (fc.hidden) fc.querySelector('input').checked = false;
+                });
+                document.getElementById('mgModalityRow').hidden = p !== '96E6';
+                areas.forEach(sync);
+            }
+            areas.forEach(area => area.addEventListener('change', e => {
+                if (e.target === allBox(area)) items(area).forEach(i => { i.checked = e.target.checked; });
+                else sync(area);
+            }));
+            form.querySelectorAll('[name=send_plant_num]').forEach(r => r.addEventListener('change', loadCheckbox));
+
+            // 수정: 목록 값으로 채움
+            const d = form.dataset;
+            if (d.emplNum) {
+                form.empl_num.value = d.emplNum;
+                fillHr(d.emplNum);
+                const check = (name, csv) => (csv || '').split(',').forEach(v => {
+                    form.querySelectorAll('[name=' + name + ']').forEach(i => { if (i.value === v) i.checked = true; });
+                });
+                check('send_team', d.sendTeam);
+                check('send_modality', d.sendModality);
+                check('send_region', d.sendRegion);
+                form.send_all_yn.checked = d.sendAll === 'Y';
+            }
+            loadCheckbox();
+
+            document.getElementById('btnManagerSearch').addEventListener('click', () => {
+                if (!fillHr(form.empl_num.value.trim())) oh.toast('사용자 정보가 없습니다. (샘플 사번: 100231, 200114 …)', 'warning');
+            });
+            form.empl_num.addEventListener('keydown', e => {
+                if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btnManagerSearch').click(); }
+            });
+
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                if (!found) { form.empl_num.classList.add('is-invalid'); form.empl_num.focus(); return; }
+                bootstrap.Modal.getInstance(modal).hide();
+                oh.toast('저장이 완료되었습니다.');
+            });
+            document.getElementById('btnManagerDelete').addEventListener('click', () => {
+                oh.confirm('삭제하시겠습니까?', { okText: '삭제' }).then(ok => {
+                    if (!ok) return;
+                    bootstrap.Modal.getInstance(modal).hide();
+                    oh.toast('삭제가 완료되었습니다.');
+                });
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

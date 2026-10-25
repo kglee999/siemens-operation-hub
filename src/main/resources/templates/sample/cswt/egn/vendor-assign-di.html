@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>파트너사 순번관리 (DI)</title>
+</head>
+<body>
+<!-- CS Webtool egn/vendor_assign_di.jsp: 기간설정 / 파트너사별 GG 표(배정 엔지니어 + X, 추가) -->
+<main layout:fragment="content" th:with="dutyDate=${param.dutyDate != null ? param.dutyDate[0] : '2026-10-24'}">
+    <div class="page-title"><h3>파트너사 순번관리 (DI)</h3></div>
+
+    <form id="searchForm" method="get" th:action="@{/sample/cswt/egn/vendor-assign-di}">
+        <div class="x_panel">
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto"><label class="search-label" for="dutyDate">기간설정</label></div>
+                    <div class="col-auto">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                            <input type="date" class="form-control" id="dutyDate" name="dutyDate" style="width: 200px;" th:value="${dutyDate}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="x_panel" id="vendorBoard" th:attr="data-add-url=@{/sample/cswt/egn/modal/vendor-assign-di-add},data-duty-date=${dutyDate}">
+        <div class="x_content">
+            <th:block th:each="p : ${ {
+                    {'HANMED', '한메드', { {'CT','김도현|이준서'}, {'MR','박서연'}, {'AX',''}, {'XP','최민호|정유나|한지민'} } },
+                    {'KMS', '케이엠에스', { {'CT','오승현'}, {'MR','강다인|윤태경'}, {'AX','서지안'}, {'XP',''} } },
+                    {'DAEJIN MEDICAL', '대진메디칼', { {'CT',''}, {'MR','임채원'}, {'AX','조하람|배성우'}, {'XP','신동혁'} } }
+                } }">
+                <h3 class="duty-area-title" th:text="|${p[0]} (${p[1]})|">HANMED (한메드)</h3>
+                <div class="table-responsive">
+                    <table class="table table-striped jambo_table duty-table">
+                        <colgroup>
+                            <col style="width: 200px;">
+                            <col>
+                            <col style="width: 70px;">
+                        </colgroup>
+                        <tbody>
+                        <tr th:each="g : ${p[2]}" th:attr="data-vendor=${p[0]},data-gg=${g[0]}"
+                            th:with="names=${#strings.arraySplit(g[1], '|')}">
+                            <td><h4 th:text="${g[0]}">CT</h4></td>
+                            <td class="a-left duty-engineers">
+                                <div class="btn-group duty-chip" role="group" th:each="n : ${names}">
+                                    <button type="button" class="btn btn-default" th:text="${n}">김도현</button>
+                                    <button type="button" class="btn btn-default btn-duty-delete" th:attr="aria-label=|${n} 삭제|">X</button>
+                                </div>
+                                <span class="duty-empty" th:classappend="${names.length > 0} ? 'd-none'">배정된 엔지니어가 없습니다.</span>
+                            </td>
+                            <td><button type="button" class="btn btn-success btn-duty-add">추가</button></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </th:block>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script>
+        (function () {
+            const board = document.getElementById('vendorBoard');
+
+            document.getElementById('dutyDate').addEventListener('change', e => {
+                if (e.target.value) e.target.form.submit();
+            });
+
+            // 칩이 없으면 '배정된 엔지니어가 없습니다.'
+            const refreshEmpty = cell => cell.querySelector('.duty-empty')
+                .classList.toggle('d-none', !!cell.querySelector('.duty-chip'));
+
+            // 모달(_vendor-assign-di-add)에서 저장하면 호출: 해당 줄에 칩 추가
+            window.vendorAssignAddChip = (tr, name) => {
+                const cell = tr.querySelector('.duty-engineers');
+                const chip = document.createElement('div');
+                chip.className = 'btn-group duty-chip';
+                chip.setAttribute('role', 'group');
+                chip.innerHTML = '<button type="button" class="btn btn-default"></button>' +
+                    '<button type="button" class="btn btn-default btn-duty-delete">X</button>';
+                chip.firstChild.textContent = name;
+                chip.lastChild.setAttribute('aria-label', name + ' 삭제');
+                cell.insertBefore(chip, cell.querySelector('.duty-empty'));
+                refreshEmpty(cell);
+            };
+
+            board.addEventListener('click', e => {
+                const add = e.target.closest('.btn-duty-add');
+                if (add) {
+                    const tr = add.closest('tr');
+                    window.vendorAssignTarget = { tr: tr, vendor: tr.dataset.vendor, gg: tr.dataset.gg, dutyDate: board.dataset.dutyDate };
+                    oh.modal.open(board.dataset.addUrl);
+                    return;
+                }
+                const del = e.target.closest('.btn-duty-delete');
+                if (del) {
+                    oh.confirm('삭제하시겠습니까?', { okText: '삭제' }).then(ok => {
+                        if (!ok) return;
+                        const cell = del.closest('.duty-engineers');
+                        del.closest('.duty-chip').remove();
+                        refreshEmpty(cell);
+                        oh.toast('삭제가 완료되었습니다.');
+                    });
+                }
+            });
+        })();
+    </script>
+</th:block>
+</body>
+</html>

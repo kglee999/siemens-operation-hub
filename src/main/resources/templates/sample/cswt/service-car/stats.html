@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>운행기록 통계</title>
+</head>
+<body>
+<!-- CS Webtool serviceCar/serviceCar_stats.jsp: 기간(최대 1년) · 차량구분 · 차량번호 · 차량사용자로 차량별 운행 합계 조회 -->
+<main layout:fragment="content">
+    <div class="page-title">
+        <h3>운행기록 통계</h3>
+    </div>
+
+    <form id="searchForm" method="get" th:action="@{/sample/cswt/service-car/stats}">
+        <input type="hidden" name="pageNo" value="1">
+        <div class="x_panel">
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-1 col-md-2"><label class="search-label" for="firstDate">기간설정</label></div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="input-group">
+                            <input type="date" class="form-control" id="firstDate" name="firstDate" value="2026-01-01">
+                            <span class="input-group-text">~</span>
+                            <input type="date" class="form-control" id="lastDate" name="lastDate" value="2026-10-24" aria-label="기간 종료일">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-1 col-md-2"><span class="search-label">차량구분</span></div>
+                    <div class="col-lg-3 col-md-10">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="searchType" id="searchType1" value="" checked>
+                            <label class="form-check-label" for="searchType1">전체</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="searchType" id="searchType2" value="C">
+                            <label class="form-check-label" for="searchType2">회사</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="searchType" id="searchType3" value="P">
+                            <label class="form-check-label" for="searchType3">개인</label>
+                        </div>
+                    </div>
+                    <div class="col-lg-1 col-md-2"><label class="search-label" for="searchNum">차량번호</label></div>
+                    <div class="col-lg-3 col-md-4">
+                        <input type="text" class="form-control" id="searchNum" name="searchNum" placeholder="차량번호 입력">
+                    </div>
+                    <div class="col-lg-1 col-md-2"><label class="search-label" for="searchNum2">차량사용자</label></div>
+                    <div class="col-lg-3 col-md-4">
+                        <input type="text" class="form-control" id="searchNum2" name="searchNum2" placeholder="이름 또는 사번 입력">
+                    </div>
+                </div>
+            </div>
+            <div class="x_content">
+                <div class="btn-row center">
+                    <button class="btn btn-success" type="submit">검색하기</button>
+                    <button class="btn btn-success" type="button" id="btnExcel">다운로드</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="x_panel">
+        <div class="x_content">
+            <div class="table-responsive">
+                <table class="table table-striped jambo_table">
+                    <thead>
+                    <tr>
+                        <th>차량번호</th>
+                        <th>차종</th>
+                        <th>차량구분</th>
+                        <th>사번</th>
+                        <th>성명</th>
+                        <th>총 주행거리 (km)</th>
+                        <th>업무용 사용거리(km)</th>
+                        <th>업무사용비율(%)</th>
+                        <th>취득/개시일</th>
+                        <th>처분/종료일</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr><td>12가 3456</td><td>쏘나타</td><td>회사</td><td>E10012</td><td>홍길동</td><td>6,842</td><td>6,524</td><td>95.35 %</td><td>2026-07-01</td><td></td></tr>
+                    <tr><td>12가 3456</td><td>쏘나타</td><td>회사</td><td>E10231</td><td>김민준</td><td>9,315</td><td>8,870</td><td>95.22 %</td><td>2025-03-01</td><td>2026-06-30</td></tr>
+                    <tr><td>34나 7890</td><td>그랜저</td><td>회사</td><td>E10544</td><td>이서연</td><td>14,206</td><td>13,481</td><td>94.90 %</td><td>2024-09-01</td><td></td></tr>
+                    <tr><td>56다 1122</td><td>K5</td><td>개인</td><td>E10388</td><td>박지훈</td><td>11,573</td><td>9,962</td><td>86.08 %</td><td>2025-01-15</td><td></td></tr>
+                    <tr><td>78라 3344</td><td>투싼</td><td>회사</td><td>E10790</td><td>최유진</td><td>12,960</td><td>12,418</td><td>95.82 %</td><td>2026-01-02</td><td></td></tr>
+                    <tr><td>90마 5566</td><td>아반떼</td><td>회사</td><td>E10120</td><td>강도현</td><td>5,128</td><td>4,903</td><td>95.61 %</td><td>2023-05-01</td><td>2026-04-30</td></tr>
+                    <tr><td>11바 7788</td><td>스포티지</td><td>개인</td><td>E10655</td><td>윤서준</td><td>13,447</td><td>11,092</td><td>82.49 %</td><td>2024-03-04</td><td></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <nav aria-label="페이지 이동">
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" href="#" aria-label="처음">&laquo;</a></li>
+                    <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#" aria-label="마지막">&raquo;</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script>
+        (function () {
+            const form = document.getElementById('searchForm');
+            const first = document.getElementById('firstDate');
+            const last = document.getElementById('lastDate');
+
+            // 기간은 최대 1년 (CS Webtool dateLimit: { year: 1 })
+            function shift(value, years) {
+                const d = new Date(value);
+                d.setFullYear(d.getFullYear() + years);
+                return d.toISOString().slice(0, 10);
+            }
+            function syncRange() {
+                if (first.value) { last.min = first.value; last.max = shift(first.value, 1); }
+                if (last.value) { first.max = last.value; first.min = shift(last.value, -1); }
+            }
+            syncRange();
+            first.addEventListener('change', syncRange);
+            last.addEventListener('change', syncRange);
+
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                if (!form.checkValidity()) { oh.toast('기간은 최대 1년까지 설정하실 수 있습니다.', 'warning'); return; }
+                oh.toast('조회되었습니다.');
+            });
+            document.getElementById('btnExcel').addEventListener('click', () => oh.toast('엑셀 파일을 내려받습니다.'));
+        })();
+    </script>
+</th:block>
+</body>
+</html>

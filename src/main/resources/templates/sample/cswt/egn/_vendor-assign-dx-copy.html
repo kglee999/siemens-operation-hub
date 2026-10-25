@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- CS Webtool egn/vendor_assign_dx_copy.jsp: 기준날짜 / 대상날짜(기간, 최대 20일) → 복사 -->
+<div class="modal fade" tabindex="-1" aria-labelledby="vendorCopyTitle" aria-hidden="true" th:fragment="modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" id="vendorCopyForm" novalidate>
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title" id="vendorCopyTitle">파트너사 순번 복사</h5>
+                    <small class="text-navy d-block">기준 날짜의 파트너사 순번을 적용 날짜로 복사할 수 있습니다.<br>서버 부하의 문제로 최대 20일까지 복사 가능합니다.</small>
+                </div>
+                <button type="button" class="btn-close align-self-start" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-sm-3"><span class="col-form-label search-label d-block">기준날짜</span></div>
+                    <div class="col-sm-9"><p class="form-static">2026-10-24</p></div>
+                </div>
+                <div class="row g-2 align-items-start">
+                    <div class="col-sm-3"><label class="col-form-label search-label" for="copyFrom">대상날짜</label></div>
+                    <div class="col-sm-9">
+                        <div class="input-group has-validation">
+                            <input type="date" class="form-control" id="copyFrom" name="firstDate" value="2026-10-26" required>
+                            <span class="input-group-text">~</span>
+                            <input type="date" class="form-control" name="lastDate" value="2026-10-31" required aria-label="대상날짜 종료">
+                            <div class="invalid-feedback">대상날짜를 확인해주세요.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success">복사</button>
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            const form = document.getElementById('vendorCopyForm');
+            const feedback = form.querySelector('.invalid-feedback');
+            const DAY = 24 * 60 * 60 * 1000;
+
+            // 시작 ≤ 종료, 최대 20일 (원본 daterangepicker dateLimit: 20일)
+            function validate() {
+                const from = form.firstDate.value, to = form.lastDate.value;
+                let msg = '';
+                if (!from || !to) msg = '대상날짜를 입력해주세요.';
+                else if (from > to) msg = '종료일이 시작일보다 빠릅니다.';
+                else if ((new Date(to) - new Date(from)) / DAY + 1 > 20) msg = '최대 20일까지 복사 가능합니다.';
+                form.lastDate.setCustomValidity(msg);
+                form.firstDate.setCustomValidity(msg);
+                feedback.textContent = msg;
+                return !msg;
+            }
+            form.addEventListener('input', () => { if (form.classList.contains('was-validated')) validate(); });
+
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                form.classList.add('was-validated');
+                if (!validate()) return;
+                if (window.vendorAssignDxHasData && !window.vendorAssignDxHasData()) {
+                    oh.toast('기준일자에 데이터가 존재하지 않습니다.', 'warning');
+                    return;
+                }
+                oh.confirm('선택한 날짜로 복사를 진행하시겠습니까? (선택한 날짜의 기존 데이터는 모두 삭제됩니다.)', { okText: '복사' })
+                    .then(ok => {
+                        if (!ok) return;
+                        bootstrap.Modal.getInstance(form.closest('.modal')).hide();
+                        oh.toast('복사가 완료되었습니다.');
+                    });
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

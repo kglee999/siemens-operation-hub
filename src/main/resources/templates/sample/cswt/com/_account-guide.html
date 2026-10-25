@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 계정 등록 안내 (CS Webtool com/account_guide_popup.jsp, 로그인 화면의 계정 등록 링크). 제목 없는 안내문 모달. -->
+<div class="modal fade" tabindex="-1" aria-label="계정 등록 안내" aria-hidden="true" th:fragment="modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body account-guide">
+                <p>아이디 등록이 필요하시면 아래 양식 작성하여 그룹 메일로 요청 부탁 드립니다.</p>
+                <p class="mb-0">In-vivo: <strong>DL KR CS SO CCC</strong></p>
+                <p>In-vivo 이메일주소: <a href="mailto:cs-so-ccc@example.com">cs-so-ccc@example.com</a></p>
+                <p class="mb-0">In-vitro: <strong>DL KR DX CS OP</strong></p>
+                <p>In-vitro 이메일주소: <a href="mailto:dx-cs-op@example.com">dx-cs-op@example.com</a></p>
+
+                <p class="mb-1"><strong>[CS Webtool 계정 등록 양식]</strong></p>
+                <ul class="list-unstyled mb-3">
+                    <li>사번:</li>
+                    <li>GID:</li>
+                    <li>이름(영문):</li>
+                    <li>이름(한글):</li>
+                    <li>핸드폰번호:</li>
+                    <li>이메일주소(회사계정):</li>
+                    <li>Plant: In-vivo / In-vitro (하나만 선택해 주세요)</li>
+                </ul>
+
+                <p class="mb-1"><strong>In-vivo</strong></p>
+                <ul class="list-unstyled mb-3">
+                    <li>Team: AX / CT / MI / MR / Apps (하나만 선택해 주세요)</li>
+                    <li>Region(CSE만): SG / RE / RW (하나만 선택해 주세요)</li>
+                </ul>
+
+                <p class="mb-1"><strong>In-vitro</strong></p>
+                <ul class="list-unstyled mb-0">
+                    <li>Team: FSE / 학술 (하나만 선택해 주세요)</li>
+                    <li>Region(CSE만): SN / SS / RE / RW (하나만 선택해 주세요)</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

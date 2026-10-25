@@ -1,0 +1,55 @@
+/* CS Webtool 내 스케줄 관리 / 팀 스케줄 관리 (egn_schedule*.jsp) */
+
+/* 상단 월 제목 (well 가운데 "OOO 님의 N월 스케쥴" + 오른쪽 표시항목) */
+.sched-well { text-align: center; }
+.sched-well .sched-personal { margin: 0 0 6px; font-size: 14px; }
+.sched-well .sched-personal strong { font-size: 20px; font-weight: 500; }
+.sched-well .legend { margin-bottom: 0; }
+
+/* 필터 패널: 라벨 폭 통일 */
+.sched-filter .search-label { min-width: 70px; }
+.sched-select { width: 200px; }
+
+/* "N월 N일 스케쥴" 초록 제목 + 일별 카드 영역 */
+.schedule_title { display: block; margin: 0 0 6px; padding: 5px 8px; background: #26b99a; color: #fff; font-weight: 700; }
+.schedule_day { min-height: 150px; max-height: 600px; overflow-x: hidden; overflow-y: auto; }
+.schedule_day .sched-empty { padding: 40px 0; text-align: center; color: #73879c; }
+
+/* 스케쥴 카드: 왼쪽 팀색 번호 띠 + dt/dd 2열 */
+.item_card { position: relative; display: flex; height: 100%; background: #f6f6f6; }
+.item_card .count_num { flex: 0 0 15px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; }
+.item_card .count_num.bg-rw { color: #333; }
+.item_card dl { flex: 1; display: grid; grid-template-columns: 40% 60%; align-content: start; margin: 0; padding: 4px 22px 4px 5px; }
+.item_card dt { font-weight: 700; }
+.item_card dt, .item_card dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.item_card dd.memos { min-height: 19px; max-height: 38px; margin-bottom: 6px; overflow-y: auto; }
+.item_card .team-schedule-red { color: #ff253a; font-weight: 700; }
+.item_card .count_setting { grid-column: 2; display: flex; justify-content: flex-end; gap: 3px; }
+.item_card .count_setting .btn { line-height: 1; padding: 3px 5px; }
+/* 표시/숨김 표시 (ico-mark-unmarked / ico-mark-hidden) */
+.item_card .marked { position: absolute; top: 3px; right: 5px; padding: 0; border: 0; background: none; color: #555; font-size: 16px; line-height: 1; }
+.item_card .marked[data-marked="N"] { color: #aaa; }
+.item_card .marked:hover { color: #26b99a; }
+
+/* 달력: 선택한 날 (CS Webtool #bce8f1) */
+.oh-calendar .sched-picked { background-color: #bce8f1 !important; }
+.oh-calendar .sched-ev { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.oh-calendar .sched-ev-time { margin-right: 3px; }
+.sched-calendar-wrap .oh-calendar { cursor: pointer; }
+
+/* 팀 스케줄: 달력모드 선택 패널 */
+.sched-mode-title { display: block; margin-bottom: 6px; font-weight: 700; }
+.sched-check-group { padding: 6px 0; border-top: 1px dashed #e5e5e5; }
+.sched-check-group:first-of-type { border-top: 0; }
+.sched-check-group .form-check-inline { margin-right: 12px; margin-bottom: 2px; }
+
+/* 스케쥴 입력 모달 */
+.modal-sched { --bs-modal-width: 600px; }
+.modal-sched .sched-sva { display: flex; justify-content: flex-end; font-size: 12px; margin-bottom: 4px; }
+.modal-sched .ln_solid { margin: 10px 0; }
+.modal-sched .time-range { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.modal-sched .sched-date { max-width: 360px; }
+.modal-sched .scroll-box tbody tr { cursor: pointer; }
+.modal-sched .scroll-box .btn-info { width: 100%; }
+/* style.css 의 .scroll-box > .table { border: 0 } 이 border-color 까지 currentColor 로 바꿔 셀 줄이 검게 나옴 -> 색 되돌림 */
+.scroll-box > .table.jambo_table { border-color: var(--bs-table-border-color); }

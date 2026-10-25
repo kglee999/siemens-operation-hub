@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 처분/종료 모달 (CS Webtool serviceCar/serviceCar_manage_user_add.jsp).
+     파라미터: carNumber, korName, emplNum, startDate, endDate. 사용자가 있으면 '사용자 삭제' 버튼 표시 -->
+<div class="modal fade" tabindex="-1" aria-labelledby="svcCarUserTitle" aria-hidden="true" th:fragment="modal"
+     th:with="hasUser=${param.emplNum != null and !#strings.isEmpty(param.emplNum)}">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" id="svcCarUserForm" novalidate>
+            <div class="modal-header">
+                <h5 class="modal-title" id="svcCarUserTitle">처분/종료</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-sm-4"><label class="col-form-label" for="svcUserCarNumber">차량번호</label></div>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="svcUserCarNumber" th:value="${param.carNumber} ?: '12가 3456'" disabled>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-sm-4"><label class="col-form-label" for="svcUserCurrent">현재사용자</label></div>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="svcUserCurrent" disabled
+                               th:value="${hasUser} ? |${param.korName} (${param.emplNum})| : '없음'">
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-sm-4"><label class="col-form-label" for="svcUserStart">취득/개시일</label></div>
+                    <div class="col-sm-8">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                            <input type="date" class="form-control" id="svcUserStart" name="assgn_start_date" th:value="${param.startDate}">
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center">
+                    <div class="col-sm-4"><label class="col-form-label" for="svcUserEnd">처분/종료일</label></div>
+                    <div class="col-sm-8">
+                        <div class="input-group has-validation">
+                            <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                            <input type="date" class="form-control" id="svcUserEnd" name="assgn_end_date" th:value="${param.endDate}">
+                            <div class="invalid-feedback">처분/종료일은 취득/개시일 이후여야 합니다.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success">종료일 수정</button>
+                <button type="button" class="btn btn-danger" id="svcUserDelete" th:if="${hasUser}">사용자 삭제</button>
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            const form = document.getElementById('svcCarUserForm');
+            const start = form.assgn_start_date;
+            const end = form.assgn_end_date;
+            const close = () => bootstrap.Modal.getInstance(form.closest('.modal')).hide();
+
+            function checkRange() {
+                end.setCustomValidity(start.value && end.value && end.value < start.value ? 'range' : '');
+            }
+            [start, end].forEach(el => el.addEventListener('change', checkRange));
+
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                checkRange();
+                form.classList.add('was-validated');
+                if (!form.checkValidity()) return;
+                close();
+                oh.toast('저장이 완료되었습니다.', 'success');
+            });
+
+            const del = document.getElementById('svcUserDelete');
+            if (del) del.addEventListener('click', () => {
+                oh.confirm('삭제하시겠습니까?', { okText: '삭제' }).then(ok => {
+                    if (!ok) return;
+                    close();
+                    oh.toast('사용자가 삭제되었습니다.', 'success');
+                });
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

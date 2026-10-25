@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- PM/TS 그룹 관리(DI) 엑셀 업로드 모달 (CS Webtool adm/adm_pmts_excel_add.jsp).
+     업로드 양식 / 파일명 / 업로드 결과(처음엔 비어 있음). 등록을 누르면 가짜 결과를 보여 줌 (실제 업로드 없음). -->
+<div class="modal fade" tabindex="-1" aria-labelledby="pmtsExcelTitle" aria-hidden="true" th:fragment="modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" id="pmtsExcelForm" novalidate>
+            <div class="modal-header">
+                <h5 class="modal-title" id="pmtsExcelTitle">PM/TS 그룹 관리(DI) 엑셀 업로드 <small class="text-navy d-block ms-0 mt-1">PM/TS 그룹 관리(DI) 엑셀을 업로드 하실 수 있습니다.</small></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-sm-3"><span class="col-form-label d-block">업로드 양식</span></div>
+                    <div class="col-sm-9"><a href="#" id="pmtsSampleDownload"><i class="bi bi-file-earmark-excel"></i> 다운로드</a></div>
+                </div>
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-sm-3"><label class="col-form-label" for="pmtsExcelFile">파일명</label></div>
+                    <div class="col-sm-9">
+                        <input type="file" class="form-control" id="pmtsExcelFile" name="excelFile" accept=".xlsx,.xls" required>
+                        <div class="invalid-feedback">엑셀 파일을 입력해주세요.</div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start">
+                    <div class="col-sm-3"><span class="col-form-label d-block">업로드 결과</span></div>
+                    <div class="col-sm-9"><pre class="upload-result" id="pmtsExcelResult"></pre></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success">등록</button>
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            const form = document.getElementById('pmtsExcelForm');
+            document.getElementById('pmtsSampleDownload').addEventListener('click', e => {
+                e.preventDefault();
+                oh.toast('업로드 양식을 내려받았습니다. (샘플)', 'info');
+            });
+            form.excelFile.addEventListener('change', () => form.excelFile.classList.remove('is-invalid'));
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                if (!form.excelFile.value) { form.excelFile.classList.add('is-invalid'); return; }
+                oh.loading.show();
+                setTimeout(() => {
+                    oh.loading.hide();
+                    const name = form.excelFile.files[0].name;
+                    document.getElementById('pmtsExcelResult').textContent =
+                        '파일: ' + name + '\n' +
+                        '전체 12건 / 성공 10건 / 실패 2건\n\n' +
+                        '[실패]\n' +
+                        '4행: 사번 P58109999 은(는) 등록되지 않은 사용자입니다.\n' +
+                        '9행: 7월 값 "PT" 은(는) PM 또는 TS 만 입력 가능합니다.';
+                }, 600);
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

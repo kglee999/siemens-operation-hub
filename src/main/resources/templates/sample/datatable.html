@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>DataTables 샘플</title>
+    <link rel="stylesheet" th:href="@{/assets/vendor/datatables-3.1.4/css/dataTables.bootstrap5.min.css}">
+</head>
+<body>
+<main layout:fragment="content">
+    <div class="page-title">
+        <h3>DataTables 샘플</h3>
+    </div>
+
+    <!-- DataTables 3.1.4 (MIT, jQuery 없음). 서버가 그린 표에 정렬 · 검색 · 페이지 크기 · 페이징을 브라우저에서 붙입니다. 데이터가 수천 건 이상이면 서버 페이징(목록 화면 샘플)을 쓰세요. -->
+
+    <div class="x_panel">
+        <div class="x_content">
+        <table id="userTable" class="table table-striped jambo_table w-100">
+            <thead>
+            <tr>
+                <th>사용자 NO</th>
+                <th>사용자명</th>
+                <th>조직</th>
+                <th>권한</th>
+                <th>Mobile</th>
+                <th>E-mail</th>
+                <th>사용</th>
+                <th>최근 로그인</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="u : ${users}">
+                <td th:text="${u.emplNo}">E0001</td>
+                <td th:text="${u.name}">홍길동</td>
+                <td th:text="${u.team}">운영1팀</td>
+                <td th:text="${u.gradeName()}">일반</td>
+                <td th:text="${u.phone}">010-0000-0000</td>
+                <td class="a-left" th:text="${u.email}">user@example.com</td>
+                <td th:attr="data-order=${u.useYn} ? 1 : 0"><th:block th:text="${u.useYn} ? 'Y' : 'N'">Y</th:block></td>
+                <td th:text="${u.lastLogin}">2026-10-24 09:00</td>
+            </tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/assets/vendor/datatables-3.1.4/js/dataTables.min.js}"></script>
+    <script th:src="@{/assets/vendor/datatables-3.1.4/js/dataTables.bootstrap5.min.js}"></script>
+    <script th:src="@{/assets/js/oh-datatables.js}"></script>
+    <!-- th:inline="none": [[...]] 를 Thymeleaf 표현식으로 해석하지 않도록 -->
+    <script th:inline="none">
+        // 공통 기본값(한글 문구, 배치, 10건)은 oh-datatables.js. 화면별 옵션만 지정.
+        new DataTable('#userTable', {
+            order: [[7, 'desc']],          // 최근 로그인 최신순
+            columnDefs: [
+                { targets: [6], searchable: false }
+            ]
+        });
+    </script>
+</th:block>
+</body>
+</html>

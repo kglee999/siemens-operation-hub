@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>사용자 관리</title>
+    <link rel="stylesheet" th:href="@{/assets/css/cswt/adm.css}">
+</head>
+<body>
+<!-- CS Webtool adm/adm_user.jsp: 조직설정(com_plant_search) + 사용자명 / 권한설정 / 검색·엑셀 버튼 / 추가하기 / 목록(Plant·Team 병합) + 페이징 -->
+<main layout:fragment="content">
+    <div class="page-title">
+        <h3>사용자 관리</h3>
+    </div>
+
+    <form id="searchForm" method="get" th:action="@{/sample/cswt/adm/user}">
+        <input type="hidden" name="pageNo" value="1">
+        <div class="x_panel">
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-1 col-md-2"><span class="search-label">조직설정</span></div>
+                    <div class="col-lg-5 col-md-10">
+                        <div th:replace="~{sample/cswt/com/popups :: plantSearch}"></div>
+                    </div>
+                    <div class="col-lg-1 col-md-2 offset-lg-1"><label class="search-label" for="searchNum">사용자명</label></div>
+                    <div class="col-lg-3 col-md-4">
+                        <input type="text" class="form-control" id="searchNum" name="searchNum" placeholder="사용자명 입력">
+                    </div>
+                </div>
+            </div>
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-1 col-md-2"><span class="search-label">권한설정</span></div>
+                    <div class="col-lg-11 col-md-10">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="searchType4" id="searchType40" value="" checked>
+                            <label class="form-check-label" for="searchType40">All</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="searchType4" id="searchType41" value="1">
+                            <label class="form-check-label" for="searchType41">일반</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="searchType4" id="searchType42" value="2">
+                            <label class="form-check-label" for="searchType42">당직 관리</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="searchType4" id="searchType49" value="9">
+                            <label class="form-check-label" for="searchType49">Admin</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="x_content">
+                <div class="btn-row center">
+                    <button class="btn btn-success" type="submit">검색하기</button>
+                    <button class="btn btn-success" type="button" id="btnExcel">엑셀받기</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="btn-row end mb-1">
+        <button class="btn btn-success" type="button" data-mode="add">추가하기</button>
+    </div>
+    <div class="x_panel">
+        <div class="x_content">
+            <div class="table-responsive">
+                <!-- Plant / Team 은 같은 값끼리 병합 (CS Webtool mergeRowSingle → rowspan) -->
+                <table class="table table-striped jambo_table" id="userTable"
+                       th:attr="data-modal-url=@{/sample/cswt/adm/modal/user-add}">
+                    <thead>
+                    <tr>
+                        <th>Plant</th>
+                        <th>Team</th>
+                        <th>Region</th>
+                        <th>Modality</th>
+                        <th>권한</th>
+                        <th>스케쥴 권한</th>
+                        <th>사용자NO</th>
+                        <th>사용자명(E)</th>
+                        <th>사용자명(K)</th>
+                        <th>Mobile</th>
+                        <th>E-mail</th>
+                        <th>Status</th>
+                        <th>잠김여부</th>
+                        <th>Change Date</th>
+                        <th>Last login date</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr data-empl-num="100231" data-empl-num-p58="E100231" data-gid="Z003AB1C" data-empl-name="Gildong Hong" data-kor-name="홍길동"
+                        data-phone="010-2345-1001" data-email="gildong.hong@example.com" data-plant="96E6" data-team="CT" data-modality="E65340"
+                        data-region="SG" data-status="ON" data-grade="1" data-schedule="Y" data-lock="N">
+                        <td class="cell-merge" rowspan="6">DI</td>
+                        <td class="cell-merge" rowspan="3">CT</td>
+                        <td>SG</td><td>CT</td><td>일반</td><td>Y</td>
+                        <td><a href="#" class="btn-modify">100231</a></td>
+                        <td>Gildong Hong</td><td>홍길동</td><td>010-2345-1001</td><td>gildong.hong@example.com</td>
+                        <td>ON</td><td>N</td><td>2026-09-14</td><td>2026-10-24 08:52</td>
+                    </tr>
+                    <tr data-empl-num="100245" data-empl-num-p58="E100245" data-gid="Z003AB2D" data-empl-name="Cheolsu Kim" data-kor-name="김철수"
+                        data-phone="010-2345-1002" data-email="cheolsu.kim@example.com" data-plant="96E6" data-team="CT" data-modality="E65340"
+                        data-region="RE" data-status="ON" data-grade="2" data-schedule="Y" data-lock="N">
+                        <td>RE</td><td>CT</td><td>당직 관리</td><td>Y</td>
+                        <td><a href="#" class="btn-modify">100245</a></td>
+                        <td>Cheolsu Kim</td><td>김철수</td><td>010-2345-1002</td><td>cheolsu.kim@example.com</td>
+                        <td>ON</td><td>N</td><td>2026-08-02</td><td>2026-10-23 18:10</td>
+                    </tr>
+                    <tr data-empl-num="100318" data-empl-num-p58="E100318" data-gid="Z003AC3E" data-empl-name="Younghee Lee" data-kor-name="이영희"
+                        data-phone="010-2345-1003" data-email="younghee.lee@example.com" data-plant="96E6" data-team="CT" data-modality="E65340"
+                        data-region="RW" data-status="ON" data-grade="1" data-schedule="N" data-lock="N">
+                        <td>RW</td><td>CT</td><td>일반</td><td>N</td>
+                        <td><a href="#" class="btn-modify">100318</a></td>
+                        <td>Younghee Lee</td><td>이영희</td><td>010-2345-1003</td><td>younghee.lee@example.com</td>
+                        <td>ON</td><td>N</td><td>2026-07-21</td><td>2026-10-22 09:31</td>
+                    </tr>
+                    <tr data-empl-num="100402" data-empl-num-p58="E100402" data-gid="Z003AD4F" data-empl-name="Minsu Park" data-kor-name="박민수"
+                        data-phone="010-2345-1004" data-email="minsu.park@example.com" data-plant="96E6" data-team="MR" data-modality="E65330"
+                        data-region="SG" data-status="ON" data-grade="9" data-schedule="Y" data-lock="N">
+                        <td class="cell-merge" rowspan="2">MR</td>
+                        <td>SG</td><td>MR</td><td>Admin</td><td>Y</td>
+                        <td><a href="#" class="btn-modify">100402</a></td>
+                        <td>Minsu Park</td><td>박민수</td><td>010-2345-1004</td><td>minsu.park@example.com</td>
+                        <td>ON</td><td>N</td><td>2026-10-01</td><td>2026-10-24 07:58</td>
+                    </tr>
+                    <tr data-empl-num="100417" data-empl-num-p58="E100417" data-gid="Z003AE5G" data-empl-name="Jiwon Choi" data-kor-name="최지원"
+                        data-phone="010-2345-1005" data-email="jiwon.choi@example.com" data-plant="96E6" data-team="MR" data-modality="E65330"
+                        data-region="RE" data-status="OFF" data-grade="1" data-schedule="N" data-lock="Y">
+                        <td>RE</td><td>MR</td><td>일반</td><td>N</td>
+                        <td><a href="#" class="btn-modify">100417</a></td>
+                        <td>Jiwon Choi</td><td>최지원</td><td>010-2345-1005</td><td>jiwon.choi@example.com</td>
+                        <td>OFF</td><td>Y</td><td>2026-06-11</td><td>2026-09-30 14:22</td>
+                    </tr>
+                    <tr data-empl-num="100533" data-empl-num-p58="E100533" data-gid="Z003AF6H" data-empl-name="Haneul Jung" data-kor-name="정하늘"
+                        data-phone="010-2345-1006" data-email="haneul.jung@example.com" data-plant="96E6" data-team="APPS" data-modality="E65310"
+                        data-region="SG" data-status="ON" data-grade="1" data-schedule="Y" data-lock="N">
+                        <td class="cell-merge">Apps</td>
+                        <td>SG</td><td>AX</td><td>일반</td><td>Y</td>
+                        <td><a href="#" class="btn-modify">100533</a></td>
+                        <td>Haneul Jung</td><td>정하늘</td><td>010-2345-1006</td><td>haneul.jung@example.com</td>
+                        <td>ON</td><td>N</td><td>2026-05-19</td><td>2026-10-21 11:05</td>
+                    </tr>
+                    <tr data-empl-num="200114" data-empl-num-p58="E200114" data-gid="Z004BA1J" data-empl-name="Seojun Kang" data-kor-name="강서준"
+                        data-phone="010-3456-2001" data-email="seojun.kang@example.com" data-plant="94E6" data-team="FSE" data-modality=""
+                        data-region="SN" data-status="ON" data-grade="1" data-schedule="N" data-lock="N">
+                        <td class="cell-merge" rowspan="3">DX</td>
+                        <td class="cell-merge" rowspan="2">FSE</td>
+                        <td>SN</td><td></td><td>일반</td><td>N</td>
+                        <td><a href="#" class="btn-modify">200114</a></td>
+                        <td>Seojun Kang</td><td>강서준</td><td>010-3456-2001</td><td>seojun.kang@example.com</td>
+                        <td>ON</td><td>N</td><td>2026-04-08</td><td>2026-10-24 09:40</td>
+                    </tr>
+                    <tr data-empl-num="200127" data-empl-num-p58="E200127" data-gid="Z004BB2K" data-empl-name="Jiwoo Yoon" data-kor-name="윤지우"
+                        data-phone="010-3456-2002" data-email="jiwoo.yoon@example.com" data-plant="94E6" data-team="FSE" data-modality=""
+                        data-region="SS" data-status="ON" data-grade="2" data-schedule="Y" data-lock="N">
+                        <td>SS</td><td></td><td>당직 관리</td><td>Y</td>
+                        <td><a href="#" class="btn-modify">200127</a></td>
+                        <td>Jiwoo Yoon</td><td>윤지우</td><td>010-3456-2002</td><td>jiwoo.yoon@example.com</td>
+                        <td>ON</td><td>N</td><td>2026-09-02</td><td>2026-10-23 20:17</td>
+                    </tr>
+                    <tr data-empl-num="200231" data-empl-num-p58="E200231" data-gid="Z004BC3L" data-empl-name="Doyun Lim" data-kor-name="임도윤"
+                        data-phone="010-3456-2003" data-email="doyun.lim@example.com" data-plant="94E6" data-team="ACA" data-modality=""
+                        data-region="RE" data-status="ON" data-grade="1" data-schedule="N" data-lock="N">
+                        <td class="cell-merge">학술</td>
+                        <td>RE</td><td></td><td>일반</td><td>N</td>
+                        <td><a href="#" class="btn-modify">200231</a></td>
+                        <td>Doyun Lim</td><td>임도윤</td><td>010-3456-2003</td><td>doyun.lim@example.com</td>
+                        <td>ON</td><td>N</td><td>2026-03-27</td><td>2026-10-20 16:48</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <nav aria-label="페이지 이동">
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" href="#" aria-label="처음">&laquo;</a></li>
+                    <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">4</a></li>
+                    <li class="page-item"><a class="page-link" href="#">5</a></li>
+                    <li class="page-item"><a class="page-link" href="#" aria-label="마지막">&raquo;</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script>
+        (function () {
+            const table = document.getElementById('userTable');
+            const url = table.dataset.modalUrl;
+            document.addEventListener('click', e => {
+                if (e.target.closest('[data-mode=add]')) {
+                    oh.modal.open(url, { mode: 'add' });
+                    return;
+                }
+                const link = e.target.closest('#userTable .btn-modify');
+                if (link) {
+                    e.preventDefault();
+                    oh.modal.open(url, Object.assign({ mode: 'modify' }, link.closest('tr').dataset));
+                    return;
+                }
+                if (e.target.closest('#btnExcel')) oh.toast('엑셀 파일을 내려받았습니다. (샘플)', 'info');
+            });
+            document.getElementById('searchForm').addEventListener('submit', e => {
+                e.preventDefault();
+                oh.toast('검색 조건이 적용되었습니다. (샘플)', 'info');
+            });
+        })();
+    </script>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>일반 테이블 샘플</title>
+</head>
+<body>
+<!-- 라이브러리 없이 서버에서 그리는 표. CS Webtool 에서 쓰는 형태 위주:
+     기본 목록(jambo_table) / 체크박스 선택 / 병합 헤더 + 첫 열 고정(freeze-table 대체) + 합계 / 빈 목록 -->
+<main layout:fragment="content">
+    <div class="page-title">
+        <h3>일반 테이블 샘플</h3>
+    </div>
+
+    <!-- 1. 기본 목록 -->
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>기본 목록 <small>table table-striped jambo_table</small></h2>
+        </div>
+        <div class="x_content">
+            <p class="table-count">전체 <strong th:text="${#lists.size(users)}">8</strong>건</p>
+            <div class="table-responsive">
+                <table class="table table-striped jambo_table">
+                    <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>사용자 NO</th>
+                        <th>사용자명</th>
+                        <th>조직</th>
+                        <th>권한</th>
+                        <th>E-mail</th>
+                        <th>사용</th>
+                        <th>최근 로그인</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="u, s : ${users}">
+                        <td th:text="${s.count}">1</td>
+                        <td><a th:href="@{/sample/form}" th:text="${u.emplNo}">E0001</a></td>
+                        <td th:text="${u.name}">홍길동</td>
+                        <td th:text="${u.team}">운영1팀</td>
+                        <td th:text="${u.gradeName()}">일반</td>
+                        <td class="a-left" th:text="${u.email}">user@example.com</td>
+                        <td th:text="${u.useYn} ? 'Y' : 'N'">Y</td>
+                        <td th:text="${u.lastLogin}">2026-10-24 09:00</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 체크박스 선택 -->
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>체크박스 선택 <small>전체 선택 · 선택 행 강조(tr.selected)</small></h2>
+        </div>
+        <div class="x_content">
+            <div class="btn-row end mb-2">
+                <button type="button" class="btn btn-default" id="btnDeleteChecked">선택 삭제</button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped jambo_table" id="checkTable">
+                    <thead>
+                    <tr>
+                        <th class="col-check"><input class="form-check-input" type="checkbox" id="checkAll" aria-label="전체 선택"></th>
+                        <th>사용자 NO</th>
+                        <th>사용자명</th>
+                        <th>조직</th>
+                        <th>Mobile</th>
+                        <th>E-mail</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="u : ${users}">
+                        <td class="col-check"><input class="form-check-input" type="checkbox" name="emplNo"
+                                                     th:value="${u.emplNo}" th:attr="aria-label=${u.emplNo} + ' 선택'"></td>
+                        <td th:text="${u.emplNo}">E0001</td>
+                        <td th:text="${u.name}">홍길동</td>
+                        <td th:text="${u.team}">운영1팀</td>
+                        <td th:text="${u.phone}">010-0000-0000</td>
+                        <td class="a-left" th:text="${u.email}">user@example.com</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 병합 헤더 + 첫 열 고정 + 합계 (CS Webtool 일간/주간 근무 화면 형태) -->
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>주간 근무 현황 <small>rowspan/colspan 헤더 · 헤더와 첫 열 고정 · 합계 행</small></h2>
+        </div>
+        <div class="x_content">
+            <!-- table-freeze: 가로/세로 스크롤 시 헤더와 첫 열이 고정됨 (freeze-table 플러그인 대신 CSS) -->
+            <div class="table-freeze" style="max-height: 420px;">
+                <table class="table table-striped jambo_table">
+                    <thead>
+                    <tr>
+                        <th rowspan="2">사번(이름)</th>
+                        <th colspan="2" th:each="d : ${days}" th:utext="${d.date} + '<br>(' + ${d.week} + ')'">10-19<br>(월)</th>
+                        <th colspan="2">주간 합계</th>
+                    </tr>
+                    <tr>
+                        <th:block th:each="d : ${days}">
+                            <th>정상</th>
+                            <th>연장</th>
+                        </th:block>
+                        <th>정상</th>
+                        <th>연장</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="r : ${workRows}">
+                        <td class="a-left" th:text="${r.label}">E0001(홍길동)</td>
+                        <th:block th:each="d, s : ${days}">
+                            <td th:text="${#numbers.formatDecimal(r.normal[s.index], 1, 1)}">8.0</td>
+                            <td th:classappend="${r.extra[s.index] > 0} ? 'text-extra'"
+                                th:text="${#numbers.formatDecimal(r.extra[s.index], 1, 1)}">0.0</td>
+                        </th:block>
+                        <td class="a-bold" th:text="${#numbers.formatDecimal(r.normalTotal(), 1, 1)}">40.0</td>
+                        <td class="a-bold" th:text="${#numbers.formatDecimal(r.extraTotal(), 1, 1)}">2.0</td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td th:text="${workTotal.label}">합계</td>
+                        <th:block th:each="d, s : ${days}">
+                            <td th:text="${#numbers.formatDecimal(workTotal.normal[s.index], 1, 1)}">96.0</td>
+                            <td th:text="${#numbers.formatDecimal(workTotal.extra[s.index], 1, 1)}">6.0</td>
+                        </th:block>
+                        <td th:text="${#numbers.formatDecimal(workTotal.normalTotal(), 1, 1)}">480.0</td>
+                        <td th:text="${#numbers.formatDecimal(workTotal.extraTotal(), 1, 1)}">30.0</td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 빈 목록 -->
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>빈 목록 <small>조회 결과가 없을 때</small></h2>
+        </div>
+        <div class="x_content">
+            <div class="table-responsive">
+                <table class="table table-striped jambo_table">
+                    <thead>
+                    <tr>
+                        <th>사용자 NO</th>
+                        <th>사용자명</th>
+                        <th>조직</th>
+                        <th>권한</th>
+                        <th>최근 로그인</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(emptyList)}" class="no-data">
+                        <td colspan="5">목록이 없습니다.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script>
+        (function () {
+            const table = document.getElementById('checkTable');
+            const checkAll = document.getElementById('checkAll');
+            const rowChecks = () => [...table.querySelectorAll('tbody input[type=checkbox]')];
+
+            function sync() {
+                const all = rowChecks();
+                const checked = all.filter(c => c.checked);
+                all.forEach(c => c.closest('tr').classList.toggle('selected', c.checked));
+                checkAll.checked = all.length > 0 && checked.length === all.length;
+                checkAll.indeterminate = checked.length > 0 && checked.length < all.length;
+            }
+
+            checkAll.addEventListener('change', () => {
+                rowChecks().forEach(c => { c.checked = checkAll.checked; });
+                sync();
+            });
+            table.addEventListener('change', e => {
+                if (e.target.matches('tbody input[type=checkbox]')) sync();
+            });
+            // 행 아무 곳이나 눌러도 선택 (링크/입력 요소 제외)
+            table.addEventListener('click', e => {
+                const tr = e.target.closest('tbody tr');
+                if (!tr || e.target.closest('a, input, button, label')) return;
+                const c = tr.querySelector('input[type=checkbox]');
+                c.checked = !c.checked;
+                sync();
+            });
+
+            document.getElementById('btnDeleteChecked').addEventListener('click', () => {
+                const checked = rowChecks().filter(c => c.checked);
+                if (!checked.length) { oh.toast('삭제할 항목을 선택하세요.', 'warning'); return; }
+                // 샘플: 화면에서만 제거 (실제 화면은 oh.ajax.postForm 으로 서버에 보낸 뒤 목록 갱신)
+                checked.forEach(c => c.closest('tr').remove());
+                sync();
+                oh.toast(checked.length + '건 삭제되었습니다.', 'success');
+            });
+        })();
+    </script>
+</th:block>
+</body>
+</html>

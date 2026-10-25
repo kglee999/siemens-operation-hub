@@ -1,0 +1,20 @@
+/* 운행기록부 / 차량관리 / 운행기록 통계 (CS Webtool serviceCar) */
+
+/* 시작일 · 종료일 단일 달력 두 개 나란히 (CS Webtool: 180px 입력 두 개) */
+.svc-date-pair { display: flex; flex-wrap: wrap; gap: 10px; }
+.svc-date-pair > .input-group { width: 220px; }
+
+/* 운행기록부 목록: 헤더/첫 열 고정 영역 높이, 열 너비 */
+.svc-record-freeze { max-height: 640px; }
+.table-freeze > .svc-record-table > thead > tr > th:first-child,
+.table-freeze > .svc-record-table > tbody > tr > td:first-child { min-width: 130px; }
+.table-freeze > .svc-record-table > thead > tr > th.col-remark { min-width: 160px; }
+.table-freeze > .svc-record-table > thead > tr > th.col-btn { min-width: 76px; }
+table.jambo_table.svc-record-table tbody td.a-left { white-space: normal; }
+
+/* 하단 합계(과세기간 주행거리/업무용 사용거리/업무사용비율): 첫 열 고정 해제, 값 줄은 굵게 */
+.table-freeze > .svc-record-table > tbody > tr.svc-sum > td { position: static; min-width: 0; background-color: #eee; box-shadow: none; }
+.table-freeze > .svc-record-table > tbody > tr.svc-sum-value > td { background-color: #fff; font-weight: 700; color: var(--oh-teal-700); }
+
+/* 두 줄 검색 라벨 (입력제한 / (1개월)): 기본 line-height 2.5 대신 촘촘하게 */
+.search-label.svc-label-2line { display: inline-block; line-height: 1.35; }

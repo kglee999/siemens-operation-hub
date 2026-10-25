@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 처리완료 (CS Webtool egn/disp/call_complete.jsp). mode=update 면 저장된 값으로 채움 -->
+<div class="modal fade" tabindex="-1" aria-labelledby="dispCompleteTitle" aria-hidden="true" th:fragment="modal"
+     th:with="upd=${param.mode != null and param.mode[0] == 'update'}">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" novalidate>
+            <div class="modal-header">
+                <h5 class="modal-title" id="dispCompleteTitle">처리완료</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-sm-3"><label class="col-form-label text-sm-end d-block" for="cpCloseStat">처리결과</label></div>
+                    <div class="col-sm-9">
+                        <select class="form-select" id="cpCloseStat" name="close_stat">
+                            <option value="OPN">Open</option>
+                            <option value="CLS" th:selected="${upd}">Close</option>
+                            <option value="N2F">Need to Follow</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-sm-3"><label class="col-form-label text-sm-end d-block" for="cpTrvTime">방문시작시간</label></div>
+                    <div class="col-sm-9">
+                        <input type="text" inputmode="numeric" maxlength="4" class="form-control input-time" id="cpTrvTime" name="trv_time"
+                               placeholder="0000" pattern="([01][0-9]|2[0-3])[0-5][0-9]" required th:value="${upd} ? '2015' : ''">
+                        <div class="invalid-feedback">방문시작시간을 HHMM 형식으로 입력해주세요.</div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-sm-3"><label class="col-form-label text-sm-end d-block" for="cpStrtTime">일시작시간</label></div>
+                    <div class="col-sm-9">
+                        <input type="text" inputmode="numeric" maxlength="4" class="form-control input-time" id="cpStrtTime" name="strt_time"
+                               placeholder="0000" pattern="([01][0-9]|2[0-3])[0-5][0-9]" required th:value="${upd} ? '2040' : ''">
+                        <div class="invalid-feedback">일시작시간을 HHMM 형식으로 입력해주세요.</div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-sm-3"><label class="col-form-label text-sm-end d-block" for="cpEndTime">일종료시간</label></div>
+                    <div class="col-sm-9">
+                        <input type="text" inputmode="numeric" maxlength="4" class="form-control input-time" id="cpEndTime" name="end_time"
+                               placeholder="0000" pattern="([01][0-9]|2[0-3])[0-5][0-9]" required th:value="${upd} ? '2250' : ''">
+                        <div class="invalid-feedback">일종료시간을 HHMM 형식으로 입력해주세요.</div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-sm-3"><label class="col-form-label text-sm-end d-block" for="cpNotiTitle">장애명</label></div>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="cpNotiTitle" name="noti_title" placeholder="장애명을 입력하세요"
+                               th:value="${upd} ? 'Gantry rotation error' : ''">
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-sm-3"><label class="col-form-label text-sm-end d-block" for="cpNotiPriority">장애등급</label></div>
+                    <div class="col-sm-9">
+                        <select class="form-select" id="cpNotiPriority" name="noti_priority">
+                            <option value="">장애등급 선택</option>
+                            <option value="PS1">PS1</option>
+                            <option value="PS2" th:selected="${upd}">PS2</option>
+                            <option value="PS3">PS3</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row g-2">
+                    <div class="col-sm-3"><label class="col-form-label text-sm-end d-block" for="cpOsrRem">처리내역</label></div>
+                    <div class="col-sm-9">
+                        <textarea class="form-control" rows="10" id="cpOsrRem" name="osr_rem" placeholder="처리내역을 입력하세요" required
+                                  th:text="${upd} ? 'Gantry 회전 오류 확인. Slip ring brush 교체 후 Tube warm-up 및 QA 정상 확인.' : ''"></textarea>
+                        <div class="invalid-feedback">처리내역을 입력해주세요.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+                <button type="submit" class="btn btn-success">저장하기</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            var modal = document.currentScript.closest('.modal');
+            var form = modal.querySelector('form');
+            // HHMM 입력칸은 숫자만
+            form.querySelectorAll('.input-time').forEach(function (el) {
+                el.addEventListener('input', function () { el.value = el.value.replace(/\D/g, ''); });
+            });
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                form.classList.add('was-validated');
+                var bad = form.querySelector(':invalid');
+                if (bad) { bad.focus(); return; }
+                bootstrap.Modal.getInstance(modal).hide();
+                oh.toast('저장이 완료되었습니다.', 'success');
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

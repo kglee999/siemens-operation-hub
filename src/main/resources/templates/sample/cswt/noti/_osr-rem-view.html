@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 조치사항 보기 모달 (CS Webtool noti/call_osr_rem_view.jsp): 읽기 전용 textarea + 닫기 -->
+<div class="modal fade" tabindex="-1" aria-labelledby="osrRemTitle" aria-hidden="true" th:fragment="modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="osrRemTitle">조치사항</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <textarea class="form-control" rows="10" readonly aria-label="조치사항">09:35 병원 출발, 10:20 현장 도착 후 점검 시작.
+- 헬륨 압력 센서 값 이상 확인 (Quench 이력 없음)
+- 콜드헤드 압축기 재기동 후 압력 정상 범위 회복
+- 테스트 스캔 (Head 프로토콜) 정상 확인
+후속 조치: 압축기 필터 교체 부품 주문 (10/27 입고 예정), 입고 후 재방문 예정.</textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

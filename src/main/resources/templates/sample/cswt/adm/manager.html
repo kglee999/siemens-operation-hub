@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>TpF/근무시간 SMS 수신 관리</title>
+    <link rel="stylesheet" th:href="@{/assets/css/cswt/adm.css}">
+</head>
+<body>
+<!-- CS Webtool adm/adm_manager.jsp: 조직설정(com_plant_search) + 사용자명 / 구분 라디오 / 검색·엑셀 / 추가하기 / 수신자 목록 + 페이징 -->
+<main layout:fragment="content">
+    <div class="page-title">
+        <h3>TpF/근무시간 SMS 수신 관리</h3>
+    </div>
+
+    <form id="searchForm" method="get" th:action="@{/sample/cswt/adm/manager}">
+        <input type="hidden" name="pageNo" value="1">
+        <div class="x_panel">
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-1 col-md-2"><span class="search-label">조직설정</span></div>
+                    <div class="col-lg-5 col-md-10">
+                        <div th:replace="~{sample/cswt/com/popups :: plantSearch}"></div>
+                    </div>
+                    <div class="col-lg-1 col-md-2 offset-lg-1"><label class="search-label" for="searchNum">사용자명</label></div>
+                    <div class="col-lg-3 col-md-4">
+                        <input type="text" class="form-control" id="searchNum" name="searchNum" placeholder="사용자명 입력">
+                    </div>
+                </div>
+            </div>
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-1 col-md-2"><span class="search-label">구분</span></div>
+                    <div class="col-lg-11 col-md-10">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="searchType4" id="searchType41" value="all" checked>
+                            <label class="form-check-label" for="searchType41">전체</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="searchType4" id="searchType42" value="CC">
+                            <label class="form-check-label" for="searchType42">TpF 발송</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="searchType4" id="searchType43" value="WN">
+                            <label class="form-check-label" for="searchType43">근무시간 안내</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="x_content">
+                <div class="btn-row center">
+                    <button class="btn btn-success" type="submit">검색하기</button>
+                    <button class="btn btn-success" type="button" id="btnExcel">엑셀받기</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="btn-row end mb-1">
+        <button class="btn btn-success" type="button" data-mode="add">추가하기</button>
+    </div>
+    <div class="x_panel">
+        <div class="x_content">
+            <div class="table-responsive">
+                <table class="table table-striped jambo_table" id="managerTable"
+                       th:attr="data-modal-url=@{/sample/cswt/adm/modal/manager-add}">
+                    <thead>
+                    <tr>
+                        <th>구분</th>
+                        <th>담당 Plant</th>
+                        <th>담당 Team</th>
+                        <th>담당 Modality</th>
+                        <th>담당 Region</th>
+                        <th>모두<br>발송</th>
+                        <th>Plant</th>
+                        <th>Team</th>
+                        <th>Region</th>
+                        <th>사용자NO</th>
+                        <th>사용자명</th>
+                        <th>Mobile</th>
+                        <th>E-mail</th>
+                        <th>수정일시</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr data-empl-num="100245" data-send-type="CC" data-send-plant="96E6" data-send-team="CT,MR" data-send-modality="CT,MR" data-send-region="SG,RE" data-send-all="N">
+                        <td>TpF 발송</td><td>DI</td><td>CT,MR</td><td>CT,MR</td><td>SG,RE</td><td>N</td>
+                        <td>DI</td><td>CT</td><td>RE</td>
+                        <td><a href="#" class="btn-modify">100245</a></td>
+                        <td>김철수</td><td>010-2345-1002</td><td>cheolsu.kim@example.com</td><td>2026-10-20 14:31</td>
+                    </tr>
+                    <tr data-empl-num="100402" data-send-type="CC" data-send-plant="96E6" data-send-team="AX,CT,MI,MR,XP,Apps" data-send-modality="AX,CT,MR,MI" data-send-region="SG,RE,RW" data-send-all="Y">
+                        <td>TpF 발송</td><td>DI</td><td>AX,CT,MI,MR,XP,Apps</td><td>AX,CT,MR,MI</td><td>SG,RE,RW</td><td>Y</td>
+                        <td>DI</td><td>MR</td><td>SG</td>
+                        <td><a href="#" class="btn-modify">100402</a></td>
+                        <td>박민수</td><td>010-2345-1004</td><td>minsu.park@example.com</td><td>2026-10-15 09:02</td>
+                    </tr>
+                    <tr data-empl-num="100231" data-send-type="WN" data-send-plant="96E6" data-send-team="CT" data-send-modality="CT" data-send-region="SG" data-send-all="N">
+                        <td>근무시간 안내</td><td>DI</td><td>CT</td><td>CT</td><td>SG</td><td>N</td>
+                        <td>DI</td><td>CT</td><td>SG</td>
+                        <td><a href="#" class="btn-modify">100231</a></td>
+                        <td>홍길동</td><td>010-2345-1001</td><td>gildong.hong@example.com</td><td>2026-10-02 17:45</td>
+                    </tr>
+                    <tr data-empl-num="100417" data-send-type="WN" data-send-plant="96E6" data-send-team="MR" data-send-modality="MR" data-send-region="RE,RW" data-send-all="N">
+                        <td>근무시간 안내</td><td>DI</td><td>MR</td><td>MR</td><td>RE,RW</td><td>N</td>
+                        <td>DI</td><td>MR</td><td>RE</td>
+                        <td><a href="#" class="btn-modify">100417</a></td>
+                        <td>최지원</td><td>010-2345-1005</td><td>jiwon.choi@example.com</td><td>2026-09-28 11:20</td>
+                    </tr>
+                    <tr data-empl-num="200114" data-send-type="CC" data-send-plant="94E6" data-send-team="FSE" data-send-modality="" data-send-region="SN,SS" data-send-all="N">
+                        <td>TpF 발송</td><td>DX</td><td>FSE</td><td></td><td>SN,SS</td><td>N</td>
+                        <td>DX</td><td>FSE</td><td>SN</td>
+                        <td><a href="#" class="btn-modify">200114</a></td>
+                        <td>강서준</td><td>010-3456-2001</td><td>seojun.kang@example.com</td><td>2026-09-11 08:37</td>
+                    </tr>
+                    <tr data-empl-num="200127" data-send-type="WN" data-send-plant="94E6" data-send-team="FSE,학술" data-send-modality="" data-send-region="SN,SS,RE,RW" data-send-all="N">
+                        <td>근무시간 안내</td><td>DX</td><td>FSE,학술</td><td></td><td>SN,SS,RE,RW</td><td>N</td>
+                        <td>DX</td><td>FSE</td><td>SS</td>
+                        <td><a href="#" class="btn-modify">200127</a></td>
+                        <td>윤지우</td><td>010-3456-2002</td><td>jiwoo.yoon@example.com</td><td>2026-08-30 15:12</td>
+                    </tr>
+                    <tr data-empl-num="200231" data-send-type="CC" data-send-plant="94E6" data-send-team="학술" data-send-modality="" data-send-region="RE" data-send-all="Y">
+                        <td>TpF 발송</td><td>DX</td><td>학술</td><td></td><td>RE</td><td>Y</td>
+                        <td>DX</td><td>학술</td><td>RE</td>
+                        <td><a href="#" class="btn-modify">200231</a></td>
+                        <td>임도윤</td><td>010-3456-2003</td><td>doyun.lim@example.com</td><td>2026-08-04 10:05</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <nav aria-label="페이지 이동">
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" href="#" aria-label="처음">&laquo;</a></li>
+                    <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#" aria-label="마지막">&raquo;</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script>
+        (function () {
+            const url = document.getElementById('managerTable').dataset.modalUrl;
+            document.addEventListener('click', e => {
+                if (e.target.closest('[data-mode=add]')) {
+                    oh.modal.open(url, { mode: 'add' });
+                    return;
+                }
+                const link = e.target.closest('#managerTable .btn-modify');
+                if (link) {
+                    e.preventDefault();
+                    oh.modal.open(url, Object.assign({ mode: 'modify' }, link.closest('tr').dataset));
+                    return;
+                }
+                if (e.target.closest('#btnExcel')) oh.toast('엑셀 파일을 내려받았습니다. (샘플)', 'info');
+            });
+            document.getElementById('searchForm').addEventListener('submit', e => {
+                e.preventDefault();
+                oh.toast('검색 조건이 적용되었습니다. (샘플)', 'info');
+            });
+        })();
+    </script>
+</th:block>
+</body>
+</html>

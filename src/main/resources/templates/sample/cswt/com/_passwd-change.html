@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 비밀번호 변경 모달 (CS Webtool com/passwd_change.jsp).
+     빈 칸은 해당 칸 아래 빨간 안내, 서버 오류(기존 비밀번호 불일치/형식/재입력 불일치)도 같은 자리에 표시. -->
+<div class="modal fade" tabindex="-1" aria-labelledby="passwdChangeTitle" aria-hidden="true" th:fragment="modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" id="passwdChangeForm" novalidate autocomplete="off">
+            <div class="modal-header">
+                <h5 class="modal-title" id="passwdChangeTitle">비밀번호 변경 <small class="text-navy">홍길동 님의 비밀번호를 변경할 수 있습니다.</small></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-sm-4"><label class="col-form-label" for="pwOld">기존 비밀번호</label></div>
+                    <div class="col-sm-8">
+                        <input type="password" class="form-control" name="old_passwd" id="pwOld" placeholder="기존 비밀번호 입력">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-sm-4"><label class="col-form-label" for="pwNew">새 비밀번호 입력</label></div>
+                    <div class="col-sm-8">
+                        <input type="password" class="form-control" name="passwd" id="pwNew" placeholder="새 비밀번호 입력">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start">
+                    <div class="col-sm-4"><label class="col-form-label" for="pwNew2">새 비밀번호 재입력</label></div>
+                    <div class="col-sm-8">
+                        <input type="password" class="form-control" name="new_passwd" id="pwNew2" placeholder="새 비밀번호 재입력">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div>
+                <p class="form-text mb-0 mt-2">샘플: 기존 비밀번호는 <code>Test1234!</code> 입니다.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success">변경</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            const form = document.getElementById('passwdChangeForm');
+            const f = { old: form.old_passwd, pw: form.passwd, pw2: form.new_passwd };
+            const PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,16}$/;
+
+            function mark(input, message) {
+                input.classList.toggle('is-invalid', !!message);
+                input.nextElementSibling.textContent = message ? '* ' + message : '';
+            }
+
+            form.addEventListener('input', e => mark(e.target, null));
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                Object.values(f).forEach(i => mark(i, null));
+                // 빈 칸 확인 (CS Webtool alert 문구)
+                if (!f.old.value) { mark(f.old, '기존 비밀번호를 입력해주세요.'); f.old.focus(); return; }
+                if (!f.pw.value) { mark(f.pw, '새 비밀번호를 입력해주세요.'); f.pw.focus(); return; }
+                if (!f.pw2.value) { mark(f.pw2, '새 비밀번호 재입력해주세요.'); f.pw2.focus(); return; }
+                // 서버 검증 흉내 (OLD_PASSWD_MATCH_ERROR / NEW_PASSWD_PATTERN_ERROR / NEW_PASSWD_MATCH_ERROR)
+                if (f.old.value !== 'Test1234!') { mark(f.old, '기존 비밀번호가 일치하지 않습니다. 다시 입력해 주세요'); return; }
+                if (!PATTERN.test(f.pw.value)) { mark(f.pw, '비밀번호는 특수문자, 영소/대문자, 숫자 포함 8자리 이상 16자리 이하로 입력하셔야 합니다.'); return; }
+                if (f.pw.value !== f.pw2.value) { mark(f.pw2, '비밀번호가 서로 일치하지 않습니다. 다시 입력해 주세요'); return; }
+                bootstrap.Modal.getInstance(form.closest('.modal')).hide();
+                oh.toast('비밀번호가 성공적으로 변경되었습니다.');
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

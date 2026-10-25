@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>등록/수정 화면 샘플</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <div class="page-title">
+        <h3>등록/수정 화면 샘플</h3>
+    </div>
+
+    <form class="needs-validation" novalidate th:action="@{/sample/form}" method="post">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>기본 정보 <small>* 표시는 필수 입력</small></h2>
+            </div>
+            <div class="x_content">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="emplNo" class="form-label">사용자 NO <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="emplNo" name="emplNo" required>
+                        <div class="invalid-feedback">사용자 NO를 입력하세요.</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="emplName" class="form-label">사용자명 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="emplName" name="emplName" required>
+                        <div class="invalid-feedback">사용자명을 입력하세요.</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="team" class="form-label">조직 <span class="text-danger">*</span></label>
+                        <select class="form-select" id="team" name="team" required>
+                            <option value="">선택</option>
+                            <option>운영1팀</option>
+                            <option>운영2팀</option>
+                            <option>지원팀</option>
+                        </select>
+                        <div class="invalid-feedback">조직을 선택하세요.</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="phone" class="form-label">Mobile</label>
+                        <input type="tel" class="form-control" id="phone" name="phone" placeholder="010-0000-0000">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="email" class="form-label">E-mail</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                            <input type="email" class="form-control" id="email" name="email">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="startDate" class="form-label">사용 시작일</label>
+                        <input type="date" class="form-control" id="startDate" name="startDate">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>권한 설정</h2>
+            </div>
+            <div class="x_content">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <span class="form-label d-block">권한</span>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="grade" id="grade1" value="1" checked>
+                            <label class="form-check-label" for="grade1">일반</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="grade" id="grade2" value="2">
+                            <label class="form-check-label" for="grade2">당직 관리</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="grade" id="grade9" value="9">
+                            <label class="form-check-label" for="grade9">Admin</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <span class="form-label d-block">메뉴 접근</span>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="menuSchedule" name="menus" value="schedule" checked>
+                            <label class="form-check-label" for="menuSchedule">스케줄</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="menuNoti" name="menus" value="noti">
+                            <label class="form-check-label" for="menuNoti">알림</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="menuAdmin" name="menus" value="admin">
+                            <label class="form-check-label" for="menuAdmin">관리자</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="useYn" name="useYn" checked>
+                            <label class="form-check-label" for="useYn">사용 여부</label>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label for="memo" class="form-label">메모</label>
+                        <textarea class="form-control" id="memo" name="memo" rows="4"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-center mb-3">
+            <a class="btn btn-default" th:href="@{/sample/list}">목록</a>
+            <button type="submit" class="btn btn-success">저장하기</button>
+        </div>
+    </form>
+</main>
+
+<th:block layout:fragment="script">
+    <script>
+        // Bootstrap 기본 폼 검증: 제출 시 필수값 표시
+        document.querySelectorAll('.needs-validation').forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            });
+        });
+    </script>
+</th:block>
+</body>
+</html>

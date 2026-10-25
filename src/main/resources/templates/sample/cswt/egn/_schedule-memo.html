@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 스케쥴 메모 수정 모달 (CS Webtool egn/egn_schedule_memo.jsp) -->
+<div class="modal fade" tabindex="-1" aria-labelledby="scheduleMemoTitle" aria-hidden="true" th:fragment="modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" id="scheduleMemoForm" novalidate>
+            <input type="hidden" name="ScheNum" th:value="${param.scheNum}">
+            <div class="modal-header">
+                <h5 class="modal-title" id="scheduleMemoTitle">스케쥴 관리 메모 수정</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 align-items-center">
+                    <div class="col-sm-3"><label class="col-form-label search-label" for="memoText">MEMO</label></div>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="memoText" name="Memo" placeholder="메모 입력" value="부품 입고 확인 후 방문">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+                <button type="submit" class="btn btn-success">저장하기</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            const form = document.getElementById('scheduleMemoForm');
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                bootstrap.Modal.getInstance(form.closest('.modal')).hide();
+                oh.toast('저장이 완료되었습니다.');
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

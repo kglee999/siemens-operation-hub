@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>엔지니어 순번관리 (DX)</title>
+    <link rel="stylesheet" th:href="@{/assets/vendor/handsontable-6.2.2/handsontable.full.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/cswt/egn-assign.css}">
+</head>
+<body>
+<!-- CS Webtool egn/egn_assign_dx.jsp: 기간설정 / 지역번호 정보 · 저장하기 · 엑셀업로드 / 지역번호 표(접기) + 순번 편집 표(Handsontable) -->
+<main layout:fragment="content" th:with="dutyDate=${param.dutyDate != null ? param.dutyDate[0] : '2026-10-24'}">
+    <div class="page-title"><h3>엔지니어 순번관리 (DX)</h3></div>
+
+    <form id="searchForm" method="get" th:action="@{/sample/cswt/egn/assign-dx}">
+        <div class="x_panel">
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto"><label class="search-label" for="dutyDate">기간설정</label></div>
+                    <div class="col-auto">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                            <input type="date" class="form-control" id="dutyDate" name="dutyDate" style="width: 200px;" th:value="${dutyDate}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="btn-row end mb-1">
+        <button class="btn btn-success" type="button" data-bs-toggle="collapse" data-bs-target="#regionInfo"
+                aria-expanded="false" aria-controls="regionInfo">지역번호 정보</button>
+        <button class="btn btn-success" type="button" id="btnSave">저장하기</button>
+        <button class="btn btn-success" type="button" id="btnExcel"
+                th:attr="data-modal-url=@{/sample/cswt/egn/modal/assign-dx-excel}">엑셀업로드</button>
+    </div>
+
+    <div class="x_panel">
+        <div class="x_content">
+            <!-- 지역번호 안내: '지역번호 정보' 버튼으로 펼치고 접음 -->
+            <div class="collapse" id="regionInfo">
+                <h4 class="info-title">지역번호</h4>
+                <div class="table-responsive">
+                    <table class="table table-striped jambo_table info-table">
+                        <colgroup>
+                            <col style="width: 200px;">
+                            <col>
+                        </colgroup>
+                        <tbody>
+                        <tr th:each="t : ${ { {'부산/울산/경남','부산(051) / 울산(052) / 경남(055)'}, {'대구/경북','대구(053) / 경북(054)'}, {'대전/충청','대전(042) / 충남(041) / 충북(043) / 세종(044)'}, {'전남/광주','전남(061) / 광주(062)'}, {'전북','전북(063)'}, {'서울/경기/강원','서울(02) / 경기(031) / 인천(032) / 강원(033)'}, {'제주','제주(064)'} } }">
+                            <td class="info-key" th:text="${t[0]}">부산/울산/경남</td>
+                            <td class="a-left" th:text="${t[1]}">부산(051) / 울산(052) / 경남(055)</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <div id="grid_1" th:attr="data-duty-date=${dutyDate}"></div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/assets/vendor/handsontable-6.2.2/handsontable.full.min.js}"></script>
+    <script th:src="@{/assets/vendor/handsontable-6.2.2/languages/ko-KR.min.js}"></script>
+    <script th:src="@{/assets/js/oh-handsontable.js}"></script>
+    <script th:inline="none">
+        (function () {
+            const el = document.getElementById('grid_1');
+            const dutyDate = el.dataset.dutyDate;
+            const SEQ = ['emplName01', 'emplName02', 'emplName03', 'emplName04', 'emplName05'];
+            // 샘플 데이터 (원본 ${jsonData}): 날짜 / 지역 / 순번-1~5
+            const data = [
+                ['부산/울산/경남', '배준호|신유진|조민재'],
+                ['대구/경북', '류승우|문가영'],
+                ['대전/충청', '송지호|안소희|황보람|남궁민'],
+                ['전남/광주', ''],
+                ['전북', '장우진'],
+                ['서울/경기/강원', '홍길동|김철수|이영희|박민수|최지원'],
+                ['제주', '']
+            ].map(([region, names]) => {
+                const row = { duty_date: dutyDate, region_rem: region };
+                const list = names ? names.split('|') : [];
+                SEQ.forEach((k, i) => { row[k] = list[i] || ''; });
+                return row;
+            });
+
+            oh.grid(el, {
+                data: data,
+                columns: [
+                    { data: 'duty_date', width: 90, readOnly: true },
+                    { data: 'region_rem', width: 120, readOnly: true },
+                    ...SEQ.map(k => ({ data: k, width: 100 }))
+                ],
+                height: 487,
+                minRows: 7,
+                colHeaders: ['날짜', '지역', '순번-1', '순번-2', '순번-3', '순번-4', '순번-5'],
+                contextMenu: ['row_above', 'row_below'],
+                // 순번-1~5(읽기 전용이 아닌 칸)가 모두 비어 있는 줄은 노란색 (hot-empty-row)
+                cells: oh.grid.emptyRowCells(),
+                afterChange: function (changes, source) {
+                    if (source === 'loadData') return;
+                    this.render();
+                }
+            });
+
+            document.getElementById('dutyDate').addEventListener('change', e => {
+                if (e.target.value) e.target.form.submit();
+            });
+
+            document.getElementById('btnSave').addEventListener('click', () => {
+                oh.confirm('저장하시겠습니까?', { okText: '저장' }).then(ok => { if (ok) oh.toast('저장이 완료되었습니다.'); });
+            });
+
+            document.getElementById('btnExcel').addEventListener('click', e => oh.modal.open(e.currentTarget.dataset.modalUrl));
+        })();
+    </script>
+</th:block>
+</body>
+</html>

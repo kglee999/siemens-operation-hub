@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 당직 추가 모달 (CS Webtool egn_assign_di_add.jsp). 이름 검색으로 엔지니어를 확인한 뒤 저장. -->
+<div class="modal fade" tabindex="-1" aria-labelledby="dutyAddTitle" aria-hidden="true" th:fragment="modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" id="dutyAddForm" th:action="@{/sample/duty/save}" method="post" novalidate
+              th:attr="data-check-url=@{/sample/duty/engineer}">
+            <input type="hidden" name="branchCd" th:value="${branchCd}">
+            <input type="hidden" name="gg" th:value="${gg}">
+            <input type="hidden" name="dutyDate" th:value="${dutyDate}">
+            <input type="hidden" name="emplNo">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dutyAddTitle">당직 추가하기 <small class="text-navy" th:text="${gg} + ' · ' + ${dutyDate}">CT · 2026-10-24</small></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 align-items-start">
+                    <div class="col-sm-3"><label class="col-form-label search-label" for="dutyKorName">엔지니어 이름</label></div>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="dutyKorName" name="korName" placeholder="엔지니어 이름" required autocomplete="off">
+                        <div class="invalid-feedback">엔지니어 이름을 검색해서 확인하세요.</div>
+                    </div>
+                    <div class="col-sm-2"><button type="button" class="btn btn-success w-100" id="btnEngineerCheck">검색</button></div>
+                    <div class="col-sm-2"><span class="col-form-label d-block check-status text-danger" id="engineerStatus">미확인</span></div>
+                </div>
+                <p class="form-text mb-0">샘플 엔지니어: 홍길동, 김철수, 이영희, 박민수, 최지원, 정하늘, 강서준, 윤지우, 임도윤, 한예린, 오세훈, 서다은</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+                <button type="submit" class="btn btn-success">저장하기</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            const form = document.getElementById('dutyAddForm');
+            const name = form.korName;
+            const status = document.getElementById('engineerStatus');
+
+            function setChecked(emplNo) {
+                form.emplNo.value = emplNo || '';
+                status.textContent = emplNo ? '확인완료' : '미확인';
+                status.className = 'col-form-label d-block check-status ' + (emplNo ? 'text-confirm' : 'text-danger');
+                name.setCustomValidity(emplNo ? '' : 'unchecked');
+            }
+
+            function check() {
+                if (!name.value.trim()) { setChecked(null); form.classList.add('was-validated'); name.focus(); return; }
+                oh.ajax.post(form.dataset.checkUrl, { korName: name.value }).then(res => {
+                    setChecked(res.result === 'OK' ? res.emplNo : null);
+                    form.classList.add('was-validated');
+                    if (res.result !== 'OK') form.querySelector('.invalid-feedback').textContent = res.message;
+                });
+            }
+
+            setChecked(null);
+            document.getElementById('btnEngineerCheck').addEventListener('click', check);
+            // 이름을 바꾸면 다시 미확인, Enter 는 검색
+            name.addEventListener('input', () => setChecked(null));
+            name.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); check(); } });
+
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                form.classList.add('was-validated');
+                if (!form.checkValidity()) {
+                    form.querySelector('.invalid-feedback').textContent = '엔지니어 이름을 검색해서 확인하세요.';
+                    return;
+                }
+                oh.ajax.postForm(form.action, form).then(res => {
+                    if (res.result !== 'OK') {
+                        name.setCustomValidity(res.message);
+                        form.querySelector('.invalid-feedback').textContent = res.message;
+                        return;
+                    }
+                    bootstrap.Modal.getInstance(form.closest('.modal')).hide();
+                    oh.toast(res.message);
+                    window.dutyReload && window.dutyReload();
+                });
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

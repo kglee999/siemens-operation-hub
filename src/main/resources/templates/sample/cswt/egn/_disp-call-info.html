@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Call 요청 정보 (CS Webtool egn/disp/call_info_pop.jsp). 읽기 전용. type=3 (장애 접수 Call) 이면 장애내역 표시 -->
+<div class="modal fade" tabindex="-1" aria-labelledby="dispCallInfoTitle" aria-hidden="true" th:fragment="modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dispCallInfoTitle">Call 요청 정보</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 mb-2">
+                    <div class="col-sm-4"><span class="col-form-label text-sm-end d-block fw-bold">인입번호</span></div>
+                    <div class="col-sm-8"><p class="form-static">02-2072-1234</p></div>
+                </div>
+                <div class="row g-2" th:classappend="${param.type != null} ? 'mb-2'">
+                    <div class="col-sm-4"><span class="col-form-label text-sm-end d-block fw-bold">회신연락처</span></div>
+                    <div class="col-sm-8"><p class="form-static">010-3456-7890</p></div>
+                </div>
+                <div class="row g-2" th:if="${param.type != null and param.type[0] == '3'}">
+                    <div class="col-sm-4"><span class="col-form-label text-sm-end d-block fw-bold">장애내역</span></div>
+                    <div class="col-sm-8"><p class="form-static">CT 촬영 중 Gantry 회전 오류 메시지가 표시되고 검사가 중단되었습니다. 재부팅 후에도 같은 증상입니다.</p></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>홈</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <div class="page-title">
+        <h3>홈</h3>
+    </div>
+
+    <div class="my_menu">
+        <ul>
+            <li><a th:href="@{/sample/list}"><i class="bi bi-list-ul"></i><span>목록 화면<br>샘플</span></a></li>
+            <li><a th:href="@{/sample/form}"><i class="bi bi-pencil-square"></i><span>등록/수정 화면<br>샘플</span></a></li>
+            <li><a th:href="@{/sample/components}"><i class="bi bi-ui-checks-grid"></i><span>UI 컴포넌트<br>샘플</span></a></li>
+            <li><a th:href="@{/sample/modal}"><i class="bi bi-window-stack"></i><span>모달 등록<br>샘플</span></a></li>
+            <li><a th:href="@{/sample/table}"><i class="bi bi-grid-3x3"></i><span>일반 테이블<br>샘플</span></a></li>
+            <li><a th:href="@{/sample/datatable}"><i class="bi bi-table"></i><span>DataTables<br>샘플</span></a></li>
+            <li><a th:href="@{/sample/handsontable}"><i class="bi bi-grid-1x2"></i><span>Handsontable<br>샘플</span></a></li>
+            <li><a th:href="@{/sample/duty}"><i class="bi bi-calendar-check"></i><span>724 당직 관리<br>(DI)</span></a></li>
+            <li><a href="#"><i class="bi bi-gear"></i><span>관리자<br>설정</span></a></li>
+        </ul>
+    </div>
+</main>
+</body>
+</html>

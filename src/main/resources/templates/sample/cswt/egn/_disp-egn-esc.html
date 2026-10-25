@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 엔지니어 지정 이관 (CS Webtool egn/disp/call_egn_esc.jsp). nosid=1 이면 SYSTEM ID 입력칸 표시. 이름 검색으로 엔지니어를 확인한 뒤 저장 -->
+<div class="modal fade" tabindex="-1" aria-labelledby="dispEgnEscTitle" aria-hidden="true" th:fragment="modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" novalidate>
+            <input type="hidden" name="egn_no">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dispEgnEscTitle">엔지니어 지정 이관</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 align-items-start mb-2" th:if="${param.nosid != null}">
+                    <div class="col-sm-4"><label class="col-form-label text-sm-end d-block" for="eeSystemId">SYSTEM ID</label></div>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="eeSystemId" name="system_id" placeholder="SYSTEM_ID" required>
+                        <div class="invalid-feedback">SYSTEM_ID 를 입력해주세요.</div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start">
+                    <div class="col-sm-4"><label class="col-form-label text-sm-end d-block" for="eeEgnNm">엔지니어 이름</label></div>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="eeEgnNm" name="egn_nm" placeholder="엔지니어 이름" required autocomplete="off">
+                        <div class="invalid-feedback">엔지니어 이름을 검색해서 확인하세요.</div>
+                    </div>
+                    <div class="col-sm-2"><button type="button" class="btn btn-success w-100 btn-egn-search">검색</button></div>
+                    <div class="col-sm-2"><span class="col-form-label d-block check-status text-danger egn-status">미확인</span></div>
+                </div>
+                <div class="row g-2 mb-2">
+                    <div class="col-sm-8 offset-sm-4"><p class="form-text m-0">샘플 엔지니어: 김민준, 이서연, 박지호, 최유진, 정현우, 강하은, 윤도현, 임채원, 한지민, 오승민</p></div>
+                </div>
+                <div class="row g-2">
+                    <div class="col-sm-4"><label class="col-form-label text-sm-end d-block" for="eeOsrRem">처리내역</label></div>
+                    <div class="col-sm-8">
+                        <textarea class="form-control" rows="15" id="eeOsrRem" name="osr_rem" placeholder="처리내역을 입력하세요" required></textarea>
+                        <div class="invalid-feedback">처리내역을 입력해주세요.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+                <button type="submit" class="btn btn-success">저장하기</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            var modal = document.currentScript.closest('.modal');
+            var form = modal.querySelector('form');
+            var name = form.egn_nm;
+            var status = modal.querySelector('.egn-status');
+            // 샘플 엔지니어 (실제로는 /egn/disp/callEgn/getEmplNum 조회)
+            var ENGINEERS = { '김민준': 'E1021', '이서연': 'E1034', '박지호': 'E1047', '최유진': 'E1052', '정현우': 'E1068',
+                              '강하은': 'E1073', '윤도현': 'E1089', '임채원': 'E1095', '한지민': 'E1102', '오승민': 'E1117' };
+
+            function setChecked(emplNo) {
+                form.egn_no.value = emplNo || '';
+                status.textContent = emplNo ? '확인완료' : '미확인';
+                status.className = 'col-form-label d-block check-status egn-status ' + (emplNo ? 'text-confirm' : 'text-danger');
+                name.setCustomValidity(emplNo ? '' : 'unchecked');
+            }
+            function check() {
+                if (!name.value.trim()) { oh.toast('엔지니어 이름을 입력해주세요.', 'warning'); name.focus(); return; }
+                var emplNo = ENGINEERS[name.value.trim()];
+                setChecked(emplNo);
+                oh.toast(emplNo ? '엔지니어가 확인되었습니다.' : '엔지니어가 확인되지 않습니다.', emplNo ? 'success' : 'danger');
+            }
+
+            setChecked(null);
+            modal.querySelector('.btn-egn-search').addEventListener('click', check);
+            // 이름을 바꾸면 다시 미확인, Enter 는 검색
+            name.addEventListener('input', function () { setChecked(null); });
+            name.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); check(); } });
+
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                form.classList.add('was-validated');
+                var bad = form.querySelector(':invalid');
+                if (bad) { bad.focus(); return; }
+                bootstrap.Modal.getInstance(modal).hide();
+                oh.toast('저장이 완료되었습니다.', 'success');
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

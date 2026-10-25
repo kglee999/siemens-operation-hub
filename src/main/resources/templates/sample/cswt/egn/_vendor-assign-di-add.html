@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- CS Webtool egn/vendor_assign_di_add.jsp: 파트너사명 / 엔지니어 이름 검색 → 확인완료 후 저장 -->
+<div class="modal fade" tabindex="-1" aria-labelledby="vendorAddTitle" aria-hidden="true" th:fragment="modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" id="vendorAddForm" novalidate>
+            <div class="modal-header">
+                <h5 class="modal-title" id="vendorAddTitle">파트너사 당직 추가하기 <small class="text-navy" id="vendorAddSub">CT · 2026-10-24</small></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-sm-3"><span class="col-form-label search-label d-block">파트너사명</span></div>
+                    <div class="col-sm-9"><p class="form-static" id="vendorAddName">HANMED</p></div>
+                </div>
+                <div class="row g-2 align-items-start">
+                    <div class="col-sm-3"><label class="col-form-label search-label" for="vendorEngName">엔지니어 이름</label></div>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="vendorEngName" name="vndEngNm" placeholder="엔지니어 이름" required autocomplete="off">
+                        <div class="invalid-feedback">엔지니어 이름을 검색해서 확인하세요.</div>
+                    </div>
+                    <div class="col-sm-2"><button type="button" class="btn btn-success w-100" id="btnVendorEngSearch">검색</button></div>
+                    <div class="col-sm-2"><span class="col-form-label d-block check-status text-danger" id="vendorEngStatus">미확인</span></div>
+                </div>
+                <p class="form-text mb-0" id="vendorEngHint"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+                <button type="submit" class="btn btn-success">저장하기</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            // 샘플 파트너사 엔지니어 (원본은 /egn/vendorAssignDI/search 로 확인)
+            const ENGINEERS = {
+                'HANMED': ['김도현', '이준서', '박서연', '최민호', '정유나', '한지민', '문태호'],
+                'KMS': ['오승현', '강다인', '윤태경', '서지안', '노현우'],
+                'DAEJIN MEDICAL': ['임채원', '조하람', '배성우', '신동혁', '유가은']
+            };
+            const target = window.vendorAssignTarget || { vendor: 'HANMED', gg: 'CT', dutyDate: '2026-10-24' };
+            const list = ENGINEERS[target.vendor] || [];
+            const form = document.getElementById('vendorAddForm');
+            const name = form.vndEngNm;
+            const status = document.getElementById('vendorEngStatus');
+
+            document.getElementById('vendorAddName').textContent = target.vendor;
+            document.getElementById('vendorAddSub').textContent = target.gg + ' · ' + target.dutyDate;
+            document.getElementById('vendorEngHint').textContent = '샘플 엔지니어: ' + list.join(', ');
+
+            function setChecked(ok) {
+                status.textContent = ok ? '확인완료' : '미확인';
+                status.className = 'col-form-label d-block check-status ' + (ok ? 'text-confirm' : 'text-danger');
+                name.setCustomValidity(ok ? '' : 'unchecked');
+            }
+            function search() {
+                form.classList.add('was-validated');
+                if (!name.value.trim()) {
+                    form.querySelector('.invalid-feedback').textContent = '엔지니어 이름을 입력해주세요.';
+                    setChecked(false); name.focus(); return;
+                }
+                const ok = list.includes(name.value.trim());
+                setChecked(ok);
+                if (ok) oh.toast('엔지니어가 확인되었습니다.');
+                else form.querySelector('.invalid-feedback').textContent = '엔지니어가 확인되지 않습니다.';
+            }
+
+            setChecked(false);
+            document.getElementById('btnVendorEngSearch').addEventListener('click', search);
+            name.addEventListener('input', () => setChecked(false));
+            name.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); search(); } });
+
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                form.classList.add('was-validated');
+                if (!form.checkValidity()) {
+                    form.querySelector('.invalid-feedback').textContent = '엔지니어 이름이 확인되지 않았습니다.';
+                    return;
+                }
+                if (target.tr && window.vendorAssignAddChip) window.vendorAssignAddChip(target.tr, name.value.trim());
+                bootstrap.Modal.getInstance(form.closest('.modal')).hide();
+                oh.toast('저장이 완료되었습니다.');
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

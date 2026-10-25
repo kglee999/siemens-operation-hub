@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>CSE/Apps 업무현황</title>
+    <link rel="stylesheet" th:href="@{/assets/css/cswt/egn-status.css}">
+</head>
+<body>
+<!-- CS Webtool egn/egn_weekly.jsp + egn/weekly/egn_weekly_item.jsp
+     연/월/주 선택 · 조직설정 / 안내 문구 / 표시기준 범례 · 2줄 헤더 · 앞 4열 고정 · 경고 색 셀 · 팀 소계 행 -->
+<main layout:fragment="content">
+    <div class="page-title"><h3>CSE/Apps 업무현황</h3></div>
+
+    <form id="searchForm" onsubmit="return false;">
+        <div class="x_panel">
+            <div class="x_content">
+                <!-- 연 / 월 / 주(토~금) 선택: 주를 바꾸면 바로 조회 -->
+                <div class="well">
+                    <div class="row g-2 justify-content-center">
+                        <div class="col-lg-2 col-md-3 col-6">
+                            <select class="form-select" id="year" name="year" aria-label="연도"></select>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-6">
+                            <select class="form-select" id="month" name="month" aria-label="월"></select>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-12">
+                            <select class="form-select" id="week" name="week" aria-label="주"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-1 col-md-2"><span class="search-label">조직설정</span></div>
+                    <div class="col-lg-6 col-md-10">
+                        <div class="row g-1">
+                            <div class="col">
+                                <select class="form-select" id="searchType" name="searchType" aria-label="Plant">
+                                    <option value="">전체</option>
+                                    <option value="96E6">DI</option>
+                                    <option value="94E6">DX</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select class="form-select" id="searchType2" name="searchType2" aria-label="Team">
+                                    <option value="">전체</option>
+                                    <option>CSE</option>
+                                    <option>APP</option>
+                                    <option>RSC</option>
+                                    <option>CH</option>
+                                </select>
+                            </div>
+                            <div class="col" id="modality-area">
+                                <select class="form-select" id="modality" name="modality" aria-label="Modality">
+                                    <option value="">전체</option>
+                                    <option>CT</option>
+                                    <option>MR</option>
+                                    <option>AX</option>
+                                    <option>XP</option>
+                                    <option>US</option>
+                                    <option>MI</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select class="form-select" id="searchType3" name="searchType3" aria-label="Region">
+                                    <option value="">전체</option>
+                                    <option>서울</option>
+                                    <option>경기</option>
+                                    <option>강원</option>
+                                    <option>충청</option>
+                                    <option>영남</option>
+                                    <option>호남</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5 col-12">
+                        <div class="btn-row center">
+                            <button class="btn btn-success" type="button" id="btnSearch">검색하기</button>
+                            <button class="btn btn-success" type="button" id="btnExcel">엑셀 다운로드</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="alert-line">RPA 문제가 발생하여 업무 시간이 제대로 업데이트되지 않을 수 있습니다.</div>
+    <div class="guide-text">
+        Work, TRAV, Training, Meeting, Office, Remote만 근무시간에 포함됩니다.<br>
+        근무시간은 토요일-금요일을 기준으로 주 단위 집계됩니다.<br>
+        평일, 주말 구분 없이 일일 근무시간 8시간 초과 시, 초과분은 연장근무시간으로 자동 계산됩니다.<br>
+        주간 총근무시간이 52시간 이내이더라도, 연장근무시간은 최대 12시간을 초과할 수 없습니다.<br>
+        [알림 문자 발송 기준]<br>
+        1. 매일 오전 9시 기준, 근무시간 36시간 도달 시<br>
+        2. 매일 오전 9시 기준, 근무시간 38시간 도달 시<br>
+        3. 매일 오전 9시 기준, 연장근무시간 6시간 도달 시<br>
+        4. 매일 오전 9시 기준, 연장근무시간 9시간 도달 시<br>
+        5. 매일 오전 9시 기준, 이전 주간 총근무시간 52시간 초과 발생 시<br>
+        6. 매월 1 – 3일(총 3번), 전월 전체 주간 총근무시간 중 52시간 초과 발생 시
+    </div>
+
+    <div class="x_panel">
+        <div class="x_content">
+            <!-- 표시기준: 근무시간 / 연장근무시간 (WorkingType.WARNING) -->
+            <div class="legend">
+                <span class="legend-title">표시기준</span>
+                <span><i class="unit cell-warning"></i>36~37 / 6~8</span>
+                <span><i class="unit cell-delay"></i>38 / 9</span>
+            </div>
+            <div class="table-freeze freeze-4" style="max-height: 600px;">
+                <table class="table table-striped jambo_table" id="tableList">
+                    <thead>
+                    <tr>
+                        <th rowspan="2" class="fz fz-1">Div</th>
+                        <th rowspan="2" class="fz fz-2">Team</th>
+                        <th rowspan="2" class="fz fz-3">Region</th>
+                        <th rowspan="2" class="fz fz-4">엔지니어</th>
+                        <th rowspan="2">총근무시간</th>
+                        <th rowspan="2">근무시간</th>
+                        <th rowspan="2">연장근무시간</th>
+                        <th>Work</th>
+                        <th>TRAV</th>
+                        <th>Training</th>
+                        <th>Meeting</th>
+                        <th>Office</th>
+                        <th>Remote</th>
+                        <th>SBTRAV</th>
+                        <th>Break</th>
+                        <th>Comp</th>
+                        <th>Non Prod</th>
+                    </tr>
+                    <tr>
+                        <th>포함</th>
+                        <th>포함</th>
+                        <th>포함</th>
+                        <th>포함</th>
+                        <th>포함</th>
+                        <th>포함</th>
+                        <th>제외</th>
+                        <th>제외</th>
+                        <th>제외</th>
+                        <th>제외</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script th:inline="none">
+        (function () {
+            const $ = id => document.getElementById(id);
+            const pad = n => String(n).padStart(2, '0');
+            const fmt = (d, sep) => d.getFullYear() + sep + pad(d.getMonth() + 1) + sep + pad(d.getDate());
+
+            // ---- 연 / 월 / 주 선택 (원본 setYear / setMonth / setWeek / calcWeek) ----
+            const today = new Date();
+            for (let y = 2018; y <= today.getFullYear(); y++) $('year').add(new Option(y, y, false, y === today.getFullYear()));
+            for (let m = 1; m <= 12; m++) $('month').add(new Option(m + '월', m, false, m === today.getMonth() + 1));
+
+            // day 가 속한 주의 토요일 ~ 금요일
+            function calcWeek(year, month, day) {
+                const start = new Date(year, month - 1, day);
+                if (start.getDay() !== 6) start.setDate(start.getDate() - (start.getDay() + 1));
+                const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6);
+                const t = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                return [start, end, start <= t && end >= t];
+            }
+            function setWeek() {
+                const year = +$('year').value, month = +$('month').value;
+                const last = new Date(year, month, 0).getDate();
+                $('week').innerHTML = '';
+                for (let i = 1; i <= last; i += 7) {
+                    const [s, e, cur] = calcWeek(year, month, i);
+                    $('week').add(new Option(fmt(s, '.') + ' ~ ' + fmt(e, '.'), fmt(s, '') + '|' + fmt(e, ''), false, cur));
+                }
+            }
+
+            // ---- Plant 에 따라 Modality 표시 (DX 는 Modality 없음) ----
+            function syncPlant() {
+                const dx = $('searchType').value === '94E6';
+                if (dx) $('modality').value = '';
+                $('modality-area').hidden = dx;
+            }
+
+            // ---- 주간 데이터 (샘플): 근무시간(B) / 연장근무시간(E) 과 항목별 시간 ----
+            // [Div, Team, Region, 엔지니어, B, E, TRAV, Training, Meeting, Office, Remote, SBTRAV, Break, Comp, NonProd]
+            const DATA = [
+                ['DI', 'CSE', '서울', '김민수', 38.00, 9.50, 6.50, 0.00, 1.00, 2.00, 0.00, 1.50, 4.50, 0.00, 0.00],
+                ['DI', 'CSE', '서울', '이준호', 36.50, 4.00, 5.00, 2.00, 1.00, 1.50, 0.50, 0.00, 4.00, 0.00, 0.50],
+                ['DI', 'CSE', '경기', '박성진', 32.00, 2.00, 4.50, 0.00, 1.00, 3.00, 0.00, 1.00, 3.50, 0.00, 0.00],
+                ['DI', 'CSE', '영남', '최영훈', 40.00, 6.50, 8.00, 0.00, 0.50, 1.00, 0.00, 2.00, 5.00, 0.00, 0.00],
+                ['DI', 'CSE', '호남', '정대현', 24.00, 0.00, 3.00, 0.00, 1.00, 2.00, 1.00, 0.00, 2.50, 8.00, 0.00],
+                ['DI', 'APP', '서울', '한지은', 30.00, 1.00, 2.50, 4.00, 2.00, 3.50, 2.00, 0.00, 3.00, 0.00, 0.00],
+                ['DI', 'APP', '경기', '오세영', 36.00, 6.00, 4.00, 2.00, 1.50, 2.50, 1.00, 0.00, 4.00, 0.00, 0.00],
+                ['DI', 'APP', '충청', '윤혜린', 16.00, 0.00, 2.00, 0.00, 1.00, 4.00, 0.00, 0.00, 2.00, 0.00, 8.00],
+                ['DX', 'CSE', '서울', '강동원', 33.50, 3.00, 5.50, 0.00, 1.00, 2.00, 0.50, 0.50, 4.00, 0.00, 0.00],
+                ['DX', 'CSE', '영남', '임재범', 37.00, 7.50, 7.00, 0.00, 0.50, 1.50, 0.00, 1.50, 4.50, 0.00, 0.00],
+                ['DX', 'CSE', '호남', '송민호', 28.00, 0.50, 4.00, 0.00, 1.00, 2.50, 0.00, 0.00, 3.50, 4.00, 0.00],
+                ['DX', 'APP', '서울', '배수지', 34.00, 2.50, 3.00, 3.00, 2.00, 4.00, 1.50, 0.00, 4.00, 0.00, 0.00],
+                ['DX', 'APP', '경기', '신예은', 20.00, 0.00, 2.00, 0.00, 1.00, 3.00, 1.00, 0.00, 2.50, 0.00, 4.00]
+            ];
+
+            // WorkingType.WARNING.getWarningClazz: 경고(38h / 연장 9h) > 조기경보(36h / 연장 6h)
+            function warningClass(b, e) {
+                if (b >= 38 || e >= 9) return 'cell-delay';
+                if (b >= 36 || e >= 6) return 'cell-warning';
+                return '';
+            }
+
+            function toRow(r) {
+                const [div, team, region, name, b, e, trav, training, meeting, office, remote, sbtrav, brk, comp, nonprod] = r;
+                const w = b + e;
+                const work = w - trav - training - meeting - office - remote; // 포함 항목 합 = 총근무시간
+                return { div, team, region, name, vals: [w, b, e, work, trav, training, meeting, office, remote, sbtrav, brk, comp, nonprod] };
+            }
+
+            function avgRow(rows, div, team) {
+                const vals = rows[0].vals.map((_, i) => rows.reduce((s, r) => s + r.vals[i], 0) / rows.length);
+                return { div, team, region: '', name: '', vals, total: true };
+            }
+
+            function render() {
+                const plant = $('searchType').value, team = $('searchType2').value, region = $('searchType3').value;
+                const plantName = { '96E6': 'DI', '94E6': 'DX' }[plant];
+                const rows = DATA.map(toRow).filter(r =>
+                    (!plantName || r.div === plantName) && (!team || r.team === team) && (!region || r.region === region));
+
+                // Div > Team 묶음 + 팀 소계(평균) 행 (원본 SQL WITH ROLLUP)
+                const groups = [];
+                rows.forEach(r => {
+                    let g = groups.find(x => x.div === r.div);
+                    if (!g) groups.push(g = { div: r.div, teams: [] });
+                    let t = g.teams.find(x => x.team === r.team);
+                    if (!t) g.teams.push(t = { team: r.team, rows: [] });
+                    t.rows.push(r);
+                });
+
+                const html = [];
+                groups.forEach(g => {
+                    const divSpan = g.teams.reduce((s, t) => s + t.rows.length + 1, 0);
+                    g.teams.forEach((t, ti) => {
+                        const list = t.rows.concat(avgRow(t.rows, g.div, t.team));
+                        list.forEach((r, ri) => {
+                            const cls = r.total ? '' : warningClass(r.vals[1], r.vals[2]);
+                            const c = cls ? ' class="' + cls + '"' : '';
+                            const cb = ' class="a-bold' + (cls ? ' ' + cls : '') + '"';
+                            html.push('<tr' + (r.total ? ' class="row-total"' : '') + '>');
+                            if (ti === 0 && ri === 0) html.push('<td class="fz fz-1" rowspan="' + divSpan + '">' + g.div + '</td>');
+                            if (ri === 0) html.push('<td class="fz fz-2" rowspan="' + list.length + '">' + t.team + '</td>');
+                            html.push('<td class="fz fz-3' + (cls ? ' ' + cls : '') + '">' + r.region + '</td>');
+                            html.push('<td class="fz fz-4' + (cls ? ' ' + cls : '') + '">' + r.name + '</td>');
+                            r.vals.forEach((v, i) => html.push('<td' + (i < 3 ? cb : c) + '>' + v.toFixed(2) + '</td>'));
+                            html.push('</tr>');
+                        });
+                    });
+                });
+                $('tableBody').innerHTML = html.length ? html.join('')
+                    : '<tr class="no-data"><td colspan="17">목록이 없습니다.</td></tr>';
+            }
+
+            function search() {
+                oh.loading.show();
+                setTimeout(() => { render(); oh.loading.hide(); }, 200);
+            }
+
+            $('year').addEventListener('change', setWeek);
+            $('month').addEventListener('change', setWeek);
+            $('week').addEventListener('change', search);
+            $('searchType').addEventListener('change', syncPlant);
+            $('btnSearch').addEventListener('click', search);
+            $('btnExcel').addEventListener('click', () => oh.toast('엑셀 파일을 다운로드합니다.', 'success'));
+
+            setWeek();
+            syncPlant();
+            render();
+        })();
+    </script>
+</th:block>
+</body>
+</html>

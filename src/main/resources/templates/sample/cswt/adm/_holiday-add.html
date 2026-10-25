@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 휴일 정보 수정 모달 (CS Webtool adm/adm_holiday_add.jsp). param: idx, name, date(yyyy-MM-dd) -->
+<div class="modal fade" tabindex="-1" aria-labelledby="holidayAddTitle" aria-hidden="true" th:fragment="modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" id="holidayAddForm" novalidate>
+            <input type="hidden" name="idx" th:value="${param.idx}">
+            <div class="modal-header">
+                <h5 class="modal-title" id="holidayAddTitle">휴일 정보 수정 <small class="text-navy">휴일 정보를 수정하실 수 있습니다.</small></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-4"><label class="col-form-label" for="hDateName">공휴일명</label></div>
+                    <div class="col-8">
+                        <input type="text" class="form-control" id="hDateName" name="date_name" placeholder="공휴일명" required th:value="${param.name}">
+                        <div class="invalid-feedback">공휴일명을 입력해주세요.</div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start">
+                    <div class="col-4"><label class="col-form-label" for="hLocdate">날짜</label></div>
+                    <div class="col-8">
+                        <div class="input-group has-validation">
+                            <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                            <input type="date" class="form-control" id="hLocdate" name="locdate" required th:value="${param.date}">
+                            <div class="invalid-feedback">날짜를 입력해주세요.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success">수정</button>
+                <button type="button" class="btn btn-danger" id="btnHolidayDelete">삭제</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            const form = document.getElementById('holidayAddForm');
+            const modal = bootstrap.Modal.getOrCreateInstance(form.closest('.modal'));
+            const idx = Number(form.idx.value);
+
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                form.classList.add('was-validated');
+                if (!form.checkValidity()) { form.querySelector(':invalid').focus(); return; }
+                oh.confirm('수정하시겠습니까?', { okText: '수정' }).then(ok => {
+                    if (!ok) return;
+                    window.holidayUpdate && window.holidayUpdate(idx, form.date_name.value.trim(), form.locdate.value);
+                    modal.hide();
+                    oh.toast('수정이 완료되었습니다.');
+                });
+            });
+            document.getElementById('btnHolidayDelete').addEventListener('click', () => {
+                oh.confirm('삭제하시겠습니까?', { okText: '삭제' }).then(ok => {
+                    if (!ok) return;
+                    window.holidayDelete && window.holidayDelete(idx);
+                    modal.hide();
+                    oh.toast('삭제가 완료되었습니다.');
+                });
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

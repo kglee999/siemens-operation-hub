@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>724 당직 관리 (DI)</title>
+</head>
+<body>
+<!-- CS Webtool egn_assign_di.jsp 와 같은 구성:
+     기간설정 / 당직 시간 안내 / 자동배정 설정 · 배정타입 저장 버튼 / 지역별 GG 표(배정타입 라디오 · 당직 엔지니어 · 추가) -->
+<main layout:fragment="content">
+    <div class="page-title">
+        <h3>724 당직 관리 (DI)</h3>
+    </div>
+
+    <!-- 검색 영역: 날짜를 바꾸면 바로 조회 -->
+    <form id="searchForm" method="get" th:action="@{/sample/duty}">
+        <div class="x_panel">
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto"><label class="search-label" for="dutyDate">기간설정</label></div>
+                    <div class="col-auto">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                            <input type="date" class="form-control" id="dutyDate" name="dutyDate" style="width: 200px;"
+                                   th:value="${dutyDate}" required>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <span class="duty-time">당직 시간 <strong th:text="${dutyTime}">10-24(금) 18:00 ~ 10-25(토) 08:00</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="guide-text">
+        평일 당직은 금일 18:00 부터 익일 08:00 까지 순번에 따라 배정<br>
+        주말 및 공휴일 당직은 금일 08:00 부터 익일 08:00 까지 순번에 따라 배정<br>
+        예시1) 목요일 당직은 (목)18:00 ~ (금)08:00<br>
+        예시2) 금요일 당직은 (금)18:00 ~ (토)08:00<br>
+        예시3) 토요일 당직은 (토)08:00 ~ (일)08:00<br>
+        예시4) 일요일 당직은 (일)08:00 ~ (월)08:00
+    </div>
+
+    <div class="btn-row end mb-1">
+        <button class="btn btn-success" type="button" id="btnAutoSet"
+                th:attr="data-modal-url=@{/sample/duty/auto}">자동배정 설정</button>
+        <button class="btn btn-success" type="button" id="btnTypeSave">엔지니어 배정타입 저장하기</button>
+    </div>
+
+    <!-- 당직표: 추가/삭제 후 이 영역만 서버에서 다시 받아 바꿈 (SampleController#dutyBoard) -->
+    <div class="x_panel" id="dutyBoard" th:fragment="board"
+         th:attr="data-duty-date=${dutyDate},data-board-url=@{/sample/duty/board},data-add-url=@{/sample/duty/add},data-delete-url=@{/sample/duty/delete},data-type-url=@{/sample/duty/type}">
+        <div class="x_content">
+            <th:block th:each="a : ${areas}">
+                <h3 class="duty-area-title" th:text="${a.area.order} + '. ' + ${a.area.branchNm}">1. 서울/경기</h3>
+                <div class="table-responsive">
+                    <table class="table table-striped jambo_table duty-table">
+                        <colgroup>
+                            <col style="width: 150px;">
+                            <col style="width: 300px;">
+                            <col>
+                            <col style="width: 70px;">
+                        </colgroup>
+                        <tbody>
+                        <tr th:each="r : ${a.rows}" th:attr="data-branch-cd=${r.branchCd},data-gg=${r.gg},data-type=${r.type}">
+                            <td><h4 th:text="${r.gg}">CT</h4></td>
+                            <td class="a-left">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" value="CSE"
+                                           th:id="|type${r.branchCd}${r.gg}C|" th:name="|type${r.branchCd}${r.gg}|" th:checked="${!r.egn()}">
+                                    <label class="form-check-label" th:for="|type${r.branchCd}${r.gg}C|">장비담당CSE배정</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" value="EGN"
+                                           th:id="|type${r.branchCd}${r.gg}E|" th:name="|type${r.branchCd}${r.gg}|" th:checked="${r.egn()}">
+                                    <label class="form-check-label" th:for="|type${r.branchCd}${r.gg}E|">당직엔지니어배정</label>
+                                </div>
+                            </td>
+                            <td class="a-left duty-engineers">
+                                <span class="duty-cse-text">장비 담당 CSE에게 배정됩니다.</span>
+                                <div class="btn-group duty-chip" role="group" th:each="d : ${r.duties}">
+                                    <button type="button" class="btn btn-default" th:text="${d.korName}" th:title="${d.emplNo}">홍길동</button>
+                                    <button type="button" class="btn btn-default btn-duty-delete" th:attr="data-duty-seq=${d.seq},aria-label=${d.korName} + ' 삭제'">X</button>
+                                </div>
+                                <span class="duty-empty" th:if="${#lists.isEmpty(r.duties)}">배정된 엔지니어가 없습니다.</span>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-success btn-duty-add">추가</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </th:block>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script>
+        (function () {
+            const board = () => document.getElementById('dutyBoard');
+            const data = name => board().dataset[name];
+
+            // 날짜 바꾸면 조회
+            document.getElementById('dutyDate').addEventListener('change', e => {
+                if (e.target.value) e.target.form.submit();
+            });
+
+            // 배정타입 라디오 -> 줄의 data-type 을 바꿔 엔지니어 칸/추가 버튼 표시 전환 (CSS)
+            document.addEventListener('change', e => {
+                if (!e.target.matches('#dutyBoard input[type=radio]')) return;
+                e.target.closest('tr').dataset.type = e.target.value;
+            });
+
+            // 당직표 다시 그리기
+            function reloadBoard() {
+                return oh.ajax.getHtml(data('boardUrl'), { dutyDate: data('dutyDate') })
+                    .then(html => { board().outerHTML = html; });
+            }
+            // 모달 저장 후 호출 (duty-add.html)
+            window.dutyReload = reloadBoard;
+
+            document.addEventListener('click', e => {
+                // 추가
+                const add = e.target.closest('#dutyBoard .btn-duty-add');
+                if (add) {
+                    const tr = add.closest('tr');
+                    oh.modal.open(data('addUrl'), { branchCd: tr.dataset.branchCd, gg: tr.dataset.gg, dutyDate: data('dutyDate') });
+                    return;
+                }
+                // 삭제
+                const del = e.target.closest('#dutyBoard .btn-duty-delete');
+                if (del) {
+                    const tr = del.closest('tr');
+                    oh.confirm('삭제하시겠습니까?', { okText: '삭제' }).then(ok => {
+                        if (!ok) return;
+                        oh.ajax.post(data('deleteUrl'), {
+                            branchCd: tr.dataset.branchCd, gg: tr.dataset.gg,
+                            dutyDate: data('dutyDate'), dutySeq: del.dataset.dutySeq
+                        }).then(res => {
+                            if (res.result !== 'OK') { oh.toast(res.message || '오류가 발생하였습니다.', 'danger'); return; }
+                            oh.toast(res.message);
+                            reloadBoard();
+                        });
+                    });
+                    return;
+                }
+                // 자동배정 설정
+                if (e.target.closest('#btnAutoSet')) {
+                    oh.modal.open(e.target.closest('#btnAutoSet').dataset.modalUrl);
+                    return;
+                }
+                // 배정타입 저장
+                if (e.target.closest('#btnTypeSave')) {
+                    const types = [...board().querySelectorAll('tr[data-gg]')].map(tr => ({
+                        branchCd: tr.dataset.branchCd, gg: tr.dataset.gg, type: tr.dataset.type
+                    }));
+                    oh.confirm('설정을 저장하시겠습니까?', { okText: '저장' }).then(ok => {
+                        if (!ok) return;
+                        oh.ajax.postJson(data('typeUrl'), types).then(res => oh.toast(res.message));
+                    });
+                }
+            });
+        })();
+    </script>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>Real-time 모니터링</title>
+    <link rel="stylesheet" th:href="@{/assets/css/cswt/egn-status.css}">
+</head>
+<body>
+<!-- CS Webtool egn/egn_real.jsp
+     기간설정(하루) · 조직설정(+PM/TS) / 표시항목 범례 / 엔지니어별 하루 타임라인.
+     원본은 FullCalendar resource timeline(유료 기능) 이므로 HTML/CSS 시간 격자로 대체:
+     왼쪽 180px 엔지니어 열(TS 는 파란 글자) · 00~24시 · 유형 색 막대 · 빨간 현재시각 선 · 마우스를 올리면 상세 툴팁 -->
+<main layout:fragment="content">
+    <div class="page-title"><h3>Real-time 모니터링</h3></div>
+
+    <form id="searchForm" onsubmit="return false;">
+        <div class="x_panel">
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-1 col-md-2"><label class="search-label" for="currentDate">기간설정</label></div>
+                    <div class="col-auto">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                            <input type="date" class="form-control" id="currentDate" name="currentDate" style="width: 200px;" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-1 col-md-2"><span class="search-label">조직설정</span></div>
+                    <div class="col-lg-7 col-md-10">
+                        <div class="row g-1">
+                            <div class="col">
+                                <select class="form-select" id="searchType" name="searchType" aria-label="Plant">
+                                    <option value="">전체</option>
+                                    <option value="96E6">DI</option>
+                                    <option value="94E6">DX</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select class="form-select" id="searchType2" name="searchType2" aria-label="Team">
+                                    <option value="">전체</option>
+                                    <option>CSE</option>
+                                    <option>APP</option>
+                                    <option>RSC</option>
+                                    <option>CH</option>
+                                </select>
+                            </div>
+                            <div class="col" id="modality-area">
+                                <select class="form-select" id="modality" name="modality" aria-label="Modality">
+                                    <option value="">전체</option>
+                                    <option>CT</option>
+                                    <option>MR</option>
+                                    <option>AX</option>
+                                    <option>XP</option>
+                                    <option>US</option>
+                                    <option>MI</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select class="form-select" id="searchType3" name="searchType3" aria-label="Region">
+                                    <option value="">전체</option>
+                                    <option>서울</option>
+                                    <option>경기</option>
+                                    <option>강원</option>
+                                    <option>충청</option>
+                                    <option>영남</option>
+                                    <option>호남</option>
+                                </select>
+                            </div>
+                            <!-- PM/TS 는 DI 일 때만 -->
+                            <div class="col" id="pmts-area" hidden>
+                                <select class="form-select" id="pmTs" name="pmTs" aria-label="PM/TS">
+                                    <option value="">전체</option>
+                                    <option>PM</option>
+                                    <option>TS</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-auto col-12">
+                        <div class="btn-row center">
+                            <button class="btn btn-success" type="button" id="btnSearch">검색하기</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="x_panel">
+        <div class="x_content">
+            <div class="legend">
+                <span class="legend-title">표시항목</span>
+                <span><i class="now"></i>현재시각</span>
+                <span><i class="unit bg-osr"></i>Working</span>
+                <span><i class="unit bg-sums"></i>Travel To</span>
+                <span><i class="unit bg-osr"></i>OSR</span>
+                <span><i class="unit bg-standby"></i>Office(Standby)</span>
+                <span><i class="unit bg-not-standby"></i>Office(Standby불가)</span>
+                <span><i class="unit bg-trav"></i>Compen</span>
+                <span><i class="unit bg-etc"></i>Training&amp;Leave</span>
+            </div>
+            <div class="rt-timeline" id="timeline">
+                <div class="rt-grid">
+                    <div class="rt-head">
+                        <div class="rt-corner">모니터링</div>
+                        <div class="rt-hour" th:each="h : ${#numbers.sequence(0, 23)}" th:text="${h < 10 ? '0' + h : h} + ':00'">00:00</div>
+                    </div>
+                    <div id="rtBody"></div>
+                    <div class="rt-now" id="rtNow" hidden></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script th:inline="none">
+        (function () {
+            const $ = id => document.getElementById(id);
+            const pad = n => String(n).padStart(2, '0');
+            const iso = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+            const today = new Date();
+            $('currentDate').value = iso(today);
+
+            // 엔지니어 (원본 egnRealUser: "Plant / Team / Region / PM·TS / 이름", TS 는 파란 글자)
+            const RESOURCES = [
+                { id: 'E01', plant: 'DI', team: 'CSE', region: '서울', pmts: 'PM', name: '김민수' },
+                { id: 'E02', plant: 'DI', team: 'CSE', region: '서울', pmts: 'TS', name: '이준호' },
+                { id: 'E03', plant: 'DI', team: 'CSE', region: '경기', pmts: 'PM', name: '박성진' },
+                { id: 'E04', plant: 'DI', team: 'CSE', region: '경기', pmts: 'TS', name: '최영훈' },
+                { id: 'E05', plant: 'DI', team: 'CSE', region: '영남', pmts: 'PM', name: '정대현' },
+                { id: 'E06', plant: 'DI', team: 'CSE', region: '호남', pmts: 'PM', name: '서지훈' },
+                { id: 'E07', plant: 'DI', team: 'APP', region: '서울', pmts: '', name: '한지은' },
+                { id: 'E08', plant: 'DI', team: 'APP', region: '경기', pmts: '', name: '오세영' },
+                { id: 'E09', plant: 'DI', team: 'RSC', region: '서울', pmts: '', name: '문태영' },
+                { id: 'E10', plant: 'DX', team: 'CSE', region: '서울', pmts: '', name: '강동원' },
+                { id: 'E11', plant: 'DX', team: 'CSE', region: '영남', pmts: '', name: '임재범' },
+                { id: 'E12', plant: 'DX', team: 'APP', region: '서울', pmts: '', name: '배수지' },
+                { id: 'E13', plant: 'DX', team: 'CH', region: '충청', pmts: '', name: '송민호' }
+            ];
+
+            // 일정 (원본 egnRealData). type → 색: ScheduleType eventType
+            // [엔지니어, 유형, 시작, 종료, 제목, 등록자, 최종수정]
+            const EVENTS = [
+                ['E01', 'TRAV_TO', '08:00', '09:00', 'Service, Travel to, 서울대학교병원, SOMATOM Force, 1-2345678901, 이동'],
+                ['E01', 'WORKING', '09:00', '12:30', 'Service, 서울대학교병원, SOMATOM Force, 정기점검, PM 작업', '', '2026-10-24 08:12'],
+                ['E01', 'OSR', '13:30', '17:00', 'Service, OSR, 세브란스병원, MAGNETOM Vida, 1-2345678912, Gradient error 조치'],
+                ['E02', 'OFFICE_STANDBY', '09:00', '18:00', 'Office(Standby), 사무실 대기, 원격 지원'],
+                ['E03', 'WORKING', '08:30', '11:00', 'Service, 삼성서울병원, MAGNETOM Skyra, 코일 교체, 부품 입고 확인', '박성진'],
+                ['E03', 'TRAV_TO', '11:30', '13:00', 'Service, Travel to, 아주대학교병원, SOMATOM Drive, 1-2345679034, 이동'],
+                ['E03', 'WORKING', '13:00', '18:30', 'Service, 아주대학교병원, SOMATOM Drive, 튜브 교체, 교체 후 캘리브레이션'],
+                ['E04', 'LEAVE', '00:00', '24:00', 'Training & Leave'],
+                ['E05', 'OSR', '07:00', '10:00', 'Service, OSR, 부산대학교병원, Artis zee, 1-2345680021, 영상 노이즈'],
+                ['E05', 'OFFICE_NOT_STANDBY', '14:00', '18:00', 'Office(Standby불가), 교육 자료 작성'],
+                ['E06', 'COMPEN', '09:00', '14:00', 'Compen, 대체휴무, 10/18 야간 출동', '김팀장', '2026-10-23 17:40'],
+                ['E06', 'WORKING', '15:00', '19:00', 'Service, 전남대학교병원, SOMATOM go.Top, 정기점검'],
+                ['E07', 'WORKING', '10:00', '16:00', 'Service, 서울아산병원, MAGNETOM Vida, 어플리케이션 교육, 신규 시퀀스'],
+                ['E08', 'LEAVE', '09:00', '14:00', 'Training & Leave'],
+                ['E08', 'OFFICE_STANDBY', '14:00', '18:00', 'Office(Standby), 사무실 대기'],
+                ['E09', 'TRAV_TO', '06:30', '08:00', 'Service, Travel to, 분당서울대학교병원, Biograph Vision, 1-2345681190, 이동'],
+                ['E09', 'WORKING', '08:00', '20:30', 'Service, 분당서울대학교병원, Biograph Vision, 설치, 2일차'],
+                ['E10', 'WORKING', '09:00', '11:30', 'Service, 세브란스병원, Atellica Solution, 정기점검, PM 작업'],
+                ['E10', 'OSR', '12:30', '15:30', 'Service, OSR, 고려대학교 안암병원, Atellica CH 930, 1-2345682207, 시약 프로브 에러'],
+                ['E11', 'OFFICE_NOT_STANDBY', '09:00', '12:00', 'Office(Standby불가), 주간 회의'],
+                ['E11', 'WORKING', '13:00', '17:30', 'Service, 경북대학교병원, Atellica IM 1600, 부품 교체'],
+                ['E12', 'COMPEN', '00:00', '09:00', 'Compen, 대체휴무, 주말 설치 지원'],
+                ['E12', 'WORKING', '10:00', '15:00', 'Service, 서울성모병원, Atellica Solution, 사용자 교육'],
+                ['E13', 'LEAVE', '00:00', '24:00', 'Training & Leave']
+            ];
+            const COLOR = {
+                WORKING: 'bg-osr', OSR: 'bg-osr', TRAV_TO: 'bg-sums', OFFICE_STANDBY: 'bg-standby',
+                OFFICE_NOT_STANDBY: 'bg-not-standby', COMPEN: 'bg-trav', LEAVE: 'bg-etc'
+            };
+
+            const toHour = t => { const [h, m] = t.split(':').map(Number); return h + m / 60; };
+            const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+            function diffText(min) {
+                const h = Math.floor(min / 60), m = min % 60;
+                return h === 0 ? m + '분' : m === 0 ? h + '시간' : h + '시간 ' + m + '분';
+            }
+
+            function render() {
+                // 이전 툴팁 정리
+                document.querySelectorAll('#rtBody [data-bs-toggle="tooltip"]').forEach(el => {
+                    const t = bootstrap.Tooltip.getInstance(el);
+                    if (t) t.dispose();
+                });
+
+                const plant = { '96E6': 'DI', '94E6': 'DX' }[$('searchType').value];
+                const team = $('searchType2').value, region = $('searchType3').value;
+                const pmts = $('pmts-area').hidden ? '' : $('pmTs').value;
+                const list = RESOURCES.filter(r => (!plant || r.plant === plant) && (!team || r.team === team)
+                    && (!region || r.region === region) && (!pmts || r.pmts === pmts));
+
+                $('rtBody').innerHTML = list.length ? list.map(r => {
+                    const label = [r.plant, r.team, r.region, r.pmts, r.name].filter(Boolean).join(' / ');
+                    const bars = EVENTS.filter(e => e[0] === r.id).map(([, type, s, e, title, adm, upd]) => {
+                        const start = toHour(s), end = toHour(e);
+                        const head = title + (adm ? ' [' + adm + ']' : '');
+                        const tip = [head, s + ' - ' + e, diffText(Math.round((end - start) * 60)), upd].filter(Boolean).map(esc).join('<br>');
+                        return '<div class="rt-event ' + COLOR[type] + '" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top"'
+                            + ' data-bs-title="' + esc(tip) + '"'
+                            + ' style="left: calc(var(--rt-hour-w) * ' + start + '); width: calc(var(--rt-hour-w) * ' + (end - start) + ');">'
+                            + '<span>' + esc(head) + '</span></div>';
+                    }).join('');
+                    return '<div class="rt-row"><div class="rt-name' + (r.pmts === 'TS' ? ' text-blue' : '') + '">' + esc(label) + '</div>'
+                        + '<div class="rt-lane">' + bars + '</div></div>';
+                }).join('') : '<div class="rt-empty">목록이 없습니다.</div>';
+
+                document.querySelectorAll('#rtBody [data-bs-toggle="tooltip"]').forEach(el =>
+                    new bootstrap.Tooltip(el, { container: 'body' }));
+                updateNow();
+            }
+
+            // 현재시각 선: 오늘을 볼 때만
+            function updateNow() {
+                const now = new Date();
+                const isToday = $('currentDate').value === iso(now);
+                $('rtNow').hidden = !isToday;
+                if (isToday) {
+                    const h = now.getHours() + now.getMinutes() / 60;
+                    $('rtNow').style.left = 'calc(var(--rt-name-w) + var(--rt-hour-w) * ' + h + ')';
+                }
+                return isToday ? now.getHours() + now.getMinutes() / 60 : null;
+            }
+
+            // 현재 시각(오늘이 아니면 08시) 근처로 가로 스크롤 (원본 scrollTime)
+            function scrollToTime() {
+                const h = updateNow();
+                const hourW = $('timeline').querySelector('.rt-hour').getBoundingClientRect().width;
+                $('timeline').scrollLeft = Math.max(0, ((h === null ? 8 : h) - 3) * hourW);
+            }
+
+            function search() {
+                if (!$('currentDate').value) { oh.toast('기간을 입력하세요.', 'warning'); return; }
+                oh.loading.show();
+                setTimeout(() => { render(); scrollToTime(); oh.loading.hide(); }, 200);
+            }
+
+            // Plant 에 따라 Modality / PM·TS 표시 (com_plant_search.jsp load())
+            $('searchType').addEventListener('change', () => {
+                const v = $('searchType').value;
+                if (v === '94E6') $('modality').value = '';
+                $('modality-area').hidden = v === '94E6';
+                $('pmts-area').hidden = v !== '96E6';
+            });
+            $('currentDate').addEventListener('change', search);
+            $('btnSearch').addEventListener('click', search);
+            setInterval(updateNow, 60 * 1000);
+
+            render();
+            scrollToTime();
+        })();
+    </script>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>팀 스케줄 관리</title>
+    <link rel="stylesheet" th:href="@{/assets/vendor/fullcalendar-7.1.3/skeleton.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendor/fullcalendar-7.1.3/themes/classic/theme.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendor/fullcalendar-7.1.3/themes/classic/palette.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/cswt/egn-schedule.css}">
+</head>
+<body>
+<!-- CS Webtool egn/egn_schedule_all.jsp: 월 제목 well / 왼쪽 필터(구분·정렬·노출) + 일별 카드 /
+     오른쪽 달력모드 선택(Plant·Team·Modality·Region, com_plant_checkbox.jsp) + 월 달력(monthly.js -> FullCalendar) + 버튼 -->
+<main layout:fragment="content">
+    <div class="page-title"><h3>팀 Schedule 관리</h3></div>
+
+    <div class="x_panel">
+        <div class="x_content">
+            <div class="well sched-well">
+                <p class="sched-personal"><strong id="titlePlant">DI</strong> 의 <span id="titleMonth">10</span>월 스케쥴</p>
+                <div class="legend" id="displayColor"></div>
+            </div>
+
+            <div class="row g-3">
+                <!-- 왼쪽: 필터 + 일별 카드 -->
+                <div class="col-lg-8">
+                    <form class="x_panel sched-filter" id="scheduleFilter">
+                        <div class="x_content">
+                            <div class="row g-2 align-items-center">
+                                <div class="col-auto"><span class="search-label">구분</span></div>
+                                <div class="col">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="type6All" value="all" checked>
+                                        <label class="form-check-label" for="type6All">ALL</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="searchType6" id="type601" value="01" checked>
+                                        <label class="form-check-label" for="type601">Service</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="searchType6" id="type602" value="02" checked>
+                                        <label class="form-check-label" for="type602">Compen</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="searchType6" id="type603" value="03" checked>
+                                        <label class="form-check-label" for="type603">Office(Standby)</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="searchType6" id="type607" value="07" checked>
+                                        <label class="form-check-label" for="type607">Office(Standby불가)</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="searchType6" id="type604" value="04" checked>
+                                        <label class="form-check-label" for="type604">Training(국내)</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="searchType6" id="type606" value="06" checked>
+                                        <label class="form-check-label" for="type606">Training(해외)</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="searchType6" id="type605" value="05" checked>
+                                        <label class="form-check-label" for="type605">Leave</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row g-2 align-items-center mt-1">
+                                <div class="col-auto"><span class="search-label">정렬기준</span></div>
+                                <div class="col-auto">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="searchType4" id="sortName" value="name">
+                                        <label class="form-check-label" for="sortName">엔지니어 이름순</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="searchType4" id="sortTime" value="time" checked>
+                                        <label class="form-check-label" for="sortTime">작업시간순</label>
+                                    </div>
+                                </div>
+                                <div class="col-auto ms-lg-3"><label class="search-label" for="searchType5">노출 조건</label></div>
+                                <div class="col-auto">
+                                    <select class="form-select sched-select" id="searchType5" name="searchType5">
+                                        <option value="all">All</option>
+                                        <option value="N">Hidden</option>
+                                        <option value="Y">Unmarked</option>
+                                    </select>
+                                </div>
+                                <div class="col-auto">
+                                    <button class="btn btn-success" type="button" id="btnSearch">검색하기</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="x_panel">
+                        <label class="schedule_title" id="scheduleTitle">10월 24일 스케쥴</label>
+                        <div class="schedule_day" id="scheduleDay"
+                             th:attr="data-add-url=@{/sample/cswt/egn/modal/schedule-add},data-memo-url=@{/sample/cswt/egn/modal/schedule-memo}">
+                            <div class="row g-1" id="cardList">
+                                <!-- DI -->
+                                <div class="col-md-6 col-xl-4" data-plant="96E6" data-team="CSE" data-type="01" data-marked="Y" data-name="홍길동" data-time="0800">
+                                    <div class="item_card">
+                                        <div class="count_num bg-sn">1</div>
+                                        <dl>
+                                            <dt>요청자</dt><dd>홍길동</dd>
+                                            <dt>사번</dt><dd>K2019034</dd>
+                                            <dt>구분</dt><dd>Service</dd>
+                                            <dt>병원</dt><dd class="memos">서울대학교병원</dd>
+                                            <dt>장비</dt><dd class="memos">SOMATOM Force</dd>
+                                            <dt>FL</dt><dd>1000234517</dd>
+                                            <dt>System #</dt><dd>400-123456</dd>
+                                            <dt>Serial #</dt><dd>73512</dd>
+                                            <dt>Equip #</dt><dd>30018842</dd>
+                                            <dt>계약상태</dt><dd>유상계약</dd>
+                                            <dt>Travel to</dt><dd>08:00 ~ 09:00</dd>
+                                            <dt>OSR</dt><dd>09:00 ~ 12:00</dd>
+                                            <dt>Description</dt><dd class="memos">정기 PM (Tube 점검 포함)</dd>
+                                            <dt>MEMO</dt><dd class="memos"></dd>
+                                            <dd class="count_setting">
+                                                <button type="button" class="btn btn-xs btn-default btn-memo" data-id="201" title="메모 수정"><i class="bi bi-eraser"></i></button>
+                                                <button type="button" class="btn btn-xs btn-default btn-modify" data-id="201" title="스케쥴 변경"><i class="bi bi-pencil-square"></i></button>
+                                            </dd>
+                                        </dl>
+                                        <button type="button" class="marked" data-marked="Y" title="숨기기"><i class="bi bi-eye-fill"></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-xl-4" data-plant="96E6" data-team="APP" data-type="01" data-marked="Y" data-name="이서연" data-time="1000">
+                                    <div class="item_card">
+                                        <div class="count_num bg-ss">2</div>
+                                        <dl>
+                                            <dt>요청자</dt><dd>이서연</dd>
+                                            <dt>사번</dt><dd>K2021117</dd>
+                                            <dt>구분</dt><dd>Service</dd>
+                                            <dt>병원</dt><dd class="memos">삼성서울병원</dd>
+                                            <dt>장비</dt><dd class="memos">MAGNETOM Vida</dd>
+                                            <dt>FL</dt><dd>1000318842</dd>
+                                            <dt>System #</dt><dd>400-215873</dd>
+                                            <dt>Serial #</dt><dd>175642</dd>
+                                            <dt>Equip #</dt><dd>30021407</dd>
+                                            <dt>시간</dt><dd>10:00 ~ 15:00</dd>
+                                            <dt>Description</dt><dd class="memos">신규 시퀀스 Application 교육</dd>
+                                            <dt>MEMO</dt><dd class="memos">방사선사 3명 참석</dd>
+                                            <dd class="count_setting">
+                                                <button type="button" class="btn btn-xs btn-default btn-memo" data-id="202" title="메모 수정"><i class="bi bi-eraser"></i></button>
+                                                <button type="button" class="btn btn-xs btn-default btn-modify" data-id="202" title="스케쥴 변경"><i class="bi bi-pencil-square"></i></button>
+                                            </dd>
+                                        </dl>
+                                        <button type="button" class="marked" data-marked="Y" title="숨기기"><i class="bi bi-eye-fill"></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-xl-4" data-plant="96E6" data-team="RSC" data-type="03" data-marked="N" data-name="박지훈" data-time="0900">
+                                    <div class="item_card">
+                                        <div class="count_num bg-rw">3</div>
+                                        <dl>
+                                            <dt>요청자</dt><dd>박지훈<br>(김민준)</dd>
+                                            <dt>사번</dt><dd>K2017052</dd>
+                                            <dt>구분</dt><dd>Office(Standby)</dd>
+                                            <dt>병원</dt><dd class="memos"></dd>
+                                            <dt>장비</dt><dd class="memos"></dd>
+                                            <dt>FL</dt><dd>.</dd>
+                                            <dt>System #</dt><dd>.</dd>
+                                            <dt>Serial #</dt><dd>.</dd>
+                                            <dt>Equip #</dt><dd>.</dd>
+                                            <dt>시간</dt><dd>09:00 ~ 18:00</dd>
+                                            <dt>Description</dt><dd class="memos">원격 지원 대기</dd>
+                                            <dt>MEMO</dt><dd class="memos"></dd>
+                                            <dd class="count_setting">
+                                                <button type="button" class="btn btn-xs btn-default btn-memo" data-id="203" title="메모 수정"><i class="bi bi-eraser"></i></button>
+                                                <button type="button" class="btn btn-xs btn-default btn-modify" data-id="203" title="스케쥴 변경"><i class="bi bi-pencil-square"></i></button>
+                                            </dd>
+                                        </dl>
+                                        <button type="button" class="marked" data-marked="N" title="표시하기"><i class="bi bi-eye-slash"></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-xl-4" data-plant="96E6" data-team="Others" data-type="05" data-marked="Y" data-name="최유진" data-time="0900">
+                                    <div class="item_card">
+                                        <div class="count_num bg-etc">4</div>
+                                        <dl>
+                                            <dt>요청자</dt><dd>최유진</dd>
+                                            <dt>사번</dt><dd>K2022008</dd>
+                                            <dt>구분</dt><dd>Leave</dd>
+                                            <dt>병원</dt><dd class="memos"></dd>
+                                            <dt>장비</dt><dd class="memos"></dd>
+                                            <dt>FL</dt><dd>.</dd>
+                                            <dt>System #</dt><dd>.</dd>
+                                            <dt>Serial #</dt><dd>.</dd>
+                                            <dt>Equip #</dt><dd>.</dd>
+                                            <dt>시간</dt><dd>Real time 미노출</dd>
+                                            <dt>Description</dt><dd class="memos">연차</dd>
+                                            <dt>MEMO</dt><dd class="memos"></dd>
+                                            <dd class="count_setting">
+                                                <button type="button" class="btn btn-xs btn-default btn-memo" data-id="204" title="메모 수정"><i class="bi bi-eraser"></i></button>
+                                                <button type="button" class="btn btn-xs btn-default btn-modify" data-id="204" title="스케쥴 변경"><i class="bi bi-pencil-square"></i></button>
+                                            </dd>
+                                        </dl>
+                                        <button type="button" class="marked" data-marked="Y" title="숨기기"><i class="bi bi-eye-fill"></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-xl-4" data-plant="96E6" data-team="CSE" data-type="02" data-marked="Y" data-name="정우성" data-time="1300">
+                                    <div class="item_card">
+                                        <div class="count_num bg-sn">5</div>
+                                        <dl>
+                                            <dt>요청자</dt><dd>정우성</dd>
+                                            <dt>사번</dt><dd>K2016121</dd>
+                                            <dt>구분</dt><dd>Compen</dd>
+                                            <dt>병원</dt><dd class="memos"></dd>
+                                            <dt>장비</dt><dd class="memos"></dd>
+                                            <dt>FL</dt><dd>.</dd>
+                                            <dt>System #</dt><dd>.</dd>
+                                            <dt>Serial #</dt><dd>.</dd>
+                                            <dt>Equip #</dt><dd>.</dd>
+                                            <dt>시간</dt><dd>13:00 ~ 18:00</dd>
+                                            <dt>Description</dt><dd class="memos">주말 당직 보상</dd>
+                                            <dt>MEMO</dt><dd class="memos"></dd>
+                                            <dd class="count_setting">
+                                                <button type="button" class="btn btn-xs btn-default btn-memo" data-id="205" title="메모 수정"><i class="bi bi-eraser"></i></button>
+                                                <button type="button" class="btn btn-xs btn-default btn-modify" data-id="205" title="스케쥴 변경"><i class="bi bi-pencil-square"></i></button>
+                                            </dd>
+                                        </dl>
+                                        <button type="button" class="marked" data-marked="Y" title="숨기기"><i class="bi bi-eye-fill"></i></button>
+                                    </div>
+                                </div>
+                                <!-- DX (미계약 장비는 빨간 글씨) -->
+                                <div class="col-md-6 col-xl-4" data-plant="94E6" data-team="CSE" data-type="01" data-marked="Y" data-name="강하늘" data-time="0930">
+                                    <div class="item_card">
+                                        <div class="count_num bg-sn">6</div>
+                                        <dl>
+                                            <dt>요청자</dt><dd>강하늘</dd>
+                                            <dt>사번</dt><dd>K2018076</dd>
+                                            <dt>구분</dt><dd>Service</dd>
+                                            <dt>병원</dt><dd class="memos">고려대학교안암병원</dd>
+                                            <dt>장비</dt><dd class="memos">Atellica Solution</dd>
+                                            <dt class="team-schedule-red">FL</dt><dd class="team-schedule-red">2000418820</dd>
+                                            <dt class="team-schedule-red">System #</dt><dd class="team-schedule-red">400-318204</dd>
+                                            <dt class="team-schedule-red">Serial #</dt><dd class="team-schedule-red">AT21-0457</dd>
+                                            <dt class="team-schedule-red">Equip #</dt><dd class="team-schedule-red">30030519</dd>
+                                            <dt class="team-schedule-red">Contract</dt><dd class="team-schedule-red">미계약</dd>
+                                            <dt>시간</dt><dd>09:30 ~ 11:30</dd>
+                                            <dt>Description</dt><dd class="memos">Reagent 로딩 오류 점검</dd>
+                                            <dt>MEMO</dt><dd class="memos">유상 견적 안내 필요</dd>
+                                            <dd class="count_setting">
+                                                <button type="button" class="btn btn-xs btn-default btn-memo" data-id="206" title="메모 수정"><i class="bi bi-eraser"></i></button>
+                                                <button type="button" class="btn btn-xs btn-default btn-modify" data-id="206" title="스케쥴 변경"><i class="bi bi-pencil-square"></i></button>
+                                            </dd>
+                                        </dl>
+                                        <button type="button" class="marked" data-marked="Y" title="숨기기"><i class="bi bi-eye-fill"></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-xl-4" data-plant="94E6" data-team="CH" data-type="01" data-marked="Y" data-name="장민호" data-time="1400">
+                                    <div class="item_card">
+                                        <div class="count_num bg-re">7</div>
+                                        <dl>
+                                            <dt>요청자</dt><dd>장민호</dd>
+                                            <dt>사번</dt><dd>K2020063</dd>
+                                            <dt>구분</dt><dd>Service</dd>
+                                            <dt>병원</dt><dd class="memos">서울아산병원</dd>
+                                            <dt>장비</dt><dd class="memos">Atellica CI Analyzer</dd>
+                                            <dt>FL</dt><dd>2000420077</dd>
+                                            <dt>System #</dt><dd>400-322918</dd>
+                                            <dt>Serial #</dt><dd>CI22-1180</dd>
+                                            <dt>Equip #</dt><dd>30031266</dd>
+                                            <dt>Contract</dt><dd>Full Service</dd>
+                                            <dt>계약상태</dt><dd>유상계약</dd>
+                                            <dt>시간</dt><dd>14:00 ~ 17:00</dd>
+                                            <dt>Description</dt><dd class="memos">정기 PM</dd>
+                                            <dt>MEMO</dt><dd class="memos"></dd>
+                                            <dd class="count_setting">
+                                                <button type="button" class="btn btn-xs btn-default btn-memo" data-id="207" title="메모 수정"><i class="bi bi-eraser"></i></button>
+                                                <button type="button" class="btn btn-xs btn-default btn-modify" data-id="207" title="스케쥴 변경"><i class="bi bi-pencil-square"></i></button>
+                                            </dd>
+                                        </dl>
+                                        <button type="button" class="marked" data-marked="Y" title="숨기기"><i class="bi bi-eye-fill"></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-12 sched-empty d-none">등록된 스케쥴이 없습니다.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 오른쪽: 달력모드 선택 + 월 달력 + 버튼 -->
+                <div class="col-lg-4 sched-calendar-wrap">
+                    <div class="x_panel" id="planArea">
+                        <span class="sched-mode-title">달력모드 선택</span>
+                        <!-- com_plant_checkbox.jsp: Plant 라디오 / Team / Modality(DI 만) / Region 체크박스 -->
+                        <div class="sched-check-group">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="searchType" id="plantDi" value="96E6" data-name="DI" checked>
+                                <label class="form-check-label" for="plantDi">DI</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="searchType" id="plantDx" value="94E6" data-name="DX">
+                                <label class="form-check-label" for="plantDx">DX</label>
+                            </div>
+                        </div>
+                        <div class="sched-check-group" data-group="team">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="teamAll" value="all" checked>
+                                <label class="form-check-label" for="teamAll">ALL</label>
+                            </div>
+                            <div class="form-check form-check-inline" data-plant="96E6">
+                                <input class="form-check-input" type="checkbox" name="searchType2" id="teamDiCse" value="CSE" checked>
+                                <label class="form-check-label" for="teamDiCse">CSE</label>
+                            </div>
+                            <div class="form-check form-check-inline" data-plant="96E6">
+                                <input class="form-check-input" type="checkbox" name="searchType2" id="teamDiApp" value="APP" checked>
+                                <label class="form-check-label" for="teamDiApp">APP</label>
+                            </div>
+                            <div class="form-check form-check-inline" data-plant="96E6">
+                                <input class="form-check-input" type="checkbox" name="searchType2" id="teamDiRsc" value="RSC" checked>
+                                <label class="form-check-label" for="teamDiRsc">RSC</label>
+                            </div>
+                            <div class="form-check form-check-inline" data-plant="96E6">
+                                <input class="form-check-input" type="checkbox" name="searchType2" id="teamDiEtc" value="Others" checked>
+                                <label class="form-check-label" for="teamDiEtc">Others</label>
+                            </div>
+                            <div class="form-check form-check-inline" data-plant="94E6">
+                                <input class="form-check-input" type="checkbox" name="searchType2" id="teamDxCse" value="CSE" checked>
+                                <label class="form-check-label" for="teamDxCse">CSE</label>
+                            </div>
+                            <div class="form-check form-check-inline" data-plant="94E6">
+                                <input class="form-check-input" type="checkbox" name="searchType2" id="teamDxApp" value="APP" checked>
+                                <label class="form-check-label" for="teamDxApp">APP</label>
+                            </div>
+                            <div class="form-check form-check-inline" data-plant="94E6">
+                                <input class="form-check-input" type="checkbox" name="searchType2" id="teamDxCh" value="CH" checked>
+                                <label class="form-check-label" for="teamDxCh">CH</label>
+                            </div>
+                            <div class="form-check form-check-inline" data-plant="94E6">
+                                <input class="form-check-input" type="checkbox" name="searchType2" id="teamDxEtc" value="Others" checked>
+                                <label class="form-check-label" for="teamDxEtc">Others</label>
+                            </div>
+                        </div>
+                        <div class="sched-check-group" data-group="modality" id="modalityArea">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="modalityAll" value="all" checked>
+                                <label class="form-check-label" for="modalityAll">ALL</label>
+                            </div>
+                            <div class="form-check form-check-inline" th:each="m : ${ {'AX','XP','CT','MIRO','MR'} }">
+                                <input class="form-check-input" type="checkbox" name="modality" th:id="|modality${m}|" th:value="${m}" checked>
+                                <label class="form-check-label" th:for="|modality${m}|" th:text="${m}">CT</label>
+                            </div>
+                        </div>
+                        <div class="sched-check-group" data-group="region">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="regionAll" value="all" checked>
+                                <label class="form-check-label" for="regionAll">ALL</label>
+                            </div>
+                            <div class="form-check form-check-inline" th:each="r, s : ${ {'서울','경기/인천','강원','충청','경북','경남','호남','제주'} }">
+                                <input class="form-check-input" type="checkbox" name="searchType3" th:id="|region${s.count}|" th:value="${r}" checked>
+                                <label class="form-check-label" th:for="|region${s.count}|" th:text="${r}">서울</label>
+                            </div>
+                        </div>
+                        <div class="btn-row center mt-2">
+                            <button type="button" class="btn btn-success" id="btnApply">적용하기</button>
+                        </div>
+                    </div>
+
+                    <div id="calendarArea"></div>
+                    <div class="ln_solid"></div>
+                    <div class="btn-row center">
+                        <button type="button" class="btn btn-success" id="btnScheduleAdd">스케쥴 입력하기</button>
+                        <button type="button" class="btn btn-primary" id="btnExcelUpload"
+                                th:attr="data-modal-url=@{/sample/cswt/egn/modal/schedule-excel}">엑셀 업로드</button>
+                        <button type="button" class="btn btn-success" id="btnExcelDown">엑셀 다운로드</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/assets/vendor/fullcalendar-7.1.3/fullcalendar.global.js}"></script>
+    <script th:src="@{/assets/vendor/fullcalendar-7.1.3/themes/classic/classic.global.js}"></script>
+    <script th:src="@{/assets/vendor/fullcalendar-7.1.3/locales/ko.global.js}"></script>
+    <script th:src="@{/assets/js/oh-calendar.js}"></script>
+    <script th:inline="none">
+        (function () {
+            const day = document.getElementById('scheduleDay');
+            const list = document.getElementById('cardList');
+            const plantArea = document.getElementById('planArea');
+            const pad = n => String(n).padStart(2, '0');
+            let currentDay = new Date(2026, 9, 24);
+
+            // 팀 색 (Java ScheduleType.SCHEDULE_TEAM_DI_COLOR / _DX_COLOR)
+            const TEAM = {
+                CSE: { cls: 'bg-sn', color: '#1e90ff', text: '#fff' },
+                APP: { cls: 'bg-ss', color: '#e32d2d', text: '#fff' },
+                RSC: { cls: 'bg-rw', color: '#ffe13b', text: '#333' },
+                CH: { cls: 'bg-re', color: '#229b4c', text: '#fff' },
+                Others: { cls: 'bg-etc', color: '#acacac', text: '#fff' }
+            };
+            const LEGEND = { '96E6': ['CSE', 'APP', 'RSC', 'Others'], '94E6': ['CSE', 'APP', 'CH', 'Others'] };
+
+            // 팀원 일정 (monthly.js 이벤트 자리): 이름을 팀 색 막대로 표시
+            const PEOPLE = [
+                ['홍길동', '96E6', 'CSE'], ['정우성', '96E6', 'CSE'], ['이서연', '96E6', 'APP'],
+                ['박지훈', '96E6', 'RSC'], ['최유진', '96E6', 'Others'],
+                ['강하늘', '94E6', 'CSE'], ['윤서아', '94E6', 'APP'], ['장민호', '94E6', 'CH'], ['임수빈', '94E6', 'Others']
+            ];
+            const ALL_EVENTS = [];
+            for (let d = 1; d <= 31; d++) {
+                PEOPLE.forEach((p, i) => {
+                    if ((d * 7 + i * i * 3 + i) % 9 > 3) return;
+                    const t = TEAM[p[2]];
+                    ALL_EVENTS.push({ title: p[0], start: '2026-10-' + pad(d), plant: p[1], team: p[2],
+                        color: t.color, contrastColor: t.text });
+                });
+            }
+
+            const plant = () => plantArea.querySelector('[name=searchType]:checked');
+            const checkedTeams = () => [...plantArea.querySelectorAll('[name=searchType2]:checked')]
+                .filter(c => c.closest('[data-plant]').dataset.plant === plant().value).map(c => c.value);
+
+            let picked = null;
+            const cal = oh.calendar('#calendarArea', {
+                initialDate: '2026-10-24',
+                headerToolbar: { left: 'prev', center: 'title', right: 'next' },
+                dayMaxEvents: 3,
+                events: [],
+                dateClick: info => {
+                    if (picked) picked.classList.remove('sched-picked');
+                    picked = info.dayEl;
+                    picked.classList.add('sched-picked');
+                    currentDay = info.date;
+                    titleLoad();
+                },
+                datesSet: arg => {
+                    picked = null;
+                    document.getElementById('titleMonth').textContent = arg.view.currentStart.getMonth() + 1;
+                }
+            });
+
+            // 표시항목 범례 + 제목 Plant 이름
+            function teamColorLoad() {
+                const box = document.getElementById('displayColor');
+                box.innerHTML = '<span class="legend-title">표시항목</span>' + LEGEND[plant().value]
+                    .map(t => '<span><i class="unit ' + TEAM[t].cls + '"></i>' + t + '</span>').join('');
+                document.getElementById('titlePlant').textContent = plant().dataset.name;
+            }
+
+            // 달력모드 적용: 선택한 Plant/Team 일정만 달력에
+            function teamCalendarLoad() {
+                const teams = checkedTeams();
+                cal.removeAllEvents();
+                cal.addEventSource(ALL_EVENTS.filter(e => e.plant === plant().value && teams.includes(e.team)));
+                filterCards();
+            }
+
+            // Plant 바꾸면 해당 Plant 팀만 보이고, Modality 는 DI 일 때만
+            function plantLoad() {
+                const v = plant().value;
+                plantArea.querySelectorAll('[data-group=team] [data-plant]').forEach(el => el.classList.toggle('d-none', el.dataset.plant !== v));
+                document.getElementById('modalityArea').classList.toggle('d-none', v !== '96E6');
+            }
+            plantArea.querySelectorAll('[name=searchType]').forEach(r => r.addEventListener('change', plantLoad));
+
+            // 체크박스 그룹 ALL: 전체 선택/해제, 보이는 항목이 모두 체크되면 ALL 체크
+            function bindAll(allEl, items) {
+                const visible = () => items().filter(c => !c.closest('.d-none'));
+                allEl.addEventListener('change', () => visible().forEach(c => { c.checked = allEl.checked; }));
+                items().forEach(c => c.addEventListener('change', () => { allEl.checked = visible().every(x => x.checked); }));
+            }
+            const all6 = document.getElementById('type6All');
+            const types = () => [...document.querySelectorAll('input[name=searchType6]')];
+            bindAll(all6, types);
+            plantArea.querySelectorAll('.sched-check-group[data-group]').forEach(g => {
+                bindAll(g.querySelector('input[value=all]'), () => [...g.querySelectorAll('input:not([value=all])')]);
+            });
+
+            // 검색하기: 구분 / 노출 조건 / 달력모드(Plant, Team) 로 거르고 정렬기준으로 정렬
+            function filterCards() {
+                const on = types().filter(t => t.checked).map(t => t.value);
+                const mark = document.getElementById('searchType5').value;
+                const teams = checkedTeams();
+                const sort = document.querySelector('[name=searchType4]:checked').value;
+                const cols = [...list.querySelectorAll('[data-type]')];
+                cols.sort((a, b) => sort === 'name' ? a.dataset.name.localeCompare(b.dataset.name, 'ko') : a.dataset.time.localeCompare(b.dataset.time))
+                    .forEach(c => list.insertBefore(c, list.querySelector('.sched-empty')));
+                let n = 0;
+                cols.forEach(col => {
+                    const show = col.dataset.plant === plant().value && teams.includes(col.dataset.team)
+                        && on.includes(col.dataset.type) && (mark === 'all' || col.dataset.marked === mark);
+                    col.classList.toggle('d-none', !show);
+                    if (show) col.querySelector('.count_num').textContent = ++n;
+                });
+                list.querySelector('.sched-empty').classList.toggle('d-none', n > 0);
+            }
+
+            function titleLoad() {
+                document.getElementById('titleMonth').textContent = currentDay.getMonth() + 1;
+                document.getElementById('scheduleTitle').textContent =
+                    pad(currentDay.getMonth() + 1) + '월 ' + pad(currentDay.getDate()) + '일 스케쥴';
+            }
+
+            function openAdd(modify, id) {
+                oh.modal.open(day.dataset.addUrl, modify ? { mode: 'modify', scheNum: id } : { startDate: currentDay.getFullYear() + '-' + pad(currentDay.getMonth() + 1) + '-' + pad(currentDay.getDate()) });
+            }
+
+            day.addEventListener('click', e => {
+                const memo = e.target.closest('.btn-memo');
+                if (memo) { oh.modal.open(day.dataset.memoUrl, { scheNum: memo.dataset.id }); return; }
+                const mod = e.target.closest('.btn-modify');
+                if (mod) { openAdd(true, mod.dataset.id); return; }
+                const mk = e.target.closest('.marked');
+                if (mk) {
+                    const hidden = mk.dataset.marked !== 'N';
+                    mk.dataset.marked = hidden ? 'N' : 'Y';
+                    mk.closest('[data-type]').dataset.marked = mk.dataset.marked;
+                    mk.title = hidden ? '표시하기' : '숨기기';
+                    mk.firstElementChild.className = hidden ? 'bi bi-eye-slash' : 'bi bi-eye-fill';
+                }
+            });
+
+            document.getElementById('btnSearch').addEventListener('click', filterCards);
+            document.getElementById('btnApply').addEventListener('click', () => { teamColorLoad(); teamCalendarLoad(); });
+            document.getElementById('btnScheduleAdd').addEventListener('click', () => openAdd(false));
+            document.getElementById('btnExcelUpload').addEventListener('click', e => oh.modal.open(e.currentTarget.dataset.modalUrl));
+            document.getElementById('btnExcelDown').addEventListener('click', () => oh.toast('엑셀 파일을 내려받습니다. (샘플)', 'info'));
+
+            plantLoad();
+            teamColorLoad();
+            teamCalendarLoad();
+            titleLoad();
+        })();
+    </script>
+</th:block>
+</body>
+</html>

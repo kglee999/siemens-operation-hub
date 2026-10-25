@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>통합 IVK 현황</title>
+    <link rel="stylesheet" th:href="@{/assets/css/cswt/mng.css}">
+</head>
+<body>
+<!-- CS Webtool mng/mng_ivk_detail.jsp: 조직설정(com_ivk_search) + 검색어 6개 / 장비 목록 / 페이징. System ID 를 누르면 IVK 상세현황 모달 -->
+<main layout:fragment="content">
+    <div class="page-title"><h3>통합 IVK 현황</h3></div>
+
+    <form id="searchForm" method="get" th:action="@{/sample/cswt/mng/ivk-detail}">
+        <input type="hidden" name="pageNo" value="1">
+        <div class="x_panel">
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-1 col-md-2"><label class="search-label" for="searchType">조직설정</label></div>
+                    <!-- com/com_ivk_search.jsp: Plant / GG / Region -->
+                    <div class="col-lg-7 col-md-10">
+                        <div class="row g-1">
+                            <div class="col">
+                                <select class="form-select" id="searchType" name="searchType" aria-label="Plant">
+                                    <option value="">전체</option>
+                                    <option value="96E6">DI</option>
+                                    <option value="94E6">DX</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select class="form-select" name="searchType2" aria-label="GG">
+                                    <option value="">전체</option>
+                                    <option>CT</option><option>MR</option><option>AX</option><option>MI</option>
+                                    <option>US</option><option>XP</option><option>LAB</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select class="form-select" name="searchType3" aria-label="Region">
+                                    <option value="">전체</option>
+                                    <option>서울/경기</option><option>강원</option><option>충청</option>
+                                    <option>호남</option><option>영남</option><option>제주</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-1 col-md-2"><label class="search-label label-wrap" for="searchNum">엔지니어 한글명</label></div>
+                    <div class="col-lg-3 col-md-4">
+                        <input type="text" class="form-control" id="searchNum" name="searchNum" placeholder="엔지니어 한글명 입력">
+                    </div>
+                </div>
+            </div>
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-1 col-md-2"><label class="search-label" for="searchNum5">System ID</label></div>
+                    <div class="col-lg-3 col-md-4"><input type="text" class="form-control" id="searchNum5" name="searchNum5" placeholder="System ID 입력"></div>
+                    <div class="col-lg-1 col-md-2"><label class="search-label" for="searchNum4">Serial No</label></div>
+                    <div class="col-lg-3 col-md-4"><input type="text" class="form-control" id="searchNum4" name="searchNum4" placeholder="Serial No 입력"></div>
+                    <div class="col-lg-1 col-md-2"><label class="search-label" for="searchNum7">Equip No</label></div>
+                    <div class="col-lg-3 col-md-4"><input type="text" class="form-control" id="searchNum7" name="searchNum7" placeholder="Equip No 입력"></div>
+                </div>
+            </div>
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-1 col-md-2"><label class="search-label" for="searchNum6">Func Loc</label></div>
+                    <div class="col-lg-3 col-md-4"><input type="text" class="form-control" id="searchNum6" name="searchNum6" placeholder="FUNC LOC 입력"></div>
+                    <div class="col-lg-1 col-md-2"><label class="search-label" for="searchNum3">고객사명</label></div>
+                    <div class="col-lg-3 col-md-4"><input type="text" class="form-control" id="searchNum3" name="searchNum3" placeholder="고객사명 입력"></div>
+                    <div class="col-lg-1 col-md-2"><label class="search-label" for="searchNum2">장비명</label></div>
+                    <div class="col-lg-3 col-md-4"><input type="text" class="form-control" id="searchNum2" name="searchNum2" placeholder="장비명 입력"></div>
+                </div>
+            </div>
+            <div class="x_content">
+                <div class="btn-row center">
+                    <button class="btn btn-success" type="submit">검색하기</button>
+                    <button class="btn btn-success" type="button" id="btnExcel">엑셀받기</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="x_panel">
+        <div class="x_content">
+            <div class="table-responsive">
+                <table class="table table-striped jambo_table" id="tableList">
+                    <thead>
+                    <tr>
+                        <th>System ID</th>
+                        <th>Serial NO</th>
+                        <th>FL</th>
+                        <th>고객사명</th>
+                        <th>장비명</th>
+                        <th>GG</th>
+                        <th>Equip NO</th>
+                        <th>Service By</th>
+                        <th>Contract hnm</th>
+                        <th>System Status</th>
+                        <th>1st CSE</th>
+                        <th>2nd CSE</th>
+                        <th>OUTSOURCING</th>
+                    </tr>
+                    </thead>
+                    <tbody th:with="detailUrl=@{/sample/cswt/mng/modal/ivk-detail}">
+                    <tr>
+                        <td><a href="#" class="ivk-detail-view" th:attr="data-modal-url=${detailUrl}">400-123456</a></td>
+                        <td>108452</td><td>KR01</td><td>서울대학교병원</td><td>SOMATOM Force</td><td>CT</td>
+                        <td>10234567</td><td>Siemens</td><td>계약</td><td>Maint</td><td>홍길동</td><td>김철수</td><td>N</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#" class="ivk-detail-view" th:attr="data-modal-url=${detailUrl}">400-123987</a></td>
+                        <td>175023</td><td>KR01</td><td>세브란스병원</td><td>MAGNETOM Vida</td><td>MR</td>
+                        <td>10234890</td><td>Siemens</td><td>계약</td><td>On Call</td><td>이영희</td><td>박민수</td><td>N</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#" class="ivk-detail-view" th:attr="data-modal-url=${detailUrl}">400-124410</a></td>
+                        <td>A3021</td><td>KR02</td><td>삼성서울병원</td><td>Atellica Solution</td><td>LAB</td>
+                        <td>10235012</td><td>메디테크</td><td>계약</td><td>Maint 1st</td><td>최지원</td><td>정하늘</td><td>Y</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#" class="ivk-detail-view" th:attr="data-modal-url=${detailUrl}">400-124733</a></td>
+                        <td>20871</td><td>KR01</td><td>서울아산병원</td><td>ARTIS icono</td><td>AX</td>
+                        <td>10235344</td><td>Siemens</td><td>미계약</td><td>Warr</td><td>강서준</td><td></td><td>N</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#" class="ivk-detail-view" th:attr="data-modal-url=${detailUrl}">400-125061</a></td>
+                        <td>1102</td><td>KR03</td><td>분당서울대학교병원</td><td>Biograph Vision</td><td>MI</td>
+                        <td>10235678</td><td>Siemens</td><td>계약</td><td>Maint</td><td>윤지우</td><td>임도윤</td><td>N</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#" class="ivk-detail-view" th:attr="data-modal-url=${detailUrl}">400-125398</a></td>
+                        <td>SN30482</td><td>KR02</td><td>경북대학교병원</td><td>ACUSON Sequoia</td><td>US</td>
+                        <td>10235901</td><td>한빛메디칼</td><td>계약</td><td>Maint 2nd</td><td>한예린</td><td></td><td>Y</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#" class="ivk-detail-view" th:attr="data-modal-url=${detailUrl}">400-125712</a></td>
+                        <td>40917</td><td>KR04</td><td>전남대학교병원</td><td>YSIO X.pree</td><td>XP</td>
+                        <td>10236155</td><td>Siemens</td><td>미계약</td><td>Inst</td><td>오세훈</td><td>서다은</td><td>N</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#" class="ivk-detail-view" th:attr="data-modal-url=${detailUrl}">400-126045</a></td>
+                        <td>78213</td><td>KR01</td><td>고려대학교 안암병원</td><td>SOMATOM go.Top</td><td>CT</td>
+                        <td>10236490</td><td>Siemens</td><td>계약</td><td>Maint</td><td>홍길동</td><td>강서준</td><td>N</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <nav aria-label="페이지 이동">
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" href="#" aria-label="처음">&laquo;</a></li>
+                    <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">4</a></li>
+                    <li class="page-item"><a class="page-link" href="#">5</a></li>
+                    <li class="page-item"><a class="page-link" href="#" aria-label="마지막">&raquo;</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script>
+        (function () {
+            document.addEventListener('click', e => {
+                const view = e.target.closest('.ivk-detail-view');
+                if (view) { e.preventDefault(); oh.modal.open(view.dataset.modalUrl); return; }
+                if (e.target.closest('#btnExcel')) oh.toast('엑셀 파일을 내려받습니다.');
+            });
+        })();
+    </script>
+</th:block>
+</body>
+</html>

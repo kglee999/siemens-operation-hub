@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<header class="top_nav" th:fragment="topnav">
+    <div class="nav_menu">
+        <button type="button" id="menu_toggle" aria-label="메뉴 열기/닫기"><span class="bars"></span></button>
+        <h2 class="mobile-brand"><a th:href="@{/sample/home}">Operation Hub</a></h2>
+
+        <!-- 로그인 기능 연결 전까지는 고정 샘플 사용자 표시 -->
+        <div class="user-profile">
+            <span class="part">운영</span>
+            <div class="user_info">
+                <span class="user_name"><a href="#">홍길동 접속중</a></span>
+                <span class="user_time">금주 근로 32.0 / 연장 2.0</span>
+            </div>
+            <a th:href="@{/sample/login}" class="user_logout" title="로그아웃">LOGOUT</a>
+        </div>
+    </div>
+</header>
+</body>
+</html>

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>UI 컴포넌트 샘플</title>
+</head>
+<body>
+<!-- CS Webtool 화면에서 쓰는 UI 요소 모음. 각 요소를 실제로 쓰는 CS Webtool 화면을 괄호로 적어 둠.
+     CS Webtool 에 없는 요소(배지, 진행률, 탭, 알림 상자, 카드)는 넣지 않음. -->
+<main layout:fragment="content">
+    <div class="page-title">
+        <h3>UI 컴포넌트 샘플</h3>
+    </div>
+
+    <!-- 1. 버튼 -->
+    <div class="x_panel">
+        <div class="x_content">
+            <h3 class="section-title">버튼</h3>
+            <div class="row g-3">
+                <div class="col-lg-6">
+                    <p class="comp-label">색상 · 용도</p>
+                    <div class="btn-row">
+                        <button type="button" class="btn btn-success">검색하기</button>
+                        <button type="button" class="btn btn-default">기본</button>
+                        <button type="button" class="btn btn-dark">닫기</button>
+                        <button type="button" class="btn btn-info">파트너사이관</button>
+                        <button type="button" class="btn btn-primary">엑셀 업로드</button>
+                        <button type="button" class="btn btn-danger">삭제</button>
+                        <button type="button" class="btn btn-success" disabled>비활성</button>
+                    </div>
+                    <p class="comp-note">주 동작 btn-success · 모달 닫기 btn-dark · 보조 동작 btn-info · 삭제 btn-danger</p>
+                </div>
+                <div class="col-lg-6">
+                    <p class="comp-label">아이콘 버튼 (724 Call 모니터링) · 작은 버튼 (스케줄 카드)</p>
+                    <div class="btn-row align-items-center">
+                        <button type="button" class="btn btn-info" aria-label="추가"><i class="bi bi-plus-lg"></i></button>
+                        <button type="button" class="btn btn-info" aria-label="이관"><i class="bi bi-arrow-right"></i></button>
+                        <button type="button" class="btn btn-info" aria-label="종료"><i class="bi bi-power"></i></button>
+                        <span class="mx-2"></span>
+                        <button type="button" class="btn btn-default btn-xs" aria-label="메모"><i class="bi bi-eraser"></i></button>
+                        <button type="button" class="btn btn-default btn-xs" aria-label="수정"><i class="bi bi-pencil-square"></i></button>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <p class="comp-label">이름 칩 + 삭제 (당직 관리, SMS 수신 관리)</p>
+                    <div class="btn-group duty-chip" role="group">
+                        <button type="button" class="btn btn-default">홍길동</button>
+                        <button type="button" class="btn btn-default btn-duty-delete" aria-label="홍길동 삭제">X</button>
+                    </div>
+                    <div class="btn-group duty-chip" role="group">
+                        <button type="button" class="btn btn-default">김철수</button>
+                        <button type="button" class="btn btn-default btn-duty-delete" aria-label="김철수 삭제">X</button>
+                    </div>
+                    <button type="button" class="btn btn-success">추가</button>
+                </div>
+                <div class="col-lg-6">
+                    <p class="comp-label">세로 버튼 묶음 (724 Call 후속 처리: 상태별 동작)</p>
+                    <div class="btn-stack">
+                        <button type="button" class="btn btn-success">처리완료</button>
+                        <button type="button" class="btn btn-info">엔지니어지정이관</button>
+                        <button type="button" class="btn btn-dark">수정</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 입력 요소 -->
+    <div class="x_panel">
+        <div class="x_content">
+            <h3 class="section-title">검색 · 입력 요소</h3>
+            <div class="row g-2 align-items-center">
+                <div class="col-lg-1 col-md-2"><label class="search-label" for="cPlant">조직설정</label></div>
+                <div class="col-lg-5 col-md-10">
+                    <!-- 공통 조직 필터 (com_plant_search.jsp): 같은 너비 선택칸 여러 개 -->
+                    <div class="row g-1">
+                        <div class="col"><select class="form-select" id="cPlant" aria-label="Plant"><option>DI</option><option>DX</option></select></div>
+                        <div class="col"><select class="form-select" aria-label="Team"><option>CSE</option><option>APP</option></select></div>
+                        <div class="col"><select class="form-select" aria-label="Modality"><option>CT</option><option>MR</option></select></div>
+                        <div class="col"><select class="form-select" aria-label="Region"><option>서울/경기</option><option>영남</option></select></div>
+                    </div>
+                </div>
+                <div class="col-lg-1 col-md-2"><label class="search-label" for="cName">사용자명</label></div>
+                <div class="col-lg-5 col-md-10"><input type="text" class="form-control" id="cName" placeholder="사용자명 입력"></div>
+
+                <div class="col-lg-1 col-md-2"><label class="search-label" for="cDate">기간설정</label></div>
+                <div class="col-lg-5 col-md-10">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                        <input type="date" class="form-control" id="cDate" value="2026-10-01" aria-label="시작일">
+                        <span class="input-group-text">~</span>
+                        <input type="date" class="form-control" value="2026-10-24" aria-label="종료일">
+                    </div>
+                </div>
+                <div class="col-lg-1 col-md-2"><label class="search-label" for="cDay">기준일</label></div>
+                <div class="col-lg-5 col-md-10">
+                    <div class="input-group" style="max-width: 260px;">
+                        <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                        <input type="date" class="form-control" id="cDay" value="2026-10-24">
+                    </div>
+                </div>
+
+                <div class="col-lg-1 col-md-2"><span class="search-label">접수유형</span></div>
+                <div class="col-lg-5 col-md-10">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="cType" id="cType0" checked>
+                        <label class="form-check-label" for="cType0">All</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="cType" id="cType1">
+                        <label class="form-check-label" for="cType1">접수</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="cType" id="cType2">
+                        <label class="form-check-label" for="cType2">접수불가</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="cType" id="cType3" disabled>
+                        <label class="form-check-label" for="cType3">비활성</label>
+                    </div>
+                </div>
+                <div class="col-lg-1 col-md-2"><span class="search-label">구분</span></div>
+                <div class="col-lg-5 col-md-10" id="cKinds">
+                    <!-- ALL 체크박스가 나머지를 한꺼번에 켜고 끔 (스케줄 화면) -->
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="cKindAll" data-check-all checked>
+                        <label class="form-check-label" for="cKindAll">ALL</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="cKind1" checked>
+                        <label class="form-check-label" for="cKind1">Service</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="cKind2" checked>
+                        <label class="form-check-label" for="cKind2">Compen</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="cKind3" checked>
+                        <label class="form-check-label" for="cKind3">Leave</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ln_solid"></div>
+
+            <div class="row g-3">
+                <div class="col-lg-4">
+                    <p class="comp-label">연 / 월 / 주 선택 (CSE/Apps 업무현황)</p>
+                    <div class="well text-center mb-0">
+                        <div class="row g-2 justify-content-center">
+                            <div class="col-4"><select class="form-select" aria-label="연도"><option>2026</option></select></div>
+                            <div class="col-4"><select class="form-select" aria-label="월"><option>10월</option></select></div>
+                            <div class="col-4"><select class="form-select" aria-label="주"><option>4주</option></select></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <p class="comp-label">이름 검색 + 확인 상태 (모달 공통)</p>
+                    <div class="row g-2 align-items-center">
+                        <div class="col"><input type="text" class="form-control" value="홍길동" aria-label="엔지니어 이름"></div>
+                        <div class="col-auto"><button type="button" class="btn btn-success" id="cCheckBtn">검색</button></div>
+                        <div class="col-auto"><span class="check-status text-danger" id="cCheckStatus">미확인</span></div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <p class="comp-label">시간 입력: HHMM 밑줄 / 시:분 선택 (처리완료, 스케줄 입력)</p>
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+                        <input type="text" inputmode="numeric" maxlength="4" class="form-control input-time" placeholder="0000" aria-label="도착시간">
+                        <span class="time-select">
+                            <select class="form-select" aria-label="시"><option>09</option><option>10</option></select> :
+                            <select class="form-select" aria-label="분"><option>00</option><option>30</option></select>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <p class="comp-label">여러 줄 입력 / 읽기 전용 값</p>
+                    <textarea class="form-control mb-2" rows="3" placeholder="처리내역을 입력하세요"></textarea>
+                    <div class="row g-2 align-items-center">
+                        <div class="col-sm-3"><label class="col-form-label">잠김여부</label></div>
+                        <div class="col-sm-9"><p class="form-static">N (최근 로그인 2026-10-24 09:12)</p></div>
+                        <div class="col-sm-3"><label class="col-form-label" for="cRo">System ID</label></div>
+                        <div class="col-sm-9"><input type="text" class="form-control" id="cRo" value="400-123456" readonly></div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <p class="comp-label">파일 선택 (엑셀 업로드)</p>
+                    <input type="file" class="form-control mb-2" aria-label="엑셀 파일">
+                    <span class="comp-note">업로드 양식 <a href="#">다운로드</a></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 안내 · 상태 표시 -->
+    <div class="x_panel">
+        <div class="x_content">
+            <h3 class="section-title">안내 · 상태 표시
+                <i class="bi bi-question-circle" data-bs-toggle="tooltip" data-bs-html="true"
+                   data-bs-title="도움말 툴팁<br>(SMS 수신 관리 섹션 제목)"></i>
+            </h3>
+            <div class="guide-text">
+                평일 당직은 금일 18:00 부터 익일 08:00 까지 순번에 따라 배정<br>
+                주말 및 공휴일 당직은 금일 08:00 부터 익일 08:00 까지 순번에 따라 배정
+            </div>
+            <div class="alert-line">RPA 문제가 발생하여 10/24 데이터가 늦게 반영될 수 있습니다.</div>
+
+            <div class="row g-3">
+                <div class="col-lg-6">
+                    <p class="comp-label">상태 글자색</p>
+                    <span class="text-red me-3">미확인</span>
+                    <span class="text-blue me-3">확인완료</span>
+                    <span class="me-3">배정수용</span>
+                    <!-- 클릭하면 열리는 설명 레이어 (724 Call 모니터링) -->
+                    <span class="layer-wrap">
+                        <a href="#" class="layer-detail-btn">(접수불가)</a>
+                        <span class="layer-detail">
+                            <span class="layer-title d-block">접수불가</span>
+                            <ul>
+                                <li>계약 만료 장비</li>
+                                <li>System ID 미등록</li>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+                <div class="col-lg-6">
+                    <p class="comp-label">색상 범례 (Real-time 모니터링, 업무현황)</p>
+                    <div class="legend justify-content-start">
+                        <span class="legend-title">표시항목</span>
+                        <span><i class="now"></i>현재시각</span>
+                        <span><i class="unit bg-osr"></i>Working</span>
+                        <span><i class="unit bg-sums"></i>Travel To</span>
+                        <span><i class="unit bg-standby"></i>Office(Standby)</span>
+                        <span><i class="unit bg-trav"></i>Compen</span>
+                        <span><i class="unit bg-etc"></i>Leave</span>
+                    </div>
+                    <div class="legend justify-content-start">
+                        <span class="legend-title">표시기준</span>
+                        <span><i class="unit cell-warning"></i>조기경보 (근무 36h / 연장 6h)</span>
+                        <span><i class="unit cell-delay"></i>경고 (근무 38h / 연장 9h)</span>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <p class="comp-label">팀 · 일정 유형 색</p>
+                    <div class="type-swatches">
+                        <span class="bg-sn">CSE</span><span class="bg-ss">APP/학술</span><span class="bg-rw">RSC</span>
+                        <span class="bg-re">CH</span><span class="bg-etc">Others</span><span class="bg-osr">Working</span>
+                        <span class="bg-trav">Compen</span><span class="bg-standby">Standby</span>
+                        <span class="bg-not-standby">Standby불가</span><span class="bg-sums">Travel To</span>
+                        <span class="bg-crm">CRM</span><span class="bg-xp">XP</span><span class="bg-app">APP</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 표 요소 -->
+    <div class="x_panel">
+        <div class="x_content">
+            <h3 class="section-title">표 요소 <small class="text-navy">목록 · 병합 헤더 · 고정 열은 일반 테이블 샘플 참고</small></h3>
+            <div class="row g-3">
+                <div class="col-lg-6">
+                    <p class="comp-label">경고 색 셀 · 소계 줄 (업무현황)</p>
+                    <table class="table jambo_table mb-0">
+                        <thead><tr><th>엔지니어</th><th>근무</th><th>연장</th></tr></thead>
+                        <tbody>
+                        <tr><td>홍길동</td><td>32.0</td><td>2.0</td></tr>
+                        <tr><td>김철수</td><td class="cell-warning">36.5</td><td>4.0</td></tr>
+                        <tr><td>이영희</td><td class="cell-delay">39.0</td><td class="cell-delay">9.5</td></tr>
+                        <tr class="row-total"><td>소계</td><td>107.5</td><td>15.5</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-lg-6">
+                    <p class="comp-label">항목 / 값 표 (RPA 작동 현황)</p>
+                    <table class="table jambo_table mb-0">
+                        <tbody>
+                        <tr><td class="a-bold" style="width: 160px;">IVK 정보 업데이트</td><td class="a-left">매일 06:00, 12:00, 18:00</td></tr>
+                        <tr><td class="a-bold">최근 수행 결과</td><td class="a-left">2026-10-24 06:00 <span class="text-blue">성공</span></td></tr>
+                        <tr><td colspan="2" class="a-left">※ 실패 시 담당자에게 문자를 최대 4회까지 발송합니다.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-12">
+                    <p class="comp-label">편집 표 (Handsontable 대신: 읽기 전용 셀 빨강, 빈 줄 노랑)</p>
+                    <div class="table-responsive">
+                        <table class="table jambo_table table-edit mb-0">
+                            <thead><tr><th class="row-head"></th><th>날짜</th><th>지역</th><th>순번-1</th><th>순번-2</th><th>순번-3</th></tr></thead>
+                            <tbody>
+                            <tr><td class="row-head">1</td><td class="not-editable">10-24(토)</td><td class="not-editable">서울</td>
+                                <td><input class="form-control" value="홍길동" aria-label="순번-1"></td>
+                                <td><input class="form-control" value="김철수" aria-label="순번-2"></td>
+                                <td><select class="form-select" aria-label="순번-3"><option>이영희</option><option>박민수</option></select></td></tr>
+                            <tr class="row-empty"><td class="row-head">2</td><td class="not-editable">10-25(일)</td><td class="not-editable">서울</td>
+                                <td><input class="form-control" aria-label="순번-1"></td>
+                                <td><input class="form-control" aria-label="순번-2"></td>
+                                <td><select class="form-select" aria-label="순번-3"><option></option><option>이영희</option></select></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. 모달 · 확인창 · 알림 · 로딩 · 페이징 -->
+    <div class="x_panel">
+        <div class="x_content">
+            <h3 class="section-title">모달 · 확인창 · 알림 · 로딩</h3>
+            <div class="btn-row">
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#cModal">기본 모달</button>
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#cUploadModal">엑셀 업로드 모달</button>
+                <button type="button" class="btn btn-default" id="cConfirm">확인창</button>
+                <button type="button" class="btn btn-default" data-toast="success">알림 (성공)</button>
+                <button type="button" class="btn btn-default" data-toast="danger">알림 (오류)</button>
+                <button type="button" class="btn btn-default" data-toast="warning">알림 (경고)</button>
+                <button type="button" class="btn btn-default" id="cLoading">로딩 2초</button>
+            </div>
+            <p class="comp-note mt-2">confirm() → oh.confirm · alert() → oh.toast · siemens.loadingbar → oh.loading</p>
+
+            <div class="ln_solid"></div>
+            <p class="comp-label">페이징</p>
+            <nav aria-label="페이지 이동">
+                <ul class="pagination mb-0">
+                    <li class="page-item"><a class="page-link" href="#">이전</a></li>
+                    <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">다음</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- 기본 모달: 제목 + 보조 설명, 라벨/값 4:8, 닫기(dark) + 저장하기(success) -->
+    <div class="modal fade" id="cModal" tabindex="-1" aria-labelledby="cModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form class="modal-content" novalidate>
+                <div class="modal-header">
+                    <div>
+                        <h5 class="modal-title" id="cModalTitle">사용자 정보 추가</h5>
+                        <small class="text-navy">사용자 정보를 추가하실 수 있습니다.</small>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-2 align-items-center mb-2">
+                        <div class="col-sm-4"><label class="col-form-label" for="cmNo">사용자 NO</label></div>
+                        <div class="col-sm-8"><input type="text" class="form-control" id="cmNo"></div>
+                    </div>
+                    <div class="row g-2 align-items-center mb-2">
+                        <div class="col-sm-4"><label class="col-form-label" for="cmPlant">조직</label></div>
+                        <div class="col-sm-8">
+                            <div class="row g-1">
+                                <div class="col"><select class="form-select" id="cmPlant" aria-label="Plant"><option>DI</option></select></div>
+                                <div class="col"><select class="form-select" aria-label="Team"><option>CSE</option></select></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-2 align-items-center">
+                        <div class="col-sm-4"><span class="col-form-label d-block fw-bold">권한</span></div>
+                        <div class="col-sm-8">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="cmGrade" id="cmGrade1" checked>
+                                <label class="form-check-label" for="cmGrade1">일반</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="cmGrade" id="cmGrade9">
+                                <label class="form-check-label" for="cmGrade9">Admin</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger">삭제</button>
+                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">저장하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 엑셀 업로드 모달: 업로드 전 / 결과 두 상태 -->
+    <div class="modal fade" id="cUploadModal" tabindex="-1" aria-labelledby="cUploadTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cUploadTitle">엔지니어 순번관리 (DX) 엑셀 업로드</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="upload-before">
+                        <div class="row g-2 align-items-center mb-2">
+                            <div class="col-sm-3"><span class="col-form-label d-block fw-bold">업로드 양식</span></div>
+                            <div class="col-sm-9"><a href="#">순번관리_양식.xlsx 다운로드</a></div>
+                        </div>
+                        <div class="row g-2 align-items-center">
+                            <div class="col-sm-3"><label class="col-form-label" for="cExcel">엑셀 파일</label></div>
+                            <div class="col-sm-9"><input type="file" class="form-control" id="cExcel" accept=".xlsx,.xls"></div>
+                        </div>
+                    </div>
+                    <pre class="upload-result d-none" id="cUploadResult"></pre>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success upload-before" id="cUploadBtn">등록</button>
+                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script>
+        (function () {
+            // ALL 체크박스
+            const kinds = document.getElementById('cKinds');
+            const all = kinds.querySelector('[data-check-all]');
+            const items = [...kinds.querySelectorAll('input[type=checkbox]:not([data-check-all])')];
+            all.addEventListener('change', () => items.forEach(c => { c.checked = all.checked; }));
+            items.forEach(c => c.addEventListener('change', () => { all.checked = items.every(i => i.checked); }));
+
+            // 이름 검색 -> 확인완료
+            document.getElementById('cCheckBtn').addEventListener('click', () => {
+                const s = document.getElementById('cCheckStatus');
+                s.textContent = '확인완료';
+                s.className = 'check-status text-confirm';
+            });
+
+            document.getElementById('cConfirm').addEventListener('click', () => {
+                oh.confirm('삭제하시겠습니까?', { okText: '삭제' }).then(ok => oh.toast(ok ? '삭제되었습니다.' : '취소했습니다.', ok ? 'success' : 'info'));
+            });
+            const messages = { success: '저장이 완료되었습니다.', danger: '오류가 발생하였습니다.', warning: '엔지니어 이름을 입력해주세요.' };
+            document.querySelectorAll('[data-toast]').forEach(b => b.addEventListener('click', () => oh.toast(messages[b.dataset.toast], b.dataset.toast)));
+            document.getElementById('cLoading').addEventListener('click', () => { oh.loading.show(); setTimeout(oh.loading.hide, 2000); });
+
+            // 엑셀 업로드: 등록 누르면 결과 상태로 전환 (샘플이라 실제 업로드 없음)
+            const upload = document.getElementById('cUploadModal');
+            document.getElementById('cUploadBtn').addEventListener('click', () => {
+                upload.querySelector('.modal-title').textContent = '엔지니어 순번관리 (DX) 엑셀 업로드 결과';
+                upload.querySelectorAll('.upload-before').forEach(el => el.classList.add('d-none'));
+                const result = document.getElementById('cUploadResult');
+                result.textContent = '총 42건 중 40건 등록\n\n[실패] 12행: 엔지니어 이름(홍길둥)을 찾을 수 없습니다.\n[실패] 27행: 날짜 형식이 올바르지 않습니다. (2026/10/32)';
+                result.classList.remove('d-none');
+            });
+            upload.addEventListener('hidden.bs.modal', () => {
+                upload.querySelector('.modal-title').textContent = '엔지니어 순번관리 (DX) 엑셀 업로드';
+                upload.querySelectorAll('.upload-before').forEach(el => el.classList.remove('d-none'));
+                document.getElementById('cUploadResult').classList.add('d-none');
+            });
+        })();
+    </script>
+</th:block>
+</body>
+</html>

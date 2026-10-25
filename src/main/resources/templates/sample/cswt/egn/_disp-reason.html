@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 사유등록 (CS Webtool egn/disp/call_resion.jsp). 배정미수용/응답없음 건의 미배정 사유. mode=update 면 등록된 사유로 채움 -->
+<div class="modal fade" tabindex="-1" aria-labelledby="dispReasonTitle" aria-hidden="true" th:fragment="modal"
+     th:with="upd=${param.mode != null and param.mode[0] == 'update'}">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" novalidate>
+            <div class="modal-header">
+                <h5 class="modal-title" id="dispReasonTitle">사유등록</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2">
+                    <div class="col-sm-4"><label class="col-form-label text-sm-end d-block" for="rsRem">처리내역</label></div>
+                    <div class="col-sm-8">
+                        <textarea class="form-control" rows="15" id="rsRem" name="web_not_assgn_rem" placeholder="처리내역을 입력하세요" required
+                                  th:text="${upd} ? '야간 ARS 배정 응답 없음. 담당 엔지니어 타 병원 출동 중으로 익일 08시 유선 확인 예정.' : ''"></textarea>
+                        <div class="invalid-feedback">처리내역을 입력해주세요.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+                <button type="submit" class="btn btn-success">저장하기</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            var modal = document.currentScript.closest('.modal');
+            var form = modal.querySelector('form');
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                form.classList.add('was-validated');
+                var bad = form.querySelector(':invalid');
+                if (bad) { bad.focus(); return; }
+                bootstrap.Modal.getInstance(modal).hide();
+                oh.toast('저장이 완료되었습니다.', 'success');
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

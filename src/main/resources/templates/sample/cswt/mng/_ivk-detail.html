@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- IVK 상세현황 모달 (CS Webtool mng/mng_ivk_detail_add.jsp). 관리자 화면 기준: 편집 가능한 칸은 입력, 나머지는 읽기 전용 -->
+<div class="modal fade" tabindex="-1" aria-labelledby="ivkDetailTitle" aria-hidden="true" th:fragment="modal">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <form class="modal-content ivk-detail" id="ivkDetailForm" novalidate>
+            <div class="modal-header">
+                <h5 class="modal-title" id="ivkDetailTitle">IVK 상세현황</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4 col-lg-2"><label class="col-form-label" for="ivkSerialNo">Serial NO</label></div>
+                    <div class="col-8 col-lg-4"><input type="text" class="form-control" id="ivkSerialNo" name="serial_no" value="108452" readonly></div>
+                    <div class="col-4 col-lg-2"><label class="col-form-label" for="ivkSystemId">System ID</label></div>
+                    <div class="col-8 col-lg-4"><input type="text" class="form-control" id="ivkSystemId" name="system_id" value="400-123456" readonly></div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4 col-lg-2"><label class="col-form-label" for="ivkEquipNo">Equipment NO</label></div>
+                    <div class="col-8 col-lg-4"><input type="text" class="form-control" id="ivkEquipNo" name="equipment_no" value="10234567" readonly></div>
+                    <div class="col-4 col-lg-2"><label class="col-form-label" for="ivkEquipNm">Equipment NM</label></div>
+                    <div class="col-8 col-lg-4"><input type="text" class="form-control" id="ivkEquipNm" name="equipment_nm" value="SOMATOM Force" readonly></div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4 col-lg-2"><label class="col-form-label" for="ivkEquipHnm">Equipment HNM</label></div>
+                    <div class="col-8 col-lg-4"><input type="text" class="form-control" id="ivkEquipHnm" name="equipment_hnm" value="소마톰 포스" placeholder="Equipment HNM" required></div>
+                    <div class="col-4 col-lg-2"><label class="col-form-label" for="ivkSystemStatus">System_Status</label></div>
+                    <div class="col-8 col-lg-4"><input type="text" class="form-control" id="ivkSystemStatus" name="system_status" value="Maint" placeholder="System_Status" required></div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4 col-lg-2"><label class="col-form-label" for="ivkGg">GG</label></div>
+                    <div class="col-8 col-lg-4"><input type="text" class="form-control" id="ivkGg" value="CT" readonly></div>
+                    <div class="col-4 col-lg-2"><label class="col-form-label" for="ivkFuncLoc">Functional_Location</label></div>
+                    <div class="col-8 col-lg-4"><input type="text" class="form-control" id="ivkFuncLoc" name="func_loc" value="KR01-SEL-0012" readonly></div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4 col-lg-2"><label class="col-form-label" for="ivkCustNo">Cust_NO</label></div>
+                    <div class="col-8 col-lg-4">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="ivkCustNo" name="cust_no" value="1000234" placeholder="Cust_NO">
+                            <button type="button" class="btn btn-success" id="btnCustSearch" aria-label="Cust_NO 검색"><i class="bi bi-search"></i></button>
+                        </div>
+                    </div>
+                    <div class="col-4 col-lg-2"><label class="col-form-label" for="ivkHospName">Hosp_Name</label></div>
+                    <div class="col-8 col-lg-4"><input type="text" class="form-control" id="ivkHospName" name="hosp_name" value="Seoul National University Hospital" placeholder="Hosp_Name" required></div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4 col-lg-2"><label class="col-form-label" for="ivkHospHname">Hosp_Hname</label></div>
+                    <div class="col-8 col-lg-4"><input type="text" class="form-control" id="ivkHospHname" name="hosp_hname" value="서울대학교병원" placeholder="Hosp_Hname"></div>
+                    <div class="col-4 col-lg-2"><label class="col-form-label" for="ivkArea">AREA</label></div>
+                    <div class="col-8 col-lg-4">
+                        <select class="form-select" id="ivkArea" name="area">
+                            <option value="">값 없음</option>
+                            <option selected>서울/경기</option><option>강원</option><option>충청</option>
+                            <option>호남</option><option>영남</option><option>제주</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4 col-lg-2"><label class="col-form-label" for="ivkContractLevel">Contract_Level</label></div>
+                    <div class="col-8 col-lg-4"><input type="text" class="form-control" id="ivkContractLevel" name="contract_level" value="TOP" placeholder="Contract_level"></div>
+                    <div class="col-4 col-lg-2"><label class="col-form-label" for="ivkContractHnm">Contract_Hnm</label></div>
+                    <div class="col-8 col-lg-4">
+                        <select class="form-select" id="ivkContractHnm" name="contract_hnm">
+                            <option value="">값 없음</option>
+                            <option selected>계약</option>
+                            <option>미계약</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4 col-lg-2"><label class="col-form-label" for="ivkServiceBy">Service_by</label></div>
+                    <div class="col-8 col-lg-4">
+                        <select class="form-select" id="ivkServiceBy" name="service_by">
+                            <option value="">값 없음</option>
+                            <option selected>Siemens</option>
+                            <option>메디테크</option>
+                            <option>한빛메디칼</option>
+                            <option>대한의료기술</option>
+                        </select>
+                    </div>
+                    <div class="col-4 col-lg-2"><label class="col-form-label" for="ivkMaterialNo">Matrial_NO</label></div>
+                    <div class="col-8 col-lg-4"><input type="text" class="form-control" id="ivkMaterialNo" name="material_no" value="10590000" readonly></div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4 col-lg-2"><label class="col-form-label" for="ivkPartLimit">Part_Limit_RM</label></div>
+                    <div class="col-8 col-lg-4"><input type="text" class="form-control" id="ivkPartLimit" name="part_limit_rm" value="Tube 제외" placeholder="Part_Limit_RM"></div>
+                    <div class="col-4 col-lg-2"><label class="col-form-label" for="ivkLoc">LOC</label></div>
+                    <div class="col-8 col-lg-4"><input type="text" class="form-control" id="ivkLoc" name="loc_remark" value="본관 지하1층 CT실" placeholder="LOC"></div>
+                </div>
+
+                <!-- CSE 담당자: 구/신 사번으로 검색하면 이름과 다른 사번이 채워짐 -->
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4 col-lg-2"><label class="col-form-label" for="ivkCse1No">구 CSE1_NO</label></div>
+                    <div class="col-8 col-lg-4">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="ivkCse1No" name="cse1_no" value="E0001" placeholder="구 CSE1_NO">
+                            <button type="button" class="btn btn-success btn-cse-search" data-cse="1">검색</button>
+                        </div>
+                    </div>
+                    <div class="col-4 col-lg-2"><label class="col-form-label" for="ivkCse1">CSE1</label></div>
+                    <div class="col-8 col-lg-4"><input type="text" class="form-control" id="ivkCse1" name="cse1" value="홍길동" readonly></div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4 col-lg-2"><label class="col-form-label" for="ivkCse1NewNo">신 CSE1_NO</label></div>
+                    <div class="col-8 col-lg-4">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="ivkCse1NewNo" name="cse1_new_no" value="Z003AB1C" placeholder="신 CSE1_NO">
+                            <button type="button" class="btn btn-success btn-cse-search" data-cse="1">검색</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4 col-lg-2"><label class="col-form-label" for="ivkCse2No">구 CSE2_NO</label></div>
+                    <div class="col-8 col-lg-4">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="ivkCse2No" name="cse2_no" value="E0002" placeholder="구 CSE2_NO">
+                            <button type="button" class="btn btn-success btn-cse-search" data-cse="2">검색</button>
+                        </div>
+                    </div>
+                    <div class="col-4 col-lg-2"><label class="col-form-label" for="ivkCse2">CSE2</label></div>
+                    <div class="col-8 col-lg-4"><input type="text" class="form-control" id="ivkCse2" name="cse2" value="김철수" readonly></div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4 col-lg-2"><label class="col-form-label" for="ivkCse2NewNo">신 CSE2_NO</label></div>
+                    <div class="col-8 col-lg-4">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="ivkCse2NewNo" name="cse2_new_no" value="Z003AB2D" placeholder="신 CSE2_NO">
+                            <button type="button" class="btn btn-success btn-cse-search" data-cse="2">검색</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-4 col-lg-2"><label class="col-form-label" for="ivkOutsourcing">OUTSOURCING</label></div>
+                    <div class="col-8 col-lg-4"><input type="text" class="form-control" id="ivkOutsourcing" name="outsourcing" value="N" placeholder="OUTSOURCING"></div>
+                    <div class="col-4 col-lg-2"><label class="col-form-label label-2line" for="ivkSiContract">SI CLOUD<br>CONTRACT LEVEL</label></div>
+                    <div class="col-8 col-lg-4">
+                        <select class="form-select" id="ivkSiContract" name="ivk_contract_level">
+                            <option value="">값 없음</option>
+                            <option selected>TOP</option><option>TOP Pre.</option><option>PRO</option><option>PLUS</option>
+                            <option>PLUS+</option><option>Power Pack</option><option>Smart Pack</option><option>미계약</option>
+                            <option>PLUS 취급</option><option>Sub EQ</option><option>service by partner</option><option>KTC</option>
+                            <option>INST</option><option>Warranty</option><option>해당없음</option><option>삭제</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center">
+                    <div class="col-4 col-lg-2"><label class="col-form-label label-2line" for="ivkSiStatus">SI CLOUD<br>SYSTEM STATUS</label></div>
+                    <div class="col-8 col-lg-4">
+                        <select class="form-select" id="ivkSiStatus" name="ivk_system_status">
+                            <option value="">값 없음</option>
+                            <option>On Call</option><option selected>Maint</option><option>Inst</option><option>Warr</option>
+                            <option>Maint 1st</option><option>Maint 2nd</option><option>Maint 3rd</option>
+                            <option>Maint 4th</option><option>Maint 5th</option><option>Maint 6th</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+                <button type="submit" class="btn btn-success">저장하기</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            const form = document.getElementById('ivkDetailForm');
+            // 샘플 사번 -> 엔지니어 (구 사번 / 신 사번 어느 쪽으로든 검색)
+            const engineers = [
+                { no: 'E0001', newNo: 'Z003AB1C', name: '홍길동' },
+                { no: 'E0002', newNo: 'Z003AB2D', name: '김철수' },
+                { no: 'E0003', newNo: 'Z003AB3E', name: '이영희' },
+                { no: 'E0004', newNo: 'Z003AB4F', name: '박민수' }
+            ];
+
+            form.addEventListener('click', e => {
+                const cse = e.target.closest('.btn-cse-search');
+                if (cse) {
+                    const n = cse.dataset.cse;
+                    const value = cse.closest('.input-group').querySelector('input').value.trim().toUpperCase();
+                    const hit = engineers.find(x => x.no === value || x.newNo === value);
+                    if (!hit) { oh.toast('존재하지 않는 사번입니다.', 'danger'); return; }
+                    form['cse' + n + '_no'].value = hit.no;
+                    form['cse' + n + '_new_no'].value = hit.newNo;
+                    form['cse' + n].value = hit.name;
+                    oh.toast('엔지니어가 확인되었습니다.');
+                    return;
+                }
+                if (e.target.closest('#btnCustSearch')) {
+                    if (!form.cust_no.value.trim()) { oh.toast('존재하지 않는 Cust_NO입니다.', 'danger'); return; }
+                    form.hosp_name.value = 'Seoul National University Hospital';
+                    form.hosp_hname.value = '서울대학교병원';
+                    form.area.value = '서울/경기';
+                }
+            });
+
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                form.classList.add('was-validated');
+                const empty = form.querySelector(':invalid');
+                if (empty) { oh.toast(empty.placeholder + '를 입력해주세요.', 'warning'); empty.focus(); return; }
+                bootstrap.Modal.getInstance(form.closest('.modal')).hide();
+                oh.toast('저장되었습니다.');
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

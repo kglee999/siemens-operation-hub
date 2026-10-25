@@ -1,0 +1,16 @@
+/* 724 Call 대응 후속 처리 (CS Webtool egn_disp.jsp + egn/disp/call_*.jsp) */
+
+/* 처리 열: 140px 버튼을 세로로 쌓음 (CS Webtool style="width:140px") */
+table.jambo_table td.disp-actions { width: 156px; }
+.disp-actions .btn-stack { display: flex; flex-direction: column; gap: 5px; width: 140px; margin: 0 auto; }
+.disp-actions .btn-stack > .btn { width: 100%; }
+
+/* 샘플 확인용 버튼 줄 (원본 화면에는 없음) */
+.disp-sample-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; color: #73879c; }
+.disp-sample-tools .tools-title { margin-right: 5px; font-weight: 700; }
+
+/* 파트너사 이관: 당직 엔지니어 스크롤 표 (원본 height:150px) */
+.disp-vendor-box { height: 150px; }
+
+/* HHMM 밑줄 입력칸은 좁아서 Bootstrap 검증 아이콘이 숫자를 가림: 아이콘 없이 밑줄만 빨갛게 */
+.was-validated .input-time:invalid, .input-time.is-invalid { padding-right: 12px; background-image: none; }

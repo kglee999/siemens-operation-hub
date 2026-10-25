@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>724 REPORT</title>
+</head>
+<body>
+<!-- CS Webtool noti/call_report.jsp
+     검색 조건은 724 Call 대응 모니터링과 같음 (call-monitoring.html 의 callSearch fragment).
+     목록은 Call 1건 = 1줄, 응대엔지니어를 누르면 조치사항 모달 (call_osr_rem_view.jsp). 원본도 페이징 없음. -->
+<main layout:fragment="content">
+    <div class="page-title">
+        <h3>724 REPORT</h3>
+    </div>
+
+    <form th:replace="~{sample/cswt/noti/call-monitoring :: callSearch('/sample/cswt/noti/call-report', false)}"></form>
+
+    <div class="x_panel">
+        <div class="x_content">
+            <div class="table-responsive">
+                <table class="table table-striped jambo_table" id="tableList"
+                       th:attr="data-rem-url=@{/sample/cswt/noti/modal/osr-rem-view}">
+                    <thead>
+                    <tr>
+                        <th>접수시간</th>
+                        <th>IVR_SEQ</th>
+                        <th>Call 유형</th>
+                        <th>전화번호</th>
+                        <th>FUNC LOC</th>
+                        <th>System ID</th>
+                        <th>사업부</th>
+                        <th>제품별</th>
+                        <th>병원명</th>
+                        <th>장비명</th>
+                        <th>계약</th>
+                        <th>고장증상</th>
+                        <th>STATUS</th>
+                        <th>응대엔지니어</th>
+                        <th>Dispatched<br>/SVA</th>
+                        <th>출발</th>
+                        <th>일시작</th>
+                        <th>일종료</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>2026-10-24<br>09:12:35<br>(24518)</td>
+                        <td>20261024091235</td>
+                        <td>call</td>
+                        <td>02-2072-2114</td>
+                        <td>10234</td>
+                        <td>400-123456</td>
+                        <td>DI</td>
+                        <td>MR</td>
+                        <td>서울대학교병원</td>
+                        <td>MAGNETOM Vida</td>
+                        <td>Full Service</td>
+                        <td class="a-left">헬륨 압력 경고, 스캔 불가</td>
+                        <td>Open</td>
+                        <td><a href="#" data-rem="24518">박지훈</a></td>
+                        <td>방문처리</td>
+                        <td>09:35</td><td>10:20</td><td></td>
+                    </tr>
+                    <tr>
+                        <td>2026-10-24<br>08:41:02<br>(24517)</td>
+                        <td>20261024084102</td>
+                        <td>call</td>
+                        <td>02-2228-5800</td>
+                        <td>20871</td>
+                        <td>400-208871</td>
+                        <td>DI</td>
+                        <td>CT</td>
+                        <td>세브란스병원</td>
+                        <td>SOMATOM Force</td>
+                        <td>Parts Only</td>
+                        <td class="a-left">튜브 아킹 에러로 촬영 중단</td>
+                        <td>Need to follow</td>
+                        <td><a href="#" data-rem="24517">강서준</a></td>
+                        <td>이관</td>
+                        <td></td><td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td>2026-10-23<br>22:05:48<br>(24516)</td>
+                        <td>#LQR2610230007</td>
+                        <td>QR</td>
+                        <td>010-3412-7788</td>
+                        <td>31452</td>
+                        <td>400-314520</td>
+                        <td>DI</td>
+                        <td>AT</td>
+                        <td>삼성서울병원</td>
+                        <td>ARTIS icono</td>
+                        <td>Full Service</td>
+                        <td class="a-left">모니터 화면 깜빡임</td>
+                        <td>Closed</td>
+                        <td><a href="#" data-rem="24516">윤지우</a></td>
+                        <td>유선해결</td>
+                        <td></td><td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td>2026-10-23<br>19:30:11<br>(24515)</td>
+                        <td>20261023193011</td>
+                        <td>call</td>
+                        <td>031-787-7114</td>
+                        <td>40917</td>
+                        <td>400-409170</td>
+                        <td>DI</td>
+                        <td>MR</td>
+                        <td>분당서울대학교병원</td>
+                        <td>MAGNETOM Skyra</td>
+                        <td>Full Service</td>
+                        <td class="a-left">코일 인식 불가 (Head/Neck 20)</td>
+                        <td>Closed</td>
+                        <td><a href="#" data-rem="24515">임도윤</a></td>
+                        <td>방문처리완료</td>
+                        <td>08:10</td><td>09:05</td><td>11:40</td>
+                    </tr>
+                    <tr>
+                        <td>2026-10-23<br>16:22:47<br>(24514)</td>
+                        <td>#L2610230031</td>
+                        <td>LN</td>
+                        <td>031-219-5114</td>
+                        <td>51268</td>
+                        <td>400-512680</td>
+                        <td>DI</td>
+                        <td>US</td>
+                        <td>아주대학교병원</td>
+                        <td>ACUSON Sequoia</td>
+                        <td>미계약</td>
+                        <td class="a-left">프로브 이미지 노이즈</td>
+                        <td>Open</td>
+                        <td>CS Sales</td>
+                        <td>미계약</td>
+                        <td></td><td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td>2026-10-23<br>11:08:19<br>(24513)</td>
+                        <td>20261023110819</td>
+                        <td>call</td>
+                        <td>051-240-7000</td>
+                        <td>60325</td>
+                        <td>400-603250</td>
+                        <td>DX</td>
+                        <td>LAB</td>
+                        <td>부산대학교병원</td>
+                        <td>Atellica Solution</td>
+                        <td>Full Service</td>
+                        <td class="a-left">시약 팩 인식 오류</td>
+                        <td>Closed</td>
+                        <td><a href="#" data-rem="24513">한예린</a></td>
+                        <td>TSC 처리</td>
+                        <td></td><td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td>2026-10-22<br>23:47:55<br>(24512)</td>
+                        <td>#E2610220004</td>
+                        <td>EGN</td>
+                        <td>062-220-5114</td>
+                        <td>70412</td>
+                        <td>400-704120</td>
+                        <td>DI</td>
+                        <td>CT</td>
+                        <td>전남대학교병원</td>
+                        <td>SOMATOM go.Top</td>
+                        <td>Parts Only</td>
+                        <td class="a-left">갠트리 회전 불가, 에러 코드 표시</td>
+                        <td>Need to follow</td>
+                        <td><a href="#" data-rem="24512">서다은</a></td>
+                        <td>파트너사 재배정완료</td>
+                        <td>00:20</td><td>01:35</td><td>03:10</td>
+                    </tr>
+                    <tr>
+                        <td>2026-10-22<br>14:03:26<br>(24511)</td>
+                        <td>20261022140326</td>
+                        <td>call</td>
+                        <td>053-200-5114</td>
+                        <td>80156</td>
+                        <td>400-801560</td>
+                        <td>DX</td>
+                        <td>POC</td>
+                        <td>경북대학교병원</td>
+                        <td>RAPIDPoint 500e</td>
+                        <td>Full Service</td>
+                        <td class="a-left">카트리지 교체 후 QC 실패</td>
+                        <td>Open</td>
+                        <td><a href="#" data-rem="24511">최지원</a></td>
+                        <td>배정중</td>
+                        <td></td><td></td><td></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script>
+        (function () {
+            const table = document.getElementById('tableList');
+            // 응대엔지니어 -> 조치사항 모달 (call_osr_rem_view.jsp)
+            table.addEventListener('click', e => {
+                const a = e.target.closest('[data-rem]');
+                if (!a) return;
+                e.preventDefault();
+                oh.modal.open(table.dataset.remUrl, { cs_seq: a.dataset.rem });
+            });
+
+            document.getElementById('btnExcel').addEventListener('click', () => oh.toast('엑셀 다운로드는 샘플에서 지원하지 않습니다.', 'warning'));
+            document.getElementById('searchForm').addEventListener('submit', e => {
+                e.preventDefault();
+                oh.toast('검색되었습니다.');
+            });
+        })();
+    </script>
+</th:block>
+</body>
+</html>

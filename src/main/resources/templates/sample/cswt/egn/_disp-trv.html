@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 방문처리 (CS Webtool egn/disp/call_trv.jsp). 현장 출동 처리.
+     nosid=1 이면 SYSTEM ID 입력칸 표시, mode=update 면 저장된 값으로 채움 -->
+<div class="modal fade" tabindex="-1" aria-labelledby="dispTrvTitle" aria-hidden="true" th:fragment="modal"
+     th:with="upd=${param.mode != null and param.mode[0] == 'update'}">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" novalidate>
+            <div class="modal-header">
+                <h5 class="modal-title" id="dispTrvTitle">방문처리</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 align-items-start mb-2" th:if="${param.nosid != null}">
+                    <div class="col-sm-3"><label class="col-form-label text-sm-end d-block" for="tvSystemId">SYSTEM ID</label></div>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="tvSystemId" name="system_id" placeholder="SYSTEM_ID 입력" required>
+                        <div class="invalid-feedback">SYSTEM_ID 를 입력해주세요.</div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-sm-3"><label class="col-form-label text-sm-end d-block" for="tvNotiTitle">장애명</label></div>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="tvNotiTitle" name="noti_title" placeholder="장애명을 입력하세요" required
+                               th:value="${upd} ? 'Image artifact' : ''">
+                        <div class="invalid-feedback">장애명을 입력해주세요.</div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-sm-3"><label class="col-form-label text-sm-end d-block" for="tvNotiPriority">장애등급</label></div>
+                    <div class="col-sm-9">
+                        <select class="form-select" id="tvNotiPriority" name="noti_priority" required>
+                            <option value="">장애등급 선택</option>
+                            <option value="PS1">PS1</option>
+                            <option value="PS2">PS2</option>
+                            <option value="PS3" th:selected="${upd}">PS3</option>
+                        </select>
+                        <div class="invalid-feedback">장애등급을 선택해주세요.</div>
+                    </div>
+                </div>
+                <div class="row g-2">
+                    <div class="col-sm-3"><label class="col-form-label text-sm-end d-block" for="tvOsrRem">처리내역</label></div>
+                    <div class="col-sm-9">
+                        <textarea class="form-control" rows="10" id="tvOsrRem" name="osr_rem" placeholder="처리내역을 입력하세요" required
+                                  th:text="${upd} ? '현장 출동. Detector calibration 진행 예정.' : ''"></textarea>
+                        <div class="invalid-feedback">처리내역을 입력해주세요.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+                <button type="submit" class="btn btn-success">저장하기</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            var modal = document.currentScript.closest('.modal');
+            var form = modal.querySelector('form');
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                form.classList.add('was-validated');
+                var bad = form.querySelector(':invalid');
+                if (bad) { bad.focus(); return; }
+                bootstrap.Modal.getInstance(modal).hide();
+                oh.toast('저장이 완료되었습니다.', 'success');
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

@@ -1,0 +1,49 @@
+/* CS Webtool 관리자 메뉴 + 공통 팝업 (sample/cswt/adm/*, sample/cswt/com/*) */
+
+/* 목록의 병합 셀 (mergeRow 대신 rowspan): 줄무늬/hover 색이 첫 줄에만 걸리지 않게 흰 바탕 고정 */
+table.jambo_table > tbody > tr > td.cell-merge,
+table.jambo_table > tbody > tr:hover > td.cell-merge {
+  --bs-table-bg-type: transparent;
+  --bs-table-bg-state: transparent;
+  background: #fff;
+  border-right: 1px solid #ddd;
+}
+
+/* 체크박스/라디오 묶음 상자 (CS Webtool 모달 안 x_panel + checkbox-area) */
+.check-panel {
+  padding: 6px 10px 2px;
+  background: #fff;
+  border: 1px solid var(--oh-panel-border);
+}
+.check-panel .form-check-inline { margin-bottom: 4px; }
+.check-panel + .check-panel { margin-top: 5px; }
+
+/* 휴일 관리: 오른쪽 공휴일 목록은 캘린더 높이만큼 스크롤 */
+.holiday-list-title { margin: 6px 0 10px; font-size: 18px; color: var(--oh-heading); }
+.holiday-list { overflow-y: auto; margin-bottom: 0; }
+.holiday-list > .table { margin-bottom: 0; }
+.holiday-list thead th { position: sticky; top: 0; z-index: 1; background: #e1e4e7; }
+table.jambo_table tbody tr.row-weekend > td,
+table.jambo_table tbody tr.row-weekend:hover > td { --bs-table-bg-type: #f2dede; background-color: #f2dede; }
+.holiday-add { margin-top: 15px; }
+.holiday-add .table { margin-bottom: 0; }
+
+/* 공통 팝업 데모: 섹션 사이 간격 */
+.demo-note { margin: 0 0 10px; color: #73879c; }
+
+/* 조직설정 체크박스 (com_plant_checkbox): 줄마다 Plant / Team / Modality / Region */
+.check-line { padding-top: 6px; }
+.check-line .form-check-inline { margin-bottom: 4px; }
+
+/* 모달 라벨: label / span 구분 없이 같은 굵기 (Bootstrap 3 control-label) */
+.modal-body .col-form-label { font-weight: 700; }
+
+/* PM/TS 그룹 관리 검색줄: 라벨 + 선택 한 쌍씩 (좁으면 2쌍/줄, 라벨 폭 맞춤) */
+.search-pair { display: flex; align-items: center; }
+.search-pair .search-label { flex: 0 0 80px; }
+.search-pair .form-select { flex: 1 1 auto; }
+@media (min-width: 992px) {
+  .search-pair .search-label { flex-basis: auto; }
+  .search-pair .form-select { flex: 0 0 160px; }
+  .search-pair { margin-right: 15px; }
+}

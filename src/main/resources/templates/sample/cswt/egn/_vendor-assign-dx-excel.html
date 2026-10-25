@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- CS Webtool egn/vendor_assign_dx_excel_add.jsp: 업로드 양식 / 파일명 / 업로드 결과 -->
+<div class="modal fade" tabindex="-1" aria-labelledby="vendorDxExcelTitle" aria-hidden="true" th:fragment="modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" id="vendorDxExcelForm" novalidate>
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title" id="vendorDxExcelTitle">파트너사 순번관리 (DX) 엑셀 업로드</h5>
+                    <small class="text-navy d-block">파트너사 순번관리 (DX) 엑셀을 업로드 하실 수 있습니다.</small>
+                </div>
+                <button type="button" class="btn-close align-self-start" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-sm-3"><span class="col-form-label search-label d-block">업로드 양식</span></div>
+                    <div class="col-sm-9"><a href="#" class="sample-download"><i class="bi bi-download"></i> 다운로드</a></div>
+                </div>
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-sm-3"><label class="col-form-label search-label" for="vendorDxExcelFile">파일명</label></div>
+                    <div class="col-sm-9">
+                        <input type="file" class="form-control" id="vendorDxExcelFile" name="excelFile" accept=".xlsx,.xls" required>
+                        <div class="invalid-feedback">엑셀 파일을 입력해주세요.</div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start upload-after d-none">
+                    <div class="col-sm-3"><span class="col-form-label search-label d-block">업로드 결과</span></div>
+                    <div class="col-sm-9"><pre class="upload-result" id="vendorDxExcelResult"></pre></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success">등록</button>
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            const form = document.getElementById('vendorDxExcelForm');
+            form.querySelector('.sample-download').addEventListener('click', e => {
+                e.preventDefault();
+                oh.toast('업로드 양식 다운로드 (샘플 화면)', 'info');
+            });
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                form.classList.add('was-validated');
+                if (!form.checkValidity()) return;
+                // 샘플: 업로드 없이 결과만 표시
+                form.querySelector('.upload-after').classList.remove('d-none');
+                document.getElementById('vendorDxExcelResult').textContent = [
+                    '총 업로드 건수 : 7',
+                    '등록 성공 건수 : 6',
+                    '등록 실패 건수 : 1',
+                    '',
+                    '5행 (200231 / DAEJIN MEDICAL / GJ) 순번-2 : 파트너사 엔지니어 \'박지성\' 을(를) 찾을 수 없습니다.'
+                ].join('\n');
+                oh.toast('업로드가 완료되었습니다.');
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

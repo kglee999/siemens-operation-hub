@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>목록 화면 샘플</title>
+</head>
+<body>
+<!-- CS Webtool 목록 화면 구성: 제목 / 검색 패널 / 추가 버튼 / 목록 패널(테이블 + 페이징) -->
+<main layout:fragment="content">
+    <div class="page-title">
+        <h3>사용자 관리</h3>
+    </div>
+
+    <!-- 검색 영역 -->
+    <form id="searchForm" method="get" th:action="@{/sample/list}">
+        <input type="hidden" name="pageNo" value="1">
+        <div class="x_panel">
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-1 col-md-2"><label class="search-label" for="searchPlant">조직설정</label></div>
+                    <div class="col-lg-3 col-md-4">
+                        <select class="form-select" id="searchPlant" name="plant">
+                            <option value="">전체</option>
+                            <option>운영1팀</option>
+                            <option>운영2팀</option>
+                            <option>지원팀</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-1 col-md-2"><label class="search-label" for="searchName">사용자명</label></div>
+                    <div class="col-lg-3 col-md-4">
+                        <input type="text" class="form-control" id="searchName" name="name" placeholder="사용자명 입력">
+                    </div>
+                    <div class="col-lg-1 col-md-2"><label class="search-label" for="searchFrom">등록일</label></div>
+                    <div class="col-lg-3 col-md-4">
+                        <div class="input-group">
+                            <input type="date" class="form-control" id="searchFrom" name="from">
+                            <span class="input-group-text">~</span>
+                            <input type="date" class="form-control" name="to" aria-label="등록일 종료">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-1 col-md-2"><span class="search-label">권한설정</span></div>
+                    <div class="col-lg-11 col-md-10">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="role" id="role0" value="" checked>
+                            <label class="form-check-label" for="role0">All</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="role" id="role1" value="1">
+                            <label class="form-check-label" for="role1">일반</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="role" id="role2" value="2">
+                            <label class="form-check-label" for="role2">당직 관리</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="role" id="role9" value="9">
+                            <label class="form-check-label" for="role9">Admin</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="x_content">
+                <div class="btn-row center">
+                    <button class="btn btn-success" type="submit">검색하기</button>
+                    <button class="btn btn-success" type="button">엑셀받기</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- 목록 영역 -->
+    <div class="btn-row end mb-1">
+        <a class="btn btn-success" th:href="@{/sample/form}">추가하기</a>
+    </div>
+    <div class="x_panel">
+        <div class="x_content">
+            <div class="table-responsive">
+                <table class="table table-striped jambo_table">
+                    <thead>
+                    <tr>
+                        <th>Plant</th>
+                        <th>Team</th>
+                        <th>권한</th>
+                        <th>사용자NO</th>
+                        <th>사용자명</th>
+                        <th>Mobile</th>
+                        <th>E-mail</th>
+                        <th>Status</th>
+                        <th>잠김여부</th>
+                        <th>Last login date</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>DI</td><td>운영1팀</td><td>Admin</td>
+                        <td><a th:href="@{/sample/form}">E0001</a></td>
+                        <td>홍길동</td><td>010-1234-5678</td><td>hong@example.com</td>
+                        <td>Active</td><td>N</td><td>2026-10-24 09:12</td>
+                    </tr>
+                    <tr>
+                        <td>DI</td><td>운영1팀</td><td>일반</td>
+                        <td><a th:href="@{/sample/form}">E0002</a></td>
+                        <td>김철수</td><td>010-2345-6789</td><td>kim@example.com</td>
+                        <td>Active</td><td>N</td><td>2026-10-23 17:40</td>
+                    </tr>
+                    <tr>
+                        <td>DX</td><td>운영2팀</td><td>당직 관리</td>
+                        <td><a th:href="@{/sample/form}">E0003</a></td>
+                        <td>이영희</td><td>010-3456-7890</td><td>lee@example.com</td>
+                        <td>Active</td><td>Y</td><td>2026-10-20 08:05</td>
+                    </tr>
+                    <tr>
+                        <td>DX</td><td>운영2팀</td><td>일반</td>
+                        <td><a th:href="@{/sample/form}">E0004</a></td>
+                        <td>박민수</td><td>010-4567-8901</td><td>park@example.com</td>
+                        <td>Inactive</td><td>N</td><td>2026-09-30 13:22</td>
+                    </tr>
+                    <tr>
+                        <td>ETC</td><td>지원팀</td><td>일반</td>
+                        <td><a th:href="@{/sample/form}">E0005</a></td>
+                        <td>최지원</td><td>010-5678-9012</td><td>choi@example.com</td>
+                        <td>Active</td><td>N</td><td>2026-10-24 08:47</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <nav aria-label="페이지 이동">
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" href="#" aria-label="처음">&laquo;</a></li>
+                    <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">4</a></li>
+                    <li class="page-item"><a class="page-link" href="#">5</a></li>
+                    <li class="page-item"><a class="page-link" href="#" aria-label="마지막">&raquo;</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</main>
+</body>
+</html>

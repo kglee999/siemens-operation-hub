@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- CS Webtool egn/egn_assign_dx_excel_add.jsp: 업로드 전(양식 / 파일명) → 등록 후 결과(건수 + 에러 상세) 두 상태 -->
+<div class="modal fade" tabindex="-1" aria-labelledby="dxExcelTitle" aria-hidden="true" th:fragment="modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" id="dxExcelForm" novalidate>
+            <div class="modal-header">
+                <h5 class="modal-title" id="dxExcelTitle">엔지니어 순번관리 (DX) 엑셀 업로드</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="upload-before">
+                    <div class="row g-2 align-items-center mb-2">
+                        <div class="col-sm-3"><span class="col-form-label search-label d-block">업로드 양식</span></div>
+                        <div class="col-sm-9"><a href="#" class="sample-download"><i class="bi bi-download"></i> 다운로드</a></div>
+                    </div>
+                    <div class="row g-2 align-items-start">
+                        <div class="col-sm-3"><label class="col-form-label search-label" for="dxExcelFile">파일명</label></div>
+                        <div class="col-sm-9">
+                            <input type="file" class="form-control" id="dxExcelFile" name="excelFile" accept=".xlsx,.xls" required>
+                            <div class="invalid-feedback">엑셀 파일을 입력해주세요.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start upload-after d-none">
+                    <div class="col-sm-3"><span class="col-form-label search-label d-block">업로드 결과</span></div>
+                    <div class="col-sm-9"><pre class="upload-result" id="dxExcelResult"></pre></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success upload-before">등록</button>
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            const form = document.getElementById('dxExcelForm');
+            form.querySelector('.sample-download').addEventListener('click', e => {
+                e.preventDefault();
+                oh.toast('업로드 양식 다운로드 (샘플 화면)', 'info');
+            });
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                form.classList.add('was-validated');
+                if (!form.checkValidity()) return;
+                // 샘플: 업로드 없이 결과 상태로 전환
+                form.querySelectorAll('.upload-before').forEach(el => el.classList.add('d-none'));
+                form.querySelector('.upload-after').classList.remove('d-none');
+                document.getElementById('dxExcelTitle').textContent = '엔지니어 순번관리 (DX) 엑셀 업로드 결과';
+                document.getElementById('dxExcelResult').textContent = [
+                    ' 총 업로드 건수 : 35',
+                    ' 등록 성공 건수 : 33',
+                    ' 등록 실패 건수 : 2',
+                    ' 에러 상세 내용 : ',
+                    '12행 (2026-10-27 / 대전/충청) 순번-3 : 엔지니어 \'김민준\' 을(를) 찾을 수 없습니다.',
+                    '29행 (2026-10-31 / 제주) 날짜 형식이 올바르지 않습니다. (예: 20261031)'
+                ].join('\n');
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

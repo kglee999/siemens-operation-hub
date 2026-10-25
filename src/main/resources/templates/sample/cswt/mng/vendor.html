@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>파트너사 현황</title>
+    <link rel="stylesheet" th:href="@{/assets/css/cswt/mng.css}">
+</head>
+<body>
+<!-- CS Webtool mng/mng_vendor.jsp: 조직/Region 선택 + 파트너사명/엔지니어명 검색 / 등록하기 / 파트너사 목록(같은 파트너사의 앞 5칸은 rowspan 병합) / 페이징.
+     Partner ID -> 파트너사 정보 모달(_vendor-add), KeyMan · 추가 -> 파트너사 엔지니어(KeyMan) 모달(_vendor-user-add) -->
+<main layout:fragment="content">
+    <div class="page-title"><h3>파트너사 현황</h3></div>
+
+    <form id="searchForm" method="get" th:action="@{/sample/cswt/mng/vendor}">
+        <input type="hidden" name="pageNo" value="1">
+        <div class="x_panel">
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-1 col-md-2"><label class="search-label" for="searchType">조직설정</label></div>
+                    <div class="col-lg-3 col-md-4">
+                        <select class="form-select" id="searchType" name="searchType">
+                            <option value="">전체</option>
+                            <option value="96E6">DI</option>
+                            <option value="94E6">DX</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-1 offset-lg-3 col-md-2"><label class="search-label" for="searchType2">파트너사명</label></div>
+                    <div class="col-lg-3 col-md-4"><input type="text" class="form-control" id="searchType2" name="searchType2" placeholder="파트너사 명"></div>
+                </div>
+            </div>
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-1 col-md-2"><label class="search-label" for="searchType3">Region 선택</label></div>
+                    <div class="col-lg-3 col-md-4">
+                        <select class="form-select" id="searchType3" name="searchType3">
+                            <option value="">지역선택</option>
+                            <option>서울/경기</option><option>강원</option><option>충청</option>
+                            <option>호남</option><option>영남</option><option>제주</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-1 offset-lg-3 col-md-2"><label class="search-label" for="searchType4">엔지니어명</label></div>
+                    <div class="col-lg-3 col-md-4"><input type="text" class="form-control" id="searchType4" name="searchType4" placeholder="엔지니어 명"></div>
+                </div>
+            </div>
+            <div class="x_content">
+                <div class="btn-row center">
+                    <button class="btn btn-success" type="submit">검색하기</button>
+                    <button class="btn btn-success" type="button" id="btnExcel">엑셀받기</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="btn-row end mb-1">
+        <button class="btn btn-success" type="button" id="btnVendorInsert"
+                th:attr="data-modal-url=@{/sample/cswt/mng/modal/vendor-add}">등록하기</button>
+    </div>
+    <div class="x_panel">
+        <div class="x_content">
+            <div class="table-responsive">
+                <!-- rowspan 으로 줄을 합치므로 줄무늬(table-striped) 없이 -->
+                <table class="table jambo_table vendor-table" id="tableList"
+                       th:attr="data-vendor-url=@{/sample/cswt/mng/modal/vendor-add},data-user-url=@{/sample/cswt/mng/modal/vendor-user-add}">
+                    <thead>
+                    <tr>
+                        <th>PLANT CD</th>
+                        <th>Partner ID</th>
+                        <th>파트너명(영문)</th>
+                        <th>파트너명(한글)</th>
+                        <th>OUTSOURCING</th>
+                        <th>KeyMan</th>
+                        <th>Mobile Number</th>
+                        <th>AREA</th>
+                        <th>등록일시</th>
+                        <th class="col-action"></th>
+                    </tr>
+                    </thead>
+                    <!-- 파트너사 하나 = tbody 하나 (data-* 는 모달에 넘길 값) -->
+                    <tbody data-vendor-no="V1001" data-plant="96E6" data-name-en="MEDITECH Co., Ltd." data-name-ko="메디테크" data-outsourcing="Y">
+                    <tr data-seq="11" data-keyman="김도현" data-tel="010-2345-6789" data-area="서울/경기">
+                        <td rowspan="2">DI</td>
+                        <td rowspan="2"><a href="#" class="vendor-view">V1001</a></td>
+                        <td rowspan="2">MEDITECH Co., Ltd.</td>
+                        <td rowspan="2">메디테크</td>
+                        <td rowspan="2">Y</td>
+                        <td><a href="#" class="vendor-user-view">김도현</a></td><td>010-2345-6789</td><td>서울/경기</td><td>2026-03-12 09:41</td>
+                        <td><button type="button" class="btn btn-success vendor-user-add">추가</button></td>
+                    </tr>
+                    <tr data-seq="12" data-keyman="이준호" data-tel="010-3456-7890" data-area="강원">
+                        <td><a href="#" class="vendor-user-view">이준호</a></td><td>010-3456-7890</td><td>강원</td><td>2026-05-20 14:12</td>
+                        <td><button type="button" class="btn btn-success vendor-user-add">추가</button></td>
+                    </tr>
+                    </tbody>
+                    <tbody data-vendor-no="V1002" data-plant="96E6" data-name-en="HANBIT MEDICAL" data-name-ko="한빛메디칼" data-outsourcing="Y">
+                    <tr data-seq="21" data-keyman="박성민" data-tel="010-4567-8901" data-area="영남">
+                        <td rowspan="3">DI</td>
+                        <td rowspan="3"><a href="#" class="vendor-view">V1002</a></td>
+                        <td rowspan="3">HANBIT MEDICAL</td>
+                        <td rowspan="3">한빛메디칼</td>
+                        <td rowspan="3">Y</td>
+                        <td><a href="#" class="vendor-user-view">박성민</a></td><td>010-4567-8901</td><td>영남</td><td>2025-11-03 10:25</td>
+                        <td><button type="button" class="btn btn-success vendor-user-add">추가</button></td>
+                    </tr>
+                    <tr data-seq="22" data-keyman="최유진" data-tel="010-5678-9012" data-area="영남">
+                        <td><a href="#" class="vendor-user-view">최유진</a></td><td>010-5678-9012</td><td>영남</td><td>2026-01-15 16:40</td>
+                        <td><button type="button" class="btn btn-success vendor-user-add">추가</button></td>
+                    </tr>
+                    <tr data-seq="23" data-keyman="정민재" data-tel="010-6789-0123" data-area="호남">
+                        <td><a href="#" class="vendor-user-view">정민재</a></td><td>010-6789-0123</td><td>호남</td><td>2026-09-08 11:03</td>
+                        <td><button type="button" class="btn btn-success vendor-user-add">추가</button></td>
+                    </tr>
+                    </tbody>
+                    <tbody data-vendor-no="V1003" data-plant="94E6" data-name-en="DAEHAN MEDICAL TECH" data-name-ko="대한의료기술" data-outsourcing="N">
+                    <tr data-seq="31" data-keyman="윤서연" data-tel="010-7890-1234" data-area="충청">
+                        <td>DX</td>
+                        <td><a href="#" class="vendor-view">V1003</a></td>
+                        <td>DAEHAN MEDICAL TECH</td>
+                        <td>대한의료기술</td>
+                        <td>N</td>
+                        <td><a href="#" class="vendor-user-view">윤서연</a></td><td>010-7890-1234</td><td>충청</td><td>2026-02-27 13:55</td>
+                        <td><button type="button" class="btn btn-success vendor-user-add">추가</button></td>
+                    </tr>
+                    </tbody>
+                    <tbody data-vendor-no="V1004" data-plant="96E6" data-name-en="KOREA IMAGING SERVICE" data-name-ko="코리아이미징서비스" data-outsourcing="Y">
+                    <tr data-seq="41" data-keyman="장태호" data-tel="010-8901-2345" data-area="제주">
+                        <td rowspan="2">DI</td>
+                        <td rowspan="2"><a href="#" class="vendor-view">V1004</a></td>
+                        <td rowspan="2">KOREA IMAGING SERVICE</td>
+                        <td rowspan="2">코리아이미징서비스</td>
+                        <td rowspan="2">Y</td>
+                        <td><a href="#" class="vendor-user-view">장태호</a></td><td>010-8901-2345</td><td>제주</td><td>2026-06-02 08:57</td>
+                        <td><button type="button" class="btn btn-success vendor-user-add">추가</button></td>
+                    </tr>
+                    <tr data-seq="42" data-keyman="송지훈" data-tel="010-9012-3456" data-area="서울/경기">
+                        <td><a href="#" class="vendor-user-view">송지훈</a></td><td>010-9012-3456</td><td>서울/경기</td><td>2026-10-21 17:20</td>
+                        <td><button type="button" class="btn btn-success vendor-user-add">추가</button></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <nav aria-label="페이지 이동">
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" href="#" aria-label="처음">&laquo;</a></li>
+                    <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#" aria-label="마지막">&raquo;</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script>
+        (function () {
+            const table = document.getElementById('tableList');
+
+            // 파트너사 값 (tbody data-*)
+            function vendorParams(el) {
+                const d = el.closest('tbody').dataset;
+                return { vendorNo: d.vendorNo, plant: d.plant, nameEn: d.nameEn, nameKo: d.nameKo, outsourcing: d.outsourcing };
+            }
+            // 파트너사 + 엔지니어(KeyMan) 값 (tr data-*)
+            function userParams(el) {
+                const d = el.closest('tr').dataset;
+                const v = vendorParams(el);
+                return Object.assign(v, { area: d.area });
+            }
+
+            document.addEventListener('click', e => {
+                if (e.target.closest('#btnVendorInsert')) {
+                    oh.modal.open(e.target.closest('#btnVendorInsert').dataset.modalUrl, { mode: 'insert' });
+                    return;
+                }
+                const vendor = e.target.closest('#tableList .vendor-view');
+                if (vendor) {
+                    e.preventDefault();
+                    const tr = vendor.closest('tr');
+                    oh.modal.open(table.dataset.vendorUrl, Object.assign({ mode: 'modify', area: tr.dataset.area }, vendorParams(vendor)));
+                    return;
+                }
+                const user = e.target.closest('#tableList .vendor-user-view');
+                if (user) {
+                    e.preventDefault();
+                    const d = user.closest('tr').dataset;
+                    oh.modal.open(table.dataset.userUrl, Object.assign({ mode: 'modify', seq: d.seq, keyman: d.keyman, tel: d.tel }, userParams(user)));
+                    return;
+                }
+                const add = e.target.closest('#tableList .vendor-user-add');
+                if (add) {
+                    oh.modal.open(table.dataset.userUrl, Object.assign({ mode: 'insert' }, userParams(add)));
+                    return;
+                }
+                if (e.target.closest('#btnExcel')) oh.toast('엑셀 파일을 내려받습니다.');
+            });
+        })();
+    </script>
+</th:block>
+</body>
+</html>

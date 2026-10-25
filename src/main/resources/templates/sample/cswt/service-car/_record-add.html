@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 운행기록부 입력 모달 (CS Webtool serviceCar/serviceCar_record_add.jsp).
+     파라미터: useDate(yyyyMMdd), carNumber, workKm, cWorkKm, pWorkKm, remark, firstDay=Y 이면 주행 전 계기판 거리 입력칸 표시 -->
+<div class="modal fade" tabindex="-1" aria-labelledby="svcRecordAddTitle" aria-hidden="true" th:fragment="modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" id="svcRecordAddForm" novalidate>
+            <input type="hidden" name="use_date" th:value="${param.useDate} ?: '20261024'">
+            <div class="modal-header">
+                <h5 class="modal-title" id="svcRecordAddTitle">운행기록부 입력
+                    <small class="text-navy">1 개월 전, 1 개월 후 데이터까지만 입력하실 수 있습니다.</small></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-sm-4"><label class="col-form-label">사용날짜</label></div>
+                    <div class="col-sm-8"><p class="form-static" id="svcUseDateText">2026년 10월 24일 토요일</p></div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-sm-4"><label class="col-form-label" for="svcCarNumber">차량번호</label></div>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="svcCarNumber" name="car_number"
+                               th:value="${param.carNumber} ?: '12가 3456'" readonly>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center mb-2" th:if="${#strings.equals(param.firstDay, 'Y')}">
+                    <div class="col-sm-4"><label class="col-form-label" for="svcBPanelKm">주행 전 계기판 거리(km)</label></div>
+                    <div class="col-sm-8">
+                        <input type="text" inputmode="numeric" class="form-control" id="svcBPanelKm" name="b_panel_km">
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-sm-4"><label class="col-form-label" for="svcWorkKm">출/퇴근용(km)</label></div>
+                    <div class="col-sm-8">
+                        <input type="text" inputmode="numeric" class="form-control" id="svcWorkKm" name="work_km" th:value="${param.workKm}">
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-sm-4"><label class="col-form-label" for="svcCWorkKm">일반업무용(km)</label></div>
+                    <div class="col-sm-8">
+                        <input type="text" inputmode="numeric" class="form-control" id="svcCWorkKm" name="c_work_km" th:value="${param.cWorkKm}">
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-sm-4"><label class="col-form-label" for="svcPWorkKm">개인업무용(km)</label></div>
+                    <div class="col-sm-8">
+                        <input type="text" inputmode="numeric" class="form-control" id="svcPWorkKm" name="p_work_km" th:value="${param.pWorkKm}">
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center">
+                    <div class="col-sm-4"><label class="col-form-label" for="svcRemark">비고</label></div>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="svcRemark" name="remark" th:value="${param.remark}">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success">저장하기</button>
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            const form = document.getElementById('svcRecordAddForm');
+            const kmFields = ['b_panel_km', 'work_km', 'c_work_km', 'p_work_km'];
+
+            // 사용날짜 표시: yyyyMMdd -> yyyy년 MM월 dd일 O요일
+            const ymd = form.use_date.value;
+            if (/^\d{8}$/.test(ymd)) {
+                const d = new Date(+ymd.slice(0, 4), +ymd.slice(4, 6) - 1, +ymd.slice(6, 8));
+                document.getElementById('svcUseDateText').textContent =
+                    ymd.slice(0, 4) + '년 ' + ymd.slice(4, 6) + '월 ' + ymd.slice(6, 8) + '일 ' + '일월화수목금토'[d.getDay()] + '요일';
+            }
+
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                // 빈 거리 값은 0 으로 저장 (CS Webtool 과 같음)
+                kmFields.forEach(n => { if (form[n] && form[n].value.trim() === '') form[n].value = '0'; });
+                const v = Object.fromEntries(new FormData(form));
+                window.serviceCarRecordUpdate && window.serviceCarRecordUpdate(v.use_date, v);
+                bootstrap.Modal.getInstance(form.closest('.modal')).hide();
+                oh.toast('입력이 완료되었습니다.', 'success');
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

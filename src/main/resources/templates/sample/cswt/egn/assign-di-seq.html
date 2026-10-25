@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>724 당직 관리 (DI CT-SG)</title>
+    <link rel="stylesheet" th:href="@{/assets/vendor/handsontable-6.2.2/handsontable.full.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/cswt/egn-assign.css}">
+</head>
+<body>
+<!-- CS Webtool egn/egn_assign_di_seq.jsp: 기간설정 / 당직 시간 안내 / 저장하기 · 엑셀업로드 / 지역정보 + 순번 편집 표(Handsontable) -->
+<main layout:fragment="content" th:with="dutyDate=${param.dutyDate != null ? param.dutyDate[0] : '2026-10-24'}">
+    <div class="page-title"><h3>724 당직 관리 (DI CT-SG)</h3></div>
+
+    <form id="searchForm" method="get" th:action="@{/sample/cswt/egn/assign-di-seq}">
+        <div class="x_panel">
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto"><label class="search-label" for="dutyDate">기간설정</label></div>
+                    <div class="col-auto">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                            <input type="date" class="form-control" id="dutyDate" name="dutyDate" style="width: 200px;" th:value="${dutyDate}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="guide-text">
+        평일 당직은 금일 18:00 부터 익일 08:00 까지 순번에 따라 배정<br>
+        주말 및 공휴일 당직은 금일 08:00 부터 익일 08:00 까지 순번에 따라 배정<br>
+        예시1) 목요일 당직은 (목)18:00 ~ (금)08:00<br>
+        예시2) 금요일 당직은 (금)18:00 ~ (토)08:00<br>
+        예시3) 토요일 당직은 (토)08:00 ~ (일)08:00<br>
+        예시4) 일요일 당직은 (일)08:00 ~ (월)08:00
+    </div>
+
+    <div class="btn-row end mb-1">
+        <button class="btn btn-success" type="button" id="btnSave">저장하기</button>
+        <button class="btn btn-success" type="button" id="btnExcel"
+                th:attr="data-modal-url=@{/sample/cswt/egn/modal/assign-di-seq-excel}">엑셀업로드</button>
+    </div>
+
+    <div class="x_panel">
+        <div class="x_content">
+            <h4 class="info-title">지역정보</h4>
+            <div class="table-responsive">
+                <table class="table table-striped jambo_table info-table">
+                    <colgroup>
+                        <col style="width: 200px;">
+                        <col>
+                    </colgroup>
+                    <tbody>
+                    <tr th:each="t : ${ { {'서울/경기/강원','CT / SG'}, {'부산/울산/경남','CT'}, {'대구/경북','CT'}, {'대전/충청','CT / SG'}, {'전남/광주/전북','CT'}, {'제주','CT'} } }">
+                        <td class="info-key" th:text="${t[0]}">서울/경기/강원</td>
+                        <td class="a-left" th:text="${t[1]}">CT / SG</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-responsive">
+                <div id="grid_1" th:attr="data-duty-date=${dutyDate}"></div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/assets/vendor/handsontable-6.2.2/handsontable.full.min.js}"></script>
+    <script th:src="@{/assets/vendor/handsontable-6.2.2/languages/ko-KR.min.js}"></script>
+    <script th:src="@{/assets/js/oh-handsontable.js}"></script>
+    <script th:inline="none">
+        (function () {
+            const el = document.getElementById('grid_1');
+            const dutyDate = el.dataset.dutyDate;
+            const SEQ = Array.from({ length: 10 }, (_, i) => 'emplName' + String(i + 1).padStart(2, '0'));
+            // 샘플 데이터 (원본 ${jsonData}): 날짜 / 지역 / GG / 순번-1~10
+            const data = [
+                ['서울/경기/강원', 'CT', '홍길동|김철수|이영희|박민수|최지원|정하늘|강서준|윤지우'],
+                ['서울/경기/강원', 'SG', '임도윤|한예린|오세훈|서다은|김태현'],
+                ['부산/울산/경남', 'CT', '배준호|신유진|조민재|권나래'],
+                ['대구/경북', 'CT', '류승우|문가영|백승민'],
+                ['대전/충청', 'CT', '송지호|안소희|황보람|남궁민'],
+                ['대전/충청', 'SG', ''],
+                ['전남/광주/전북', 'CT', '장우진|노하은|하지훈'],
+                ['제주', 'CT', '고은비|양재원']
+            ].map(([region, gg, names]) => {
+                const row = { duty_date: dutyDate, region_rem: region, gg: gg };
+                const list = names ? names.split('|') : [];
+                SEQ.forEach((k, i) => { row[k] = list[i] || ''; });
+                return row;
+            });
+
+            const hot = oh.grid(el, {
+                data: data,
+                columns: [
+                    { data: 'duty_date', width: 90, editor: false, readOnly: true },
+                    { data: 'region_rem', width: 120 },
+                    { data: 'gg', width: 90 },
+                    ...SEQ.map(k => ({ data: k, width: 100 }))
+                ],
+                height: 487,
+                colHeaders: ['날짜', '지역', 'GG', ...SEQ.map((_, i) => '순번-' + (i + 1))],
+                contextMenu: false,   // 원본 DI CT-SG 표에는 우클릭 메뉴 없음
+                dataSchema: { duty_date: dutyDate }
+            });
+
+            // 날짜를 바꾸면 조회
+            document.getElementById('dutyDate').addEventListener('change', e => {
+                if (e.target.value) e.target.form.submit();
+            });
+
+            document.getElementById('btnSave').addEventListener('click', () => {
+                if (!hot.getSourceData().length) { oh.toast('엔지니어 순번을 입력해주세요.', 'warning'); return; }
+                oh.confirm('저장하시겠습니까?', { okText: '저장' }).then(ok => { if (ok) oh.toast('저장 되었습니다.'); });
+            });
+
+            document.getElementById('btnExcel').addEventListener('click', e => oh.modal.open(e.currentTarget.dataset.modalUrl));
+        })();
+    </script>
+</th:block>
+</body>
+</html>

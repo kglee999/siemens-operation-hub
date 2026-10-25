@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>724 Call 대응 모니터링</title>
+    <link rel="stylesheet" th:href="@{/assets/css/cswt/call.css}">
+</head>
+<body>
+<!-- CS Webtool noti/call_monitoring.jsp
+     조직설정(com_ivk_search: 사업부/GG/지역) · 엔지니어명 / 접수유형 · 기간 / 검색하기 · 엑셀받기
+     목록: Call 1건의 공통 칸(Call 일시 ~ 관리 버튼)은 rowspan 으로 병합 (siemens.util.mergeRow('call-row', 14) 결과),
+     차수 ~ 일종료시간은 배정(차수/엔지니어)별 한 줄 -->
+<main layout:fragment="content">
+    <div class="page-title">
+        <h3>724 Call 대응 모니터링</h3>
+    </div>
+
+    <!-- 검색 영역: 724 REPORT / 724 Call TEST 도 이 fragment 를 그대로 씀 (TEST 는 엑셀받기 대신 콜 생성) -->
+    <form id="searchForm" method="get" th:action="@{${action}}"
+          th:fragment="callSearch(action, test)" th:with="action=${action} ?: '/sample/cswt/noti/call-monitoring', test=${test} ?: false">
+        <input type="hidden" name="pageNo" value="1">
+        <div class="x_panel">
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-1 col-md-2"><label class="search-label" for="searchType">조직설정</label></div>
+                    <div class="col-lg-5 col-md-10">
+                        <!-- com/com_ivk_search.jsp (관리자: 사업부 + GG + 지역) -->
+                        <div class="row g-1">
+                            <div class="col">
+                                <select class="form-select" id="searchType" name="searchType" aria-label="사업부">
+                                    <option value="">전체</option>
+                                    <option value="96E6">DI</option>
+                                    <option value="94E6">DX</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select class="form-select" name="searchType2" aria-label="GG">
+                                    <option value="">전체</option>
+                                    <option data-plant="96E6">CT</option>
+                                    <option data-plant="96E6">MR</option>
+                                    <option data-plant="96E6">AT</option>
+                                    <option data-plant="96E6">XP</option>
+                                    <option data-plant="96E6">US</option>
+                                    <option data-plant="96E6">MI</option>
+                                    <option data-plant="94E6">LAB</option>
+                                    <option data-plant="94E6">POC</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select class="form-select" name="searchType3" aria-label="지역">
+                                    <option value="">전체</option>
+                                    <option>서울</option>
+                                    <option>경기</option>
+                                    <option>강원</option>
+                                    <option>충청</option>
+                                    <option>호남</option>
+                                    <option>영남</option>
+                                    <option>제주</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-1 offset-lg-1 col-md-2"><label class="search-label" for="searchNum">엔지니어명</label></div>
+                    <div class="col-lg-4 col-md-4">
+                        <input type="text" class="form-control" id="searchNum" name="searchNum" placeholder="엔지니어명 입력">
+                    </div>
+                </div>
+            </div>
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-1 col-md-2"><span class="search-label">접수유형</span></div>
+                    <div class="col-lg-5 col-md-10">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="searchType4" id="searchType41" value="" checked>
+                            <label class="form-check-label" for="searchType41">전체</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="searchType4" id="searchType42" value="call">
+                            <label class="form-check-label" for="searchType42">Call</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="searchType4" id="searchType43" value="lifeNet">
+                            <label class="form-check-label" for="searchType43">기타</label>
+                        </div>
+                    </div>
+                    <div class="col-lg-1 offset-lg-1 col-md-2"><label class="search-label" for="firstDate">기간설정</label></div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                            <input type="date" class="form-control" id="firstDate" name="firstDate" value="2026-10-17">
+                            <span class="input-group-text">~</span>
+                            <input type="date" class="form-control" name="lastDate" value="2026-10-24" aria-label="기간 종료">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="x_content">
+                <div class="btn-row center">
+                    <button class="btn btn-success" type="submit">검색하기</button>
+                    <button class="btn btn-success" type="button" id="btnExcel" th:unless="${test}">엑셀받기</button>
+                    <button class="btn btn-success" type="button" id="btnMakeCall" th:if="${test}"
+                            th:attr="data-modal-url=@{/sample/cswt/test/modal/make-call}">콜 생성</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="x_panel">
+        <div class="x_content">
+            <div class="table-responsive">
+                <table class="table jambo_table call-table" id="tableList">
+                    <thead>
+                    <tr>
+                        <th>Call 일시</th>
+                        <th>IVR_SEQ</th>
+                        <th>고객사명</th>
+                        <th>FUNC LOC</th>
+                        <th>System ID</th>
+                        <th>장비명</th>
+                        <th>GG</th>
+                        <th>장애등급</th>
+                        <th>Call유형</th>
+                        <th>Noti No</th>
+                        <th>Area</th>
+                        <th>STATUS</th>
+                        <th aria-label="관리"></th>
+                        <th>차수</th>
+                        <th>엔지니어순번</th>
+                        <th>수락여부</th>
+                        <th>응답일시</th>
+                        <th>DISP일시</th>
+                        <th>DISP L/T</th>
+                        <th>출발시간</th>
+                        <th>일시작시간</th>
+                        <th>일종료시간</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Call 24518: 1차 2명 미수용/응답없음 -> 2차 수용, 방문처리 -->
+                    <tr>
+                        <td rowspan="3">2026-10-24<br>09:12:35<br>(24518)</td>
+                        <td rowspan="3">20261024091235</td>
+                        <td rowspan="3">서울대학교병원</td>
+                        <td rowspan="3">10234</td>
+                        <td rowspan="3">400-123456</td>
+                        <td rowspan="3">MAGNETOM Vida</td>
+                        <td rowspan="3">MR</td>
+                        <td rowspan="3">1</td>
+                        <td rowspan="3">Call</td>
+                        <td rowspan="3">300512345</td>
+                        <td rowspan="3">서울</td>
+                        <td rowspan="3">Open</td>
+                        <td rowspan="3" class="call-admin">
+                            <button type="button" class="btn btn-info" th:attr="data-modal-url=@{/sample/cswt/egn/modal/disp-egn-add}" title="엔지니어 추가"><i class="bi bi-plus-lg"></i></button>
+                            <button type="button" class="btn btn-info" th:attr="data-modal-url=@{/sample/cswt/egn/modal/disp-egn-assign}" title="엔지니어 지정"><i class="bi bi-arrow-right"></i></button>
+                            <button type="button" class="btn btn-info" th:attr="data-modal-url=@{/sample/cswt/egn/modal/disp-end-process(mode='insert')}" title="종료 처리"><i class="bi bi-power"></i></button>
+                        </td>
+                        <td>1</td><td>김민준</td><td>배정미수용</td>
+                        <td>2026-10-24<br>09:13:10</td><td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td>1</td><td>이서연</td><td>응답없음</td>
+                        <td>2026-10-24<br>09:15:42</td><td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td>2</td><td>박지훈</td><td>방문처리</td>
+                        <td>2026-10-24<br>09:18:27</td><td>2026-10-24<br>09:20:05</td><td>00:07</td><td>09:35</td><td>10:20</td><td></td>
+                    </tr>
+
+                    </tbody>
+                    <tbody>
+                    <!-- Call 24517: (접수불가) 사유 레이어, 장비명 링크 = SYSTEM ID 변경 모달 -->
+                    <tr>
+                        <td rowspan="2">2026-10-24<br>08:41:02<br>(24517)</td>
+                        <td rowspan="2">20261024084102</td>
+                        <td rowspan="2">세브란스병원</td>
+                        <td rowspan="2">20871</td>
+                        <td rowspan="2">
+                            400-208871<br>
+                            <div class="layer-wrap">
+                                <a href="#" class="layer-detail-btn">(접수불가)</a>
+                                <div class="layer-detail">
+                                    <p class="layer-title">접수불가</p>
+                                    <ul>
+                                        <li>계약 만료 장비 (2026-09-30 종료)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </td>
+                        <td rowspan="2">
+                            <a href="#" th:attr="data-modal-url=@{/sample/cswt/noti/modal/system-id}">SOMATOM Force</a>
+                        </td>
+                        <td rowspan="2">CT</td>
+                        <td rowspan="2">2</td>
+                        <td rowspan="2">Call</td>
+                        <td rowspan="2">300512298</td>
+                        <td rowspan="2">서울</td>
+                        <td rowspan="2">Need to Follow</td>
+                        <td rowspan="2" class="call-admin">
+                            <button type="button" class="btn btn-info" th:attr="data-modal-url=@{/sample/cswt/egn/modal/disp-egn-add}" title="엔지니어 추가"><i class="bi bi-plus-lg"></i></button>
+                            <button type="button" class="btn btn-info" th:attr="data-modal-url=@{/sample/cswt/egn/modal/disp-egn-assign}" title="엔지니어 지정"><i class="bi bi-arrow-right"></i></button>
+                            <button type="button" class="btn btn-info" th:attr="data-modal-url=@{/sample/cswt/egn/modal/disp-end-process(mode='insert')}" title="종료 처리"><i class="bi bi-power"></i></button>
+                        </td>
+                        <td>1</td><td>정하늘</td><td>DISP Reject</td>
+                        <td>2026-10-24<br>08:42:15</td><td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td>2</td><td>강서준</td><td>엔지니어지정이관</td>
+                        <td>2026-10-24<br>08:50:31</td><td>2026-10-24<br>08:52:10</td><td>00:11</td><td></td><td></td><td></td>
+                    </tr>
+
+                    </tbody>
+                    <tbody>
+                    <!-- Call 24516: QR 접수, 유선해결 -->
+                    <tr>
+                        <td>2026-10-23<br>22:05:48<br>(24516)</td>
+                        <td>#LQR2610230007</td>
+                        <td>삼성서울병원</td>
+                        <td>31452</td>
+                        <td>400-314520</td>
+                        <td>ARTIS icono</td>
+                        <td>AT</td>
+                        <td>2</td>
+                        <td>QR</td>
+                        <td>300512201</td>
+                        <td>서울</td>
+                        <td>Close</td>
+                        <td class="call-admin">
+                            <button type="button" class="btn btn-info" th:attr="data-modal-url=@{/sample/cswt/egn/modal/disp-egn-add}" title="엔지니어 추가"><i class="bi bi-plus-lg"></i></button>
+                            <button type="button" class="btn btn-info" th:attr="data-modal-url=@{/sample/cswt/egn/modal/disp-egn-assign}" title="엔지니어 지정"><i class="bi bi-arrow-right"></i></button>
+                            <button type="button" class="btn btn-info" th:attr="data-modal-url=@{/sample/cswt/egn/modal/disp-end-process(mode='insert')}" title="종료 처리"><i class="bi bi-power"></i></button>
+                        </td>
+                        <td>1</td><td>윤지우</td><td>유선해결</td>
+                        <td>2026-10-23<br>22:06:20</td><td>2026-10-23<br>22:07:02</td><td>00:02</td><td></td><td></td><td></td>
+                    </tr>
+
+                    </tbody>
+                    <tbody>
+                    <!-- Call 24515: 방문예약 -> 방문처리완료 -->
+                    <tr>
+                        <td rowspan="2">2026-10-23<br>19:30:11<br>(24515)</td>
+                        <td rowspan="2">20261023193011</td>
+                        <td rowspan="2">분당서울대학교병원</td>
+                        <td rowspan="2">40917</td>
+                        <td rowspan="2">400-409170</td>
+                        <td rowspan="2">
+                            <a href="#" th:attr="data-modal-url=@{/sample/cswt/noti/modal/system-id}">MAGNETOM Skyra</a>
+                        </td>
+                        <td rowspan="2">MR</td>
+                        <td rowspan="2">1</td>
+                        <td rowspan="2">Call</td>
+                        <td rowspan="2">300512187</td>
+                        <td rowspan="2">경기</td>
+                        <td rowspan="2">Close</td>
+                        <td rowspan="2" class="call-admin">
+                            <button type="button" class="btn btn-info" th:attr="data-modal-url=@{/sample/cswt/egn/modal/disp-egn-add}" title="엔지니어 추가"><i class="bi bi-plus-lg"></i></button>
+                            <button type="button" class="btn btn-info" th:attr="data-modal-url=@{/sample/cswt/egn/modal/disp-egn-assign}" title="엔지니어 지정"><i class="bi bi-arrow-right"></i></button>
+                            <button type="button" class="btn btn-info" th:attr="data-modal-url=@{/sample/cswt/egn/modal/disp-end-process(mode='insert')}" title="종료 처리"><i class="bi bi-power"></i></button>
+                        </td>
+                        <td>1</td><td>임도윤</td><td>방문예약</td>
+                        <td>2026-10-23<br>19:31:05</td><td>2026-10-23<br>19:33:40</td><td>00:03</td><td></td><td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td>2</td><td>임도윤</td><td>방문처리완료</td>
+                        <td>2026-10-24<br>07:55:12</td><td>2026-10-24<br>07:56:30</td><td>00:01</td><td>08:10</td><td>09:05</td><td>11:40</td>
+                    </tr>
+
+                    </tbody>
+                    <tbody>
+                    <!-- Call 24514: 미계약 (CS Sales), LN 접수 -->
+                    <tr>
+                        <td>2026-10-23<br>16:22:47<br>(24514)</td>
+                        <td>#L2610230031</td>
+                        <td>아주대학교병원</td>
+                        <td>51268</td>
+                        <td>400-512680</td>
+                        <td>ACUSON Sequoia</td>
+                        <td>US</td>
+                        <td>3</td>
+                        <td>LN</td>
+                        <td>300512150</td>
+                        <td>경기</td>
+                        <td>Open</td>
+                        <td class="call-admin">
+                            <button type="button" class="btn btn-info" th:attr="data-modal-url=@{/sample/cswt/egn/modal/disp-egn-add}" title="엔지니어 추가"><i class="bi bi-plus-lg"></i></button>
+                            <button type="button" class="btn btn-info" th:attr="data-modal-url=@{/sample/cswt/egn/modal/disp-egn-assign}" title="엔지니어 지정"><i class="bi bi-arrow-right"></i></button>
+                            <button type="button" class="btn btn-info" th:attr="data-modal-url=@{/sample/cswt/egn/modal/disp-end-process(mode='insert')}" title="종료 처리"><i class="bi bi-power"></i></button>
+                        </td>
+                        <td>1</td><td>CS Sales</td><td>배정수용</td>
+                        <td>2026-10-23<br>16:23:30</td><td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+
+                    </tbody>
+                    <tbody>
+                    <!-- Call 24513: 진단(DX) 장비, TSC 처리 -->
+                    <tr>
+                        <td>2026-10-23<br>11:08:19<br>(24513)</td>
+                        <td>20261023110819</td>
+                        <td>부산대학교병원</td>
+                        <td>60325</td>
+                        <td>400-603250</td>
+                        <td>Atellica Solution</td>
+                        <td>LAB</td>
+                        <td>2</td>
+                        <td>Call</td>
+                        <td>300512102</td>
+                        <td>영남</td>
+                        <td>Close</td>
+                        <td class="call-admin">
+                            <button type="button" class="btn btn-info" th:attr="data-modal-url=@{/sample/cswt/egn/modal/disp-egn-add}" title="엔지니어 추가"><i class="bi bi-plus-lg"></i></button>
+                            <button type="button" class="btn btn-info" th:attr="data-modal-url=@{/sample/cswt/egn/modal/disp-egn-assign}" title="엔지니어 지정"><i class="bi bi-arrow-right"></i></button>
+                            <button type="button" class="btn btn-info" th:attr="data-modal-url=@{/sample/cswt/egn/modal/disp-end-process(mode='insert')}" title="종료 처리"><i class="bi bi-power"></i></button>
+                        </td>
+                        <td>1</td><td>한예린</td><td>TSC 처리</td>
+                        <td>2026-10-23<br>11:09:02</td><td>2026-10-23<br>11:10:45</td><td>00:02</td><td></td><td></td><td></td>
+                    </tr>
+
+                    </tbody>
+                    <tbody>
+                    <!-- Call 24512: EGN 접수, 파트너사이관 -->
+                    <tr>
+                        <td rowspan="2">2026-10-22<br>23:47:55<br>(24512)</td>
+                        <td rowspan="2">#E2610220004</td>
+                        <td rowspan="2">전남대학교병원</td>
+                        <td rowspan="2">70412</td>
+                        <td rowspan="2">400-704120</td>
+                        <td rowspan="2">SOMATOM go.Top</td>
+                        <td rowspan="2">CT</td>
+                        <td rowspan="2">1</td>
+                        <td rowspan="2">EGN</td>
+                        <td rowspan="2">300512066</td>
+                        <td rowspan="2">호남</td>
+                        <td rowspan="2">Open</td>
+                        <td rowspan="2" class="call-admin">
+                            <button type="button" class="btn btn-info" th:attr="data-modal-url=@{/sample/cswt/egn/modal/disp-egn-add}" title="엔지니어 추가"><i class="bi bi-plus-lg"></i></button>
+                            <button type="button" class="btn btn-info" th:attr="data-modal-url=@{/sample/cswt/egn/modal/disp-egn-assign}" title="엔지니어 지정"><i class="bi bi-arrow-right"></i></button>
+                            <button type="button" class="btn btn-info" th:attr="data-modal-url=@{/sample/cswt/egn/modal/disp-end-process(mode='insert')}" title="종료 처리"><i class="bi bi-power"></i></button>
+                        </td>
+                        <td>1</td><td>오세훈</td><td>응답없음</td>
+                        <td>2026-10-22<br>23:48:40</td><td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td>2</td><td>서다은</td><td>파트너사이관</td>
+                        <td>2026-10-22<br>23:52:18</td><td>2026-10-22<br>23:55:03</td><td>00:07</td><td>00:20</td><td>01:35</td><td>03:10</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <nav aria-label="페이지 이동">
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" href="#" aria-label="처음">&laquo;</a></li>
+                    <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">4</a></li>
+                    <li class="page-item"><a class="page-link" href="#">5</a></li>
+                    <li class="page-item"><a class="page-link" href="#" aria-label="마지막">&raquo;</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script>
+        (function () {
+            // 장비명 링크 -> SYSTEM ID 변경 모달 (call_systemId_add.jsp)
+            // 관리 버튼 (엔지니어 추가 / 지정 / 종료 처리) -> 724 Call 대응 후속 처리(egn/disp) 화면과 같은 모달
+            document.addEventListener('click', e => {
+                const el = e.target.closest('[data-modal-url]');
+                if (!el) return;
+                e.preventDefault();
+                oh.modal.open(el.dataset.modalUrl).catch(() => oh.toast('모달을 불러오지 못했습니다.', 'danger'));
+            });
+
+            document.getElementById('btnExcel').addEventListener('click', () => oh.toast('엑셀 다운로드는 샘플에서 지원하지 않습니다.', 'warning'));
+            document.getElementById('searchForm').addEventListener('submit', e => {
+                e.preventDefault();
+                oh.toast('검색되었습니다.');
+            });
+        })();
+    </script>
+</th:block>
+</body>
+</html>

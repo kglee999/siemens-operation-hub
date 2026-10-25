@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 시리얼 검색 결과 선택 모달 (CS Webtool egn/egn_find_serial.jsp). 행을 누르면 선택 표시 후 닫힘 -->
+<div class="modal fade" tabindex="-1" aria-labelledby="findSerialTitle" aria-hidden="true" th:fragment="modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="findSerialTitle">시리얼 검색
+                    <small class="text-navy" th:text="|검색어: ${param.serial != null ? param.serial[0] : '735'}|">검색어: 735</small></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-result-title text-center mt-0">해당하는 내역을 선택해 주십시오</p>
+                <div class="scroll-box">
+                    <table class="table table-striped jambo_table" id="findSerialTable">
+                        <thead>
+                        <tr>
+                            <th>시리얼 넘버</th>
+                            <th>병원명</th>
+                            <th>장비명</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr data-no="30018842"><td><button type="button" class="btn btn-info btn-sm w-100">73512</button></td><td>서울대학교병원</td><td>SOMATOM Force</td></tr>
+                        <tr data-no="30018907"><td><button type="button" class="btn btn-info btn-sm w-100">73518</button></td><td>분당서울대학교병원</td><td>SOMATOM Drive</td></tr>
+                        <tr data-no="30019230"><td><button type="button" class="btn btn-info btn-sm w-100">73540</button></td><td>서울아산병원</td><td>NAEOTOM Alpha</td></tr>
+                        <tr data-no="30019518"><td><button type="button" class="btn btn-info btn-sm w-100">73577</button></td><td>강남세브란스병원</td><td>SOMATOM go.Top</td></tr>
+                        <tr data-no="30020114"><td><button type="button" class="btn btn-info btn-sm w-100">73591</button></td><td>삼성서울병원</td><td>SOMATOM X.cite</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        (function () {
+            const table = document.getElementById('findSerialTable');
+            table.addEventListener('click', e => {
+                const tr = e.target.closest('tbody tr');
+                if (!tr) return;
+                table.querySelectorAll('tr.selected').forEach(x => x.classList.remove('selected'));
+                tr.classList.add('selected');
+                oh.toast(tr.cells[1].textContent + ' / ' + tr.cells[2].textContent + ' 선택');
+                bootstrap.Modal.getInstance(table.closest('.modal')).hide();
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

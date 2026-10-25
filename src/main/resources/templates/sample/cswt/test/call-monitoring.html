@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>724 Call TEST</title>
+    <link rel="stylesheet" th:href="@{/assets/css/cswt/call.css}">
+</head>
+<body>
+<!-- CS Webtool test/call_monitoring.jsp
+     검색 조건은 724 Call 대응 모니터링과 같고 엑셀받기 대신 콜 생성 (TEST 콜 생성 모달, make_call.jsp).
+     목록: Call 1건 = <tbody> 1개, Call 일시 ~ STATUS 는 rowspan 병합 (siemens.util.mergeRow('call-row', 11) 결과),
+     줄 끝의 ○ / × 버튼으로 엔지니어 배정 수락 / 거절을 흉내냄 -->
+<main layout:fragment="content">
+    <div class="page-title">
+        <h3>724 Call TEST</h3>
+    </div>
+
+    <form th:replace="~{sample/cswt/noti/call-monitoring :: callSearch('/sample/cswt/test/call-monitoring', true)}"></form>
+
+    <div class="x_panel">
+        <div class="x_content">
+            <div class="table-responsive">
+                <table class="table jambo_table call-table" id="tableList">
+                    <thead>
+                    <tr>
+                        <th>Call 일시</th>
+                        <th>고객사명</th>
+                        <th>System ID</th>
+                        <th>장비명</th>
+                        <th>GG</th>
+                        <th>장애등급</th>
+                        <th>Call유형</th>
+                        <th>Noti No</th>
+                        <th>Area</th>
+                        <th>STATUS</th>
+                        <th>차수</th>
+                        <th>엔지니어순번</th>
+                        <th>수락여부</th>
+                        <th>응답일시</th>
+                        <th>DISP일시</th>
+                        <th>DISP L/T</th>
+                        <th aria-label="수락 / 거절"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td rowspan="2">2026-10-24<br>10:02:14<br>(T0031)</td>
+                        <td rowspan="2">서울대학교병원</td>
+                        <td rowspan="2">400-123456</td>
+                        <td rowspan="2">MAGNETOM Vida</td>
+                        <td rowspan="2">MR</td>
+                        <td rowspan="2">1</td>
+                        <td rowspan="2">Call</td>
+                        <td rowspan="2">300599012</td>
+                        <td rowspan="2">서울</td>
+                        <td rowspan="2">Open</td>
+                        <td>1</td><td>김민준</td><td class="stat">배정미수용</td>
+                        <td>2026-10-24<br>10:02:40</td><td></td><td></td>
+                        <td class="call-admin">
+                            <button type="button" class="btn btn-info" data-assign="Y" title="수락"><i class="bi bi-circle"></i></button>
+                            <button type="button" class="btn btn-info" data-assign="N" title="거절"><i class="bi bi-x-lg"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>1</td><td>이서연</td><td class="stat"></td>
+                        <td></td><td></td><td></td>
+                        <td class="call-admin">
+                            <button type="button" class="btn btn-info" data-assign="Y" title="수락"><i class="bi bi-circle"></i></button>
+                            <button type="button" class="btn btn-info" data-assign="N" title="거절"><i class="bi bi-x-lg"></i></button>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tbody>
+                    <tr>
+                        <td rowspan="2">2026-10-24<br>09:45:51<br>(T0030)</td>
+                        <td rowspan="2">세브란스병원</td>
+                        <td rowspan="2">
+                            400-208871<br>
+                            <div class="layer-wrap">
+                                <a href="#" class="layer-detail-btn">(접수불가)</a>
+                                <div class="layer-detail">
+                                    <p class="layer-title">접수불가</p>
+                                    <ul>
+                                        <li>IVR SYSTEM ID 인증 실패 (TEST)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </td>
+                        <td rowspan="2">SOMATOM Force</td>
+                        <td rowspan="2">CT</td>
+                        <td rowspan="2">2</td>
+                        <td rowspan="2">Call</td>
+                        <td rowspan="2">300599008</td>
+                        <td rowspan="2">서울</td>
+                        <td rowspan="2">Open</td>
+                        <td>1</td><td>정하늘</td><td class="stat">응답없음</td>
+                        <td>2026-10-24<br>09:46:20</td><td></td><td></td>
+                        <td class="call-admin">
+                            <button type="button" class="btn btn-info" data-assign="Y" title="수락"><i class="bi bi-circle"></i></button>
+                            <button type="button" class="btn btn-info" data-assign="N" title="거절"><i class="bi bi-x-lg"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td><td>강서준</td><td class="stat">배정수용</td>
+                        <td>2026-10-24<br>09:49:03</td><td>2026-10-24<br>09:50:12</td><td>00:04</td>
+                        <td class="call-admin">
+                            <button type="button" class="btn btn-info" data-assign="Y" title="수락"><i class="bi bi-circle"></i></button>
+                            <button type="button" class="btn btn-info" data-assign="N" title="거절"><i class="bi bi-x-lg"></i></button>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tbody>
+                    <tr>
+                        <td>2026-10-24<br>09:20:07<br>(T0029)</td>
+                        <td>삼성서울병원</td>
+                        <td>400-314520</td>
+                        <td>ARTIS icono</td>
+                        <td>AT</td>
+                        <td>3</td>
+                        <td>QR</td>
+                        <td>300599005</td>
+                        <td>서울</td>
+                        <td>Close</td>
+                        <td>1</td><td>윤지우</td><td class="stat">유선해결</td>
+                        <td>2026-10-24<br>09:20:41</td><td>2026-10-24<br>09:21:30</td><td>00:01</td>
+                        <td class="call-admin">
+                            <button type="button" class="btn btn-info" data-assign="Y" title="수락"><i class="bi bi-circle"></i></button>
+                            <button type="button" class="btn btn-info" data-assign="N" title="거절"><i class="bi bi-x-lg"></i></button>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tbody>
+                    <tr>
+                        <td>2026-10-23<br>17:12:33<br>(T0028)</td>
+                        <td>부산대학교병원</td>
+                        <td>400-603250</td>
+                        <td>Atellica Solution</td>
+                        <td>LAB</td>
+                        <td>2</td>
+                        <td>Call</td>
+                        <td>300599001</td>
+                        <td>영남</td>
+                        <td>Need to Follow</td>
+                        <td>1</td><td>한예린</td><td class="stat">방문예약</td>
+                        <td>2026-10-23<br>17:13:05</td><td>2026-10-23<br>17:14:22</td><td>00:02</td>
+                        <td class="call-admin">
+                            <button type="button" class="btn btn-info" data-assign="Y" title="수락"><i class="bi bi-circle"></i></button>
+                            <button type="button" class="btn btn-info" data-assign="N" title="거절"><i class="bi bi-x-lg"></i></button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <nav aria-label="페이지 이동">
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" href="#" aria-label="처음">&laquo;</a></li>
+                    <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#" aria-label="마지막">&raquo;</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script>
+        (function () {
+            // 콜 생성 -> TEST 콜 생성 모달 (make_call.jsp)
+            document.getElementById('btnMakeCall').addEventListener('click', e => oh.modal.open(e.currentTarget.dataset.modalUrl));
+
+            // ○ 수락 / × 거절: 원본은 저장 후 새로고침, 샘플은 수락여부 칸만 바꿈
+            document.getElementById('tableList').addEventListener('click', e => {
+                const btn = e.target.closest('[data-assign]');
+                if (!btn) return;
+                btn.closest('tr').querySelector('.stat').textContent = btn.dataset.assign === 'Y' ? '배정수용' : '배정미수용';
+                oh.toast('저장이 완료되었습니다.');
+            });
+
+            document.getElementById('searchForm').addEventListener('submit', e => {
+                e.preventDefault();
+                oh.toast('검색되었습니다.');
+            });
+        })();
+    </script>
+</th:block>
+</body>
+</html>

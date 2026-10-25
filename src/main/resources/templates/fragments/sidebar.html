@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<aside class="left_col" th:fragment="sidebar">
+    <div class="scroll-view">
+        <div class="nav_title">
+            <a th:href="@{/sample/home}" class="site_title">
+                <span class="brand-mark"><i class="bi bi-grid-3x3-gap-fill"></i></span>
+                <span class="brand-text">Operation Hub</span>
+            </a>
+        </div>
+
+        <!-- 메뉴 아이콘: Bootstrap Icons(bi-*) 또는 CS Webtool 스프라이트(si-noti, si-engine, si-manage, si-admin) -->
+        <nav id="sidebar-menu">
+            <ul class="side-menu">
+                <li>
+                    <a th:href="@{/sample/home}">
+                        <i class="bi bi-house-door"></i><span class="menu-label">홈</span>
+                    </a>
+                </li>
+                <li>
+                    <a data-bs-toggle="collapse" href="#menu-sample" role="button" aria-expanded="false" aria-controls="menu-sample">
+                        <i class="si-manage"></i><span class="menu-label">디자인 샘플</span>
+                        <i class="bi bi-chevron-down chevron"></i>
+                    </a>
+                    <div class="collapse" id="menu-sample">
+                        <ul class="child_menu">
+                            <li><a th:href="@{/sample/list}">목록 화면</a></li>
+                            <li><a th:href="@{/sample/table}">일반 테이블</a></li>
+                            <li><a th:href="@{/sample/form}">등록/수정 화면</a></li>
+                            <li><a th:href="@{/sample/modal}">모달 등록 화면</a></li>
+                            <li><a th:href="@{/sample/datatable}">DataTables</a></li>
+                            <li><a th:href="@{/sample/handsontable}">Handsontable</a></li>
+                            <li><a th:href="@{/sample/components}">UI 컴포넌트</a></li>
+                            <li><a th:href="@{/sample/login}">로그인 화면</a></li>
+                            <li><a th:href="@{/sample/cswt/com/popups}">공통 팝업</a></li>
+                            <li><a th:href="@{/sample/cswt/com/m-main}">모바일 메인</a></li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- CS Webtool 화면 퍼블 (메뉴 구성·순서를 CS Webtool menu_side.jsp 와 같게) -->
+                <li>
+                    <a data-bs-toggle="collapse" href="#menu-call" role="button" aria-expanded="false" aria-controls="menu-call">
+                        <i class="si-noti"></i><span class="menu-label">724 Call</span>
+                        <i class="bi bi-chevron-down chevron"></i>
+                    </a>
+                    <div class="collapse" id="menu-call">
+                        <ul class="child_menu">
+                            <li><a th:href="@{/sample/cswt/noti/call-monitoring}">724 Call 대응 모니터링</a></li>
+                            <li><a th:href="@{/sample/cswt/egn/disp}">724 Call 대응 후속 처리</a></li>
+                            <li><a th:href="@{/sample/cswt/noti/call-report}">724 REPORT</a></li>
+                            <li><a th:href="@{/sample/cswt/noti/call-assign-status}">724 엔지니어 배정 현황</a></li>
+                            <li><a th:href="@{/sample/cswt/test/call-monitoring}">724 Call Test</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li>
+                    <a data-bs-toggle="collapse" href="#menu-egn" role="button" aria-expanded="false" aria-controls="menu-egn">
+                        <i class="si-engine"></i><span class="menu-label">엔지니어</span>
+                        <i class="bi bi-chevron-down chevron"></i>
+                    </a>
+                    <div class="collapse" id="menu-egn">
+                        <ul class="child_menu">
+                            <li><a th:href="@{/sample/cswt/egn/weekly}">CSE/Apps 업무현황</a></li>
+                            <li><a th:href="@{/sample/cswt/egn/daily}">CSE/Apps 일별현황</a></li>
+                            <li><a th:href="@{/sample/cswt/egn/real}">Real-time 모니터링</a></li>
+                            <li><a th:href="@{/sample/cswt/egn/schedule}">내 스케줄 관리</a></li>
+                            <li><a th:href="@{/sample/cswt/egn/schedule-all}">팀 스케줄 관리</a></li>
+                            <li><a th:href="@{/sample/duty}">724 당직 관리 (DI)</a></li>
+                            <li><a th:href="@{/sample/cswt/egn/assign-di-seq}">724 당직 관리 (DI CT-SG)</a></li>
+                            <li><a th:href="@{/sample/cswt/egn/assign-dx}">엔지니어 순번관리 (DX)</a></li>
+                            <li><a th:href="@{/sample/cswt/egn/vendor-assign-di}">파트너사 순번관리 (DI)</a></li>
+                            <li><a th:href="@{/sample/cswt/egn/vendor-assign-dx}">파트너사 순번관리 (DX)</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li>
+                    <a data-bs-toggle="collapse" href="#menu-mng" role="button" aria-expanded="false" aria-controls="menu-mng">
+                        <i class="si-manage"></i><span class="menu-label">기준정보</span>
+                        <i class="bi bi-chevron-down chevron"></i>
+                    </a>
+                    <div class="collapse" id="menu-mng">
+                        <ul class="child_menu">
+                            <li><a th:href="@{/sample/cswt/mng/ivk-detail}">통합 IVK 현황</a></li>
+                            <li><a th:href="@{/sample/cswt/mng/ivk-info}">통합 IVK 정보관리</a></li>
+                            <li><a th:href="@{/sample/cswt/mng/batch-info}">RPA 작동 현황</a></li>
+                            <li><a th:href="@{/sample/cswt/mng/vendor}">파트너사 현황</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li>
+                    <a data-bs-toggle="collapse" href="#menu-car" role="button" aria-expanded="false" aria-controls="menu-car">
+                        <i class="si-manage"></i><span class="menu-label">운행기록부</span>
+                        <i class="bi bi-chevron-down chevron"></i>
+                    </a>
+                    <div class="collapse" id="menu-car">
+                        <ul class="child_menu">
+                            <li><a th:href="@{/sample/cswt/service-car/record}">운행기록부</a></li>
+                            <li><a th:href="@{/sample/cswt/service-car/manage}">차량관리</a></li>
+                            <li><a th:href="@{/sample/cswt/service-car/stats}">운행기록통계</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li>
+                    <a data-bs-toggle="collapse" href="#menu-adm" role="button" aria-expanded="false" aria-controls="menu-adm">
+                        <i class="si-admin"></i><span class="menu-label">Admin</span>
+                        <i class="bi bi-chevron-down chevron"></i>
+                    </a>
+                    <div class="collapse" id="menu-adm">
+                        <ul class="child_menu">
+                            <li><a th:href="@{/sample/cswt/adm/user}">사용자 관리</a></li>
+                            <li><a th:href="@{/sample/cswt/adm/holiday}">휴일 관리</a></li>
+                            <li><a th:href="@{/sample/cswt/egn/sms-manager}">724 Call SMS 수신 관리</a></li>
+                            <li><a th:href="@{/sample/cswt/adm/manager}">TpF/근무시간 SMS 수신 관리</a></li>
+                            <li><a th:href="@{/sample/cswt/adm/pmts}">PM/TS 그룹 관리(DI)</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="navbar_footer">
+            <a href="#">개인정보 처리방침</a>
+            <a href="#">Terms of Use</a>
+        </div>
+    </div>
+</aside>
+</body>
+</html>

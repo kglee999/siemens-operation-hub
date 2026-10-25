@@ -1,0 +1,80 @@
+/* CSE/Apps 업무현황 · 일별현황 · Real-time 모니터링 (CS Webtool egn_weekly / egn_daily / egn_real) */
+
+/* 경고/소계 색 셀: 줄무늬(box-shadow) 가 배경색을 덮지 않게 */
+table.jambo_table td.cell-warning,
+table.jambo_table td.cell-delay,
+table.jambo_table tr.row-total > td { box-shadow: none; }
+
+/* ---------------------------------------------------------------
+   앞 4열 고정 (.table-freeze 는 첫 열만 고정하므로 열 너비를 정해 left 를 누적).
+   rowspan 병합이 있어 :first-child 대신 .fz-1 ~ .fz-4 클래스로 지정 (공통 :first-child 규칙보다 구체적으로).
+   --------------------------------------------------------------- */
+.table-freeze.freeze-4 > .table.jambo_table > * > tr > .fz { position: sticky; z-index: 1; }
+.table-freeze.freeze-4 > .table.jambo_table > thead > tr > th.fz { z-index: 3; }
+.table-freeze.freeze-4 > .table.jambo_table > * > tr > .fz-1 { left: 0;     width: 60px; min-width: 60px; max-width: 60px; }
+.table-freeze.freeze-4 > .table.jambo_table > * > tr > .fz-2 { left: 60px;  width: 70px; min-width: 70px; max-width: 70px; }
+.table-freeze.freeze-4 > .table.jambo_table > * > tr > .fz-3 { left: 130px; width: 70px; min-width: 70px; max-width: 70px; }
+.table-freeze.freeze-4 > .table.jambo_table > * > tr > .fz-4 { left: 200px; width: 90px; min-width: 90px; max-width: 90px; }
+.table-freeze.freeze-4 > .table.jambo_table > tbody > tr > td.fz { background-color: #fff; }
+.table-freeze.freeze-4 > .table.jambo_table > tbody > tr > td.fz.cell-warning { background-color: #ffff80; }
+.table-freeze.freeze-4 > .table.jambo_table > tbody > tr > td.fz.cell-delay { background-color: #ffa7a7; }
+.table-freeze.freeze-4 > .table.jambo_table > tbody > tr.row-total > td.fz { background-color: #eee; }
+/* 고정 영역 오른쪽 경계 */
+.table-freeze.freeze-4 > .table.jambo_table > * > tr > .fz-4 { border-right-color: #bbb; }
+
+/* ---------------------------------------------------------------
+   Real-time 모니터링: 하루 타임라인 (FullCalendar resource timeline 대체)
+   왼쪽 180px 엔지니어 열 + 시간 열 00~24, 막대는 절대 위치
+   --------------------------------------------------------------- */
+.rt-timeline {
+  --rt-name-w: 180px;
+  --rt-hour-w: 80px;
+  --rt-row-h: 40px;
+  position: relative;
+  max-height: 600px;
+  overflow: auto;
+  border: 1px solid #ddd;
+  font-size: 13px;
+}
+.rt-grid { position: relative; width: calc(var(--rt-name-w) + var(--rt-hour-w) * 24); }
+.rt-head, .rt-row { display: flex; }
+.rt-head { position: sticky; top: 0; z-index: 4; background: #e1e4e7; border-bottom: 1px solid #ddd; }
+.rt-corner, .rt-name {
+  position: sticky; left: 0; z-index: 3;
+  flex: 0 0 var(--rt-name-w); width: var(--rt-name-w);
+  padding: 0 8px;
+  border-right: 1px solid #ccc;
+}
+.rt-corner { display: flex; align-items: center; height: 37px; background: #e1e4e7; font-weight: 700; z-index: 5; }
+.rt-hour { flex: 0 0 var(--rt-hour-w); display: flex; align-items: center; justify-content: center; height: 37px; border-right: 1px solid #ddd; }
+.rt-hour:last-child { border-right: 0; }
+.rt-row { min-height: var(--rt-row-h); border-bottom: 1px solid #ddd; }
+.rt-name { display: flex; align-items: center; background: #fff; line-height: 1.3; }
+.rt-lane {
+  position: relative;
+  flex: 0 0 calc(var(--rt-hour-w) * 24);
+  /* 시간(실선) / 30분(점선 느낌의 연한 선) 눈금 */
+  background-image:
+    linear-gradient(to right, #ddd 1px, transparent 1px),
+    linear-gradient(to right, #f0f0f0 1px, transparent 1px);
+  background-size: var(--rt-hour-w) 100%, calc(var(--rt-hour-w) / 2) 100%;
+}
+.rt-row:hover .rt-name, .rt-row:hover .rt-lane { background-color: rgba(38, 185, 154, .07); }
+.rt-row:hover .rt-name { background-color: #f4fbf9; }
+.rt-event {
+  position: absolute; top: 8px; bottom: 8px;
+  min-width: 4px;
+  padding: 0 6px;
+  border-radius: 3px;
+  font-size: 12px; line-height: 24px;
+  white-space: nowrap; overflow: clip;
+  cursor: default;
+}
+/* 막대 앞부분이 엔지니어 열 뒤로 스크롤돼도 제목이 보이게 (overflow: clip 은 sticky 를 막지 않음) */
+.rt-event > span {
+  position: sticky; left: calc(var(--rt-name-w) + 6px);
+  display: inline-block; max-width: 100%; vertical-align: top;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.rt-now { position: absolute; top: 0; bottom: 0; z-index: 2; width: 0; border-left: 2px solid #f00; pointer-events: none; }
+.rt-empty { padding: 30px 8px; text-align: center; color: #73879c; }

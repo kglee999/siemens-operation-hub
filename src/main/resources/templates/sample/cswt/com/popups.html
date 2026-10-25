@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>공통 팝업</title>
+    <link rel="stylesheet" th:href="@{/assets/css/cswt/adm.css}">
+</head>
+<body>
+<!-- CS Webtool com/* 공통 팝업과 공통 검색 include 모음.
+     아래 th:fragment 3개(plantSearch / ivkSearch / plantCheckbox)는 다른 화면에서
+     th:replace="~{sample/cswt/com/popups :: plantSearch}" 로 가져다 씀 (com_plant_search.jsp 등의 jsp:include 대체). -->
+<main layout:fragment="content">
+    <div class="page-title">
+        <h3>공통 팝업</h3>
+    </div>
+
+    <!-- 1. 공통 모달 -->
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>공통 모달 <small>com/passwd_change · req_passwd_change · account_guide_popup</small></h2>
+        </div>
+        <div class="x_content">
+            <div class="btn-row">
+                <button type="button" class="btn btn-success"
+                        th:attr="data-modal-url=@{/sample/cswt/com/modal/passwd-change}">비밀번호 변경</button>
+                <button type="button" class="btn btn-success"
+                        th:attr="data-modal-url=@{/sample/cswt/com/modal/req-passwd-change}">비밀번호 변경 요청 (임시 비밀번호)</button>
+                <button type="button" class="btn btn-success"
+                        th:attr="data-modal-url=@{/sample/cswt/com/modal/account-guide}">계정 등록 안내</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 조직설정 검색 (com_plant_search.jsp) -->
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>조직설정 검색 <small>com/com_plant_search.jsp · Plant / Team / Modality / Region</small></h2>
+        </div>
+        <div class="x_content">
+            <p class="demo-note">Plant 를 고르면 그 Plant 의 Team / Region 만 남고, DX 는 Modality 칸이 숨겨집니다.</p>
+            <div class="row g-2 align-items-center">
+                <div class="col-lg-1 col-md-2"><span class="search-label">조직설정</span></div>
+                <div class="col-lg-5 col-md-10">
+                    <div class="row g-1 plant-search" th:fragment="plantSearch">
+                        <div class="col">
+                            <select class="form-select" name="searchType" aria-label="Plant">
+                                <option value="">전체</option>
+                                <option value="96E6">DI</option>
+                                <option value="94E6">DX</option>
+                                <option value="ETC">ETC</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <select class="form-select" name="searchType2" aria-label="Team">
+                                <option value="">전체</option>
+                                <option data-plant="96E6" value="AX">AX</option>
+                                <option data-plant="96E6" value="CT">CT</option>
+                                <option data-plant="96E6" value="MI">MI</option>
+                                <option data-plant="96E6" value="MR">MR</option>
+                                <option data-plant="96E6" value="XP">XP</option>
+                                <option data-plant="96E6" value="APPS">Apps</option>
+                                <option data-plant="94E6" value="FSE">FSE</option>
+                                <option data-plant="94E6" value="ACA">학술</option>
+                                <option data-plant="ETC" value="CCC">CCC</option>
+                            </select>
+                        </div>
+                        <div class="col modality-col">
+                            <select class="form-select" name="modality" aria-label="Modality">
+                                <option value="">전체</option>
+                                <option data-plant="96E6" value="E65310">AX</option>
+                                <option data-plant="96E6" value="E65340">CT</option>
+                                <option data-plant="96E6" value="E65330">MR</option>
+                                <option data-plant="96E6" value="E65352">MI</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <select class="form-select" name="searchType3" aria-label="Region">
+                                <option value="">전체</option>
+                                <option data-plant="96E6" value="SG">SG</option>
+                                <option data-plant="96E6" value="RE">RE</option>
+                                <option data-plant="96E6" value="RW">RW</option>
+                                <option data-plant="94E6" value="SN">SN</option>
+                                <option data-plant="94E6" value="SS">SS</option>
+                                <option data-plant="94E6" value="RE">RE</option>
+                                <option data-plant="94E6" value="RW">RW</option>
+                            </select>
+                        </div>
+                        <script>
+                            /* Plant 에 맞는 Team/Region 만 표시 (전체면 중복 값 숨김), DX 는 Modality 숨김 */
+                            (function (root) {
+                                const plant = root.querySelector('[name=searchType]');
+                                const modalityCol = root.querySelector('.modality-col');
+                                function load() {
+                                    const p = plant.value;
+                                    if (modalityCol) {
+                                        modalityCol.hidden = p === '94E6';
+                                        if (modalityCol.hidden) modalityCol.querySelector('select').value = '';
+                                    }
+                                    root.querySelectorAll('select:not([name=searchType])').forEach(sel => {
+                                        const seen = new Set();
+                                        [...sel.options].forEach(o => {
+                                            const own = !o.dataset.plant || !p || o.dataset.plant === p;
+                                            o.hidden = !own || (o.value !== '' && seen.has(o.value));
+                                            if (!o.hidden) seen.add(o.value);
+                                        });
+                                        if (sel.selectedOptions[0] && sel.selectedOptions[0].hidden) sel.value = '';
+                                    });
+                                }
+                                plant.addEventListener('change', load);
+                                load();
+                            })(document.currentScript.parentElement);
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. IVK 조직설정 검색 (com_ivk_search.jsp) -->
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>IVK 조직설정 검색 <small>com/com_ivk_search.jsp · Plant / GG / Region</small></h2>
+        </div>
+        <div class="x_content">
+            <div class="row g-2 align-items-center">
+                <div class="col-lg-1 col-md-2"><span class="search-label">조직설정</span></div>
+                <div class="col-lg-5 col-md-10">
+                    <div class="row g-1 plant-search" th:fragment="ivkSearch">
+                        <div class="col">
+                            <select class="form-select" name="searchType" aria-label="Plant">
+                                <option value="">전체</option>
+                                <option value="96E6">DI</option>
+                                <option value="94E6">DX</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <select class="form-select" name="searchType2" aria-label="GG">
+                                <option value="">전체</option>
+                                <option data-plant="96E6" value="AX">AX</option>
+                                <option data-plant="96E6" value="XP">XP</option>
+                                <option data-plant="96E6" value="CT">CT</option>
+                                <option data-plant="96E6" value="MIRO">MIRO</option>
+                                <option data-plant="96E6" value="MR">MR</option>
+                                <option data-plant="94E6" value="CAI">CAI</option>
+                                <option data-plant="94E6" value="HHS">HHS</option>
+                                <option data-plant="94E6" value="POC">POC</option>
+                                <option data-plant="94E6" value="MM">MM</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <select class="form-select" name="searchType3" aria-label="Region">
+                                <option value="">전체</option>
+                                <option data-plant="96E6" value="SG">SG</option>
+                                <option data-plant="96E6" value="RE">RE</option>
+                                <option data-plant="96E6" value="RW">RW</option>
+                                <option data-plant="94E6" value="SN">SN</option>
+                                <option data-plant="94E6" value="SS">SS</option>
+                                <option data-plant="94E6" value="RE">RE</option>
+                                <option data-plant="94E6" value="RW">RW</option>
+                            </select>
+                        </div>
+                        <script>
+                            (function (root) {
+                                const plant = root.querySelector('[name=searchType]');
+                                function load() {
+                                    const p = plant.value;
+                                    root.querySelectorAll('select:not([name=searchType])').forEach(sel => {
+                                        const seen = new Set();
+                                        [...sel.options].forEach(o => {
+                                            const own = !o.dataset.plant || !p || o.dataset.plant === p;
+                                            o.hidden = !own || (o.value !== '' && seen.has(o.value));
+                                            if (!o.hidden) seen.add(o.value);
+                                        });
+                                        if (sel.selectedOptions[0] && sel.selectedOptions[0].hidden) sel.value = '';
+                                    });
+                                }
+                                plant.addEventListener('change', load);
+                                load();
+                            })(document.currentScript.parentElement);
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 조직설정 체크박스 (com_plant_checkbox.jsp) -->
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>조직설정 체크박스 <small>com/com_plant_checkbox.jsp · Plant 라디오 + Team / Modality / Region 체크박스</small></h2>
+        </div>
+        <div class="x_content">
+            <p class="demo-note">ALL 을 누르면 보이는 항목이 모두 선택/해제되고, 항목을 모두 고르면 ALL 이 자동으로 체크됩니다.</p>
+            <div class="row g-2">
+                <div class="col-lg-1 col-md-2"><span class="search-label">조직설정</span></div>
+                <div class="col-lg-11 col-md-10">
+                    <div class="plant-checkbox" th:fragment="plantCheckbox">
+                        <div class="check-line plant-area">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="searchType" id="pcPlant1" value="96E6" checked>
+                                <label class="form-check-label" for="pcPlant1">DI</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="searchType" id="pcPlant2" value="94E6">
+                                <label class="form-check-label" for="pcPlant2">DX</label>
+                            </div>
+                        </div>
+                        <div class="check-line check-area">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" name="searchType2" id="pcTeamAll" value="all">
+                                <label class="form-check-label" for="pcTeamAll">ALL</label>
+                            </div>
+                            <div class="form-check form-check-inline" data-plant="96E6"
+                                 th:each="t, s : ${ {'AX','CT','MI','MR','XP','Apps'} }">
+                                <input class="form-check-input" type="checkbox" name="searchType2" th:id="|pcTeamI${s.count}|" th:value="${t}">
+                                <label class="form-check-label" th:for="|pcTeamI${s.count}|" th:text="${t}">AX</label>
+                            </div>
+                            <div class="form-check form-check-inline" data-plant="94E6"
+                                 th:each="t, s : ${ {'FSE','학술'} }">
+                                <input class="form-check-input" type="checkbox" name="searchType2" th:id="|pcTeamX${s.count}|" th:value="${t}">
+                                <label class="form-check-label" th:for="|pcTeamX${s.count}|" th:text="${t}">FSE</label>
+                            </div>
+                        </div>
+                        <div class="check-line check-area modality-area">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" name="modality" id="pcModAll" value="all">
+                                <label class="form-check-label" for="pcModAll">ALL</label>
+                            </div>
+                            <div class="form-check form-check-inline" data-plant="96E6"
+                                 th:each="t, s : ${ {'AX','CT','MR','MI'} }">
+                                <input class="form-check-input" type="checkbox" name="modality" th:id="|pcMod${s.count}|" th:value="${t}">
+                                <label class="form-check-label" th:for="|pcMod${s.count}|" th:text="${t}">AX</label>
+                            </div>
+                        </div>
+                        <div class="check-line check-area">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" name="searchType3" id="pcRegAll" value="all">
+                                <label class="form-check-label" for="pcRegAll">ALL</label>
+                            </div>
+                            <div class="form-check form-check-inline" data-plant="96E6"
+                                 th:each="t, s : ${ {'SG','RE','RW'} }">
+                                <input class="form-check-input" type="checkbox" name="searchType3" th:id="|pcRegI${s.count}|" th:value="${t}">
+                                <label class="form-check-label" th:for="|pcRegI${s.count}|" th:text="${t}">SG</label>
+                            </div>
+                            <div class="form-check form-check-inline" data-plant="94E6"
+                                 th:each="t, s : ${ {'SN','SS','RE','RW'} }">
+                                <input class="form-check-input" type="checkbox" name="searchType3" th:id="|pcRegX${s.count}|" th:value="${t}">
+                                <label class="form-check-label" th:for="|pcRegX${s.count}|" th:text="${t}">SN</label>
+                            </div>
+                        </div>
+                        <script>
+                            /* Plant 라디오로 항목 필터 + ALL 체크박스 전체 선택/해제 */
+                            (function (root) {
+                                const areas = [...root.querySelectorAll('.check-area')];
+                                const items = area => [...area.querySelectorAll('.form-check[data-plant]')]
+                                    .filter(fc => !fc.hidden).map(fc => fc.querySelector('input'));
+                                const allBox = area => area.querySelector('input[value=all]');
+                                const sync = area => {
+                                    const list = items(area);
+                                    allBox(area).checked = list.length > 0 && list.every(i => i.checked);
+                                };
+                                function load() {
+                                    const p = root.querySelector('.plant-area input:checked').value;
+                                    root.querySelectorAll('.form-check[data-plant]').forEach(fc => {
+                                        fc.hidden = fc.dataset.plant !== p;
+                                        if (fc.hidden) fc.querySelector('input').checked = false;
+                                    });
+                                    root.querySelector('.modality-area').hidden = p !== '96E6';
+                                    // 하나도 없거나 모두 선택이면 ALL (= 전체 선택)
+                                    areas.forEach(area => {
+                                        const list = items(area);
+                                        if (!list.some(i => i.checked)) list.forEach(i => { i.checked = true; });
+                                        sync(area);
+                                    });
+                                }
+                                areas.forEach(area => area.addEventListener('change', e => {
+                                    if (e.target === allBox(area)) items(area).forEach(i => { i.checked = e.target.checked; });
+                                    else sync(area);
+                                }));
+                                root.querySelectorAll('.plant-area input').forEach(r => r.addEventListener('change', load));
+                                load();
+                            })(document.currentScript.parentElement);
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script>
+        document.addEventListener('click', e => {
+            const btn = e.target.closest('[data-modal-url]');
+            if (btn) oh.modal.open(btn.dataset.modalUrl);
+        });
+    </script>
+</th:block>
+</body>
+</html>

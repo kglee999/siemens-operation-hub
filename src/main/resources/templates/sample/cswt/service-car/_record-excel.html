@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 운행기록부 엑셀 업로드 모달 (CS Webtool serviceCar/serviceCar_record_excel_add.jsp).
+     파일 선택 -> 등록 하면 결과 화면으로 바뀜 (샘플: 실제 업로드 없음) -->
+<div class="modal fade" tabindex="-1" aria-labelledby="svcExcelTitle" aria-hidden="true" th:fragment="modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" id="svcExcelForm" novalidate>
+            <div class="modal-header">
+                <h5 class="modal-title" id="svcExcelTitle">운행기록부 엑셀 업로드
+                    <small class="text-navy">운행기록부 엑셀을 업로드 하실 수 있습니다.</small></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div id="svcExcelInput">
+                    <div class="row g-2 align-items-center mb-2">
+                        <div class="col-sm-4"><label class="col-form-label">업로드 양식</label></div>
+                        <div class="col-sm-8">
+                            <p class="form-static"><a href="#" id="svcExcelSample"><i class="bi bi-download"></i> 다운로드</a></p>
+                        </div>
+                    </div>
+                    <div class="row g-2 align-items-start">
+                        <div class="col-sm-4"><label class="col-form-label" for="svcExcelFile">파일명</label></div>
+                        <div class="col-sm-8">
+                            <input type="file" class="form-control" id="svcExcelFile" name="excelFile" accept=".xlsx,.xls" required>
+                            <div class="invalid-feedback">엑셀 파일을 입력해주세요.</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="svcExcelResult" hidden>
+                    <p class="modal-result-title mt-0">업로드 결과</p>
+                    <pre class="upload-result"></pre>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success" id="svcExcelSubmit">등록</button>
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            const form = document.getElementById('svcExcelForm');
+            const file = form.excelFile;
+
+            document.getElementById('svcExcelSample').addEventListener('click', e => {
+                e.preventDefault();
+                oh.toast('업로드 양식(siemens_serviceCar_sample.xlsx)을 내려받습니다.');
+            });
+            file.addEventListener('change', () => form.classList.remove('was-validated'));
+
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                form.classList.add('was-validated');
+                if (!form.checkValidity()) return;
+
+                oh.loading.show();
+                setTimeout(() => {
+                    oh.loading.hide();
+                    const name = file.files[0] ? file.files[0].name : 'serviceCar.xlsx';
+                    document.querySelector('#svcExcelResult .upload-result').textContent =
+                        '파일명 : ' + name + '\n' +
+                        '전체 18건 / 등록 16건 / 실패 2건\n\n' +
+                        '[실패]\n' +
+                        '7행 : 2026.10.09 - 차량 사용기간이 아닙니다.\n' +
+                        '15행 : 2026.08.20 - 1 개월 전, 1 개월 후 데이터까지만 입력하실 수 있습니다.';
+                    document.getElementById('svcExcelInput').hidden = true;
+                    document.getElementById('svcExcelResult').hidden = false;
+                    document.getElementById('svcExcelSubmit').hidden = true;
+                    oh.toast('업로드가 완료되었습니다.', 'success');
+                }, 400);
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

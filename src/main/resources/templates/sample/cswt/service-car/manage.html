@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>차량 관리</title>
+    <link rel="stylesheet" th:href="@{/assets/css/cswt/service-car.css}">
+</head>
+<body>
+<!-- CS Webtool serviceCar/serviceCar_manage.jsp
+     같은 차량의 사용자 이력은 앞 6열(차량번호~입력제한)을 rowspan 으로 병합 (CS Webtool mergeRow) -->
+<main layout:fragment="content">
+    <div class="page-title">
+        <h3>차량 관리</h3>
+    </div>
+
+    <form id="searchForm" method="get" th:action="@{/sample/cswt/service-car/manage}">
+        <input type="hidden" name="pageNo" value="1">
+        <div class="x_panel">
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-1 col-md-2"><span class="search-label">차량구분</span></div>
+                    <div class="col-lg-3 col-md-10">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="searchType" id="searchType11" value="" checked>
+                            <label class="form-check-label" for="searchType11">전체</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="searchType" id="searchType12" value="C">
+                            <label class="form-check-label" for="searchType12">회사</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="searchType" id="searchType13" value="P">
+                            <label class="form-check-label" for="searchType13">개인</label>
+                        </div>
+                    </div>
+                    <div class="col-lg-1 col-md-2"><label class="search-label" for="searchNum">차량번호</label></div>
+                    <div class="col-lg-3 col-md-4">
+                        <input type="text" class="form-control" id="searchNum" name="searchNum" placeholder="차량번호 입력">
+                    </div>
+                    <div class="col-lg-1 col-md-2"><label class="search-label" for="searchNum2">차량사용자</label></div>
+                    <div class="col-lg-3 col-md-4">
+                        <input type="text" class="form-control" id="searchNum2" name="searchNum2" placeholder="이름 또는 사번 입력">
+                    </div>
+                </div>
+            </div>
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-1 col-md-2"><span class="search-label svc-label-2line">입력제한<br>(1개월)</span></div>
+                    <div class="col-lg-11 col-md-10">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="searchType2" id="searchType21" value="" checked>
+                            <label class="form-check-label" for="searchType21">전체</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="searchType2" id="searchType22" value="Y">
+                            <label class="form-check-label" for="searchType22">제한</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="searchType2" id="searchType23" value="N">
+                            <label class="form-check-label" for="searchType23">미제한</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="x_content">
+                <div class="btn-row center">
+                    <button class="btn btn-success" type="submit">검색하기</button>
+                    <button class="btn btn-success" type="button" id="btnExcel">다운로드</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="btn-row end mb-1">
+        <button class="btn btn-success" type="button" id="btnCarAdd"
+                th:attr="data-modal-url=@{/sample/cswt/service-car/modal/manage-add}">등록하기</button>
+    </div>
+    <div class="x_panel">
+        <div class="x_content">
+            <div class="table-responsive">
+                <table class="table table-striped jambo_table" id="tableList"
+                       th:attr="data-modify-url=@{/sample/cswt/service-car/modal/manage-add},data-user-url=@{/sample/cswt/service-car/modal/manage-user-add}">
+                    <thead>
+                    <tr>
+                        <th>차량번호</th>
+                        <th>차종</th>
+                        <th>차량구분</th>
+                        <th>계약시작일</th>
+                        <th>계약종료일</th>
+                        <th>입력제한<br>(1개월)</th>
+                        <th>차량사용자</th>
+                        <th>취득/개시일</th>
+                        <th>처분/종료일</th>
+                        <th>등록일</th>
+                        <th>수정일</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- data-*: 수정/처분 모달에 넘길 값 -->
+                    <tr data-car="12가 3456|쏘나타|C|Y|2025-03-01|2028-02-29" data-user="홍길동|E10012|2026-07-01|">
+                        <td rowspan="2"><a href="#" class="btn-car-modify">12가 3456</a></td>
+                        <td rowspan="2">쏘나타</td>
+                        <td rowspan="2">회사</td>
+                        <td rowspan="2">2025-03-01</td>
+                        <td rowspan="2">2028-02-29</td>
+                        <td rowspan="2">제한</td>
+                        <td>홍길동(E10012)</td>
+                        <td>2026-07-01</td>
+                        <td></td>
+                        <td>2026-06-28 14:20</td>
+                        <td>2026-06-28 14:20</td>
+                        <td><button type="button" class="btn btn-info btn-car-user">처분/종료</button></td>
+                    </tr>
+                    <tr data-car="12가 3456|쏘나타|C|Y|2025-03-01|2028-02-29" data-user="김민준|E10231|2025-03-01|2026-06-30">
+                        <td>김민준(E10231)</td>
+                        <td>2025-03-01</td>
+                        <td>2026-06-30</td>
+                        <td>2025-02-27 10:15</td>
+                        <td>2026-06-28 14:18</td>
+                        <td><button type="button" class="btn btn-info btn-car-user">처분/종료</button></td>
+                    </tr>
+                    <tr data-car="34나 7890|그랜저|C|Y|2024-09-01|2027-08-31" data-user="이서연|E10544|2024-09-01|">
+                        <td><a href="#" class="btn-car-modify">34나 7890</a></td>
+                        <td>그랜저</td>
+                        <td>회사</td>
+                        <td>2024-09-01</td>
+                        <td>2027-08-31</td>
+                        <td>제한</td>
+                        <td>이서연(E10544)</td>
+                        <td>2024-09-01</td>
+                        <td></td>
+                        <td>2024-08-26 09:41</td>
+                        <td>2025-11-03 16:02</td>
+                        <td><button type="button" class="btn btn-info btn-car-user">처분/종료</button></td>
+                    </tr>
+                    <tr data-car="56다 1122|K5|P|N||" data-user="박지훈|E10388|2025-01-15|">
+                        <td><a href="#" class="btn-car-modify">56다 1122</a></td>
+                        <td>K5</td>
+                        <td>개인</td>
+                        <td></td>
+                        <td></td>
+                        <td>미제한</td>
+                        <td>박지훈(E10388)</td>
+                        <td>2025-01-15</td>
+                        <td></td>
+                        <td>2025-01-14 11:30</td>
+                        <td>2025-01-14 11:30</td>
+                        <td><button type="button" class="btn btn-info btn-car-user">처분/종료</button></td>
+                    </tr>
+                    <tr data-car="78라 3344|투싼|C|Y|2026-01-01|2028-12-31" data-user="최유진|E10790|2026-01-02|">
+                        <td><a href="#" class="btn-car-modify">78라 3344</a></td>
+                        <td>투싼</td>
+                        <td>회사</td>
+                        <td>2026-01-01</td>
+                        <td>2028-12-31</td>
+                        <td>제한</td>
+                        <td>최유진(E10790)</td>
+                        <td>2026-01-02</td>
+                        <td></td>
+                        <td>2025-12-22 15:07</td>
+                        <td>2025-12-22 15:07</td>
+                        <td><button type="button" class="btn btn-info btn-car-user">처분/종료</button></td>
+                    </tr>
+                    <tr data-car="90마 5566|아반떼|C|Y|2023-05-01|2026-04-30" data-user="강도현|E10120|2023-05-01|2026-04-30">
+                        <td><a href="#" class="btn-car-modify">90마 5566</a></td>
+                        <td>아반떼</td>
+                        <td>회사</td>
+                        <td>2023-05-01</td>
+                        <td>2026-04-30</td>
+                        <td>제한</td>
+                        <td>강도현(E10120)</td>
+                        <td>2023-05-01</td>
+                        <td>2026-04-30</td>
+                        <td>2023-04-24 13:52</td>
+                        <td>2026-04-30 17:45</td>
+                        <td><button type="button" class="btn btn-info btn-car-user">처분/종료</button></td>
+                    </tr>
+                    <tr data-car="11바 7788|스포티지|P|N||" data-user="윤서준|E10655|2024-03-04|">
+                        <td><a href="#" class="btn-car-modify">11바 7788</a></td>
+                        <td>스포티지</td>
+                        <td>개인</td>
+                        <td></td>
+                        <td></td>
+                        <td>미제한</td>
+                        <td>윤서준(E10655)</td>
+                        <td>2024-03-04</td>
+                        <td></td>
+                        <td>2024-02-29 10:03</td>
+                        <td>2024-02-29 10:03</td>
+                        <td><button type="button" class="btn btn-info btn-car-user">처분/종료</button></td>
+                    </tr>
+                    <tr data-car="22사 9900|카니발|C|Y|2026-10-01|2029-09-30" data-user="||">
+                        <td><a href="#" class="btn-car-modify">22사 9900</a></td>
+                        <td>카니발</td>
+                        <td>회사</td>
+                        <td>2026-10-01</td>
+                        <td>2029-09-30</td>
+                        <td>제한</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>2026-10-20 09:12</td>
+                        <td>2026-10-20 09:12</td>
+                        <td><button type="button" class="btn btn-info btn-car-user">처분/종료</button></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <nav aria-label="페이지 이동">
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" href="#" aria-label="처음">&laquo;</a></li>
+                    <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#" aria-label="마지막">&raquo;</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script>
+        (function () {
+            const table = document.getElementById('tableList');
+
+            document.getElementById('searchForm').addEventListener('submit', e => {
+                e.preventDefault();
+                oh.toast('조회되었습니다.');
+            });
+            document.getElementById('btnExcel').addEventListener('click', () => oh.toast('엑셀 파일을 내려받습니다.'));
+
+            // 등록하기
+            document.getElementById('btnCarAdd').addEventListener('click', e => oh.modal.open(e.currentTarget.dataset.modalUrl));
+
+            table.addEventListener('click', e => {
+                const tr = e.target.closest('tbody tr');
+                if (!tr) return;
+                // 차량번호 -> 차량 수정
+                if (e.target.closest('.btn-car-modify')) {
+                    e.preventDefault();
+                    const [carNumber, carType, carOwn, limitYn, contractStart, contractEnd] = tr.dataset.car.split('|');
+                    oh.modal.open(table.dataset.modifyUrl, { mode: 'modify', carNumber, carType, carOwn, limitYn, contractStart, contractEnd });
+                    return;
+                }
+                // 처분/종료 -> 사용자 기간 수정
+                if (e.target.closest('.btn-car-user')) {
+                    const carNumber = tr.dataset.car.split('|')[0];
+                    const [korName, emplNum, startDate, endDate] = tr.dataset.user.split('|');
+                    oh.modal.open(table.dataset.userUrl, { carNumber, korName, emplNum, startDate, endDate });
+                }
+            });
+        })();
+    </script>
+</th:block>
+</body>
+</html>

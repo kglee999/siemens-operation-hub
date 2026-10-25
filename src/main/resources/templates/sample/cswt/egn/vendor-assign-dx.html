@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>파트너사 순번관리 (DX)</title>
+    <link rel="stylesheet" th:href="@{/assets/vendor/handsontable-6.2.2/handsontable.full.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/cswt/egn-assign.css}">
+</head>
+<body>
+<!-- CS Webtool egn/vendor_assign_dx.jsp: 파트너사 정보 · 저장하기 · 엑셀업로드 / 파트너사 표(접기) + 순번 편집 표(Handsontable) -->
+<main layout:fragment="content">
+    <div class="page-title"><h3>파트너사 순번관리 (DX)</h3></div>
+
+    <div class="btn-row end mb-1">
+        <button class="btn btn-success" type="button" data-bs-toggle="collapse" data-bs-target="#partnerInfo"
+                aria-expanded="false" aria-controls="partnerInfo">파트너사 정보</button>
+        <button class="btn btn-success" type="button" id="btnSave">저장하기</button>
+        <button class="btn btn-success" type="button" id="btnCopy"
+                th:attr="data-modal-url=@{/sample/cswt/egn/modal/vendor-assign-dx-copy}">순번 복사</button>
+        <button class="btn btn-success" type="button" id="btnExcel"
+                th:attr="data-modal-url=@{/sample/cswt/egn/modal/vendor-assign-dx-excel}">엑셀업로드</button>
+    </div>
+
+    <div class="x_panel">
+        <div class="x_content">
+            <!-- 파트너사 안내: '파트너사 정보' 버튼으로 펼치고 접음 -->
+            <div class="collapse" id="partnerInfo">
+                <div class="table-responsive">
+                    <table class="table table-striped jambo_table info-table">
+                        <colgroup>
+                            <col style="width: 100px;">
+                            <col style="width: 200px;">
+                            <col style="width: 200px;">
+                            <col>
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th>Partner no</th>
+                            <th>파트너사 영문명</th>
+                            <th>파트너사 한글명</th>
+                            <th>엔지니어</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="t : ${ { {'200145','HANMED','한메드','김도현, 이준서, 박서연, 최민호'}, {'200178','KMS','케이엠에스','오승현, 강다인, 윤태경'}, {'200231','DAEJIN MEDICAL','대진메디칼','임채원, 조하람, 배성우, 신동혁'}, {'200306','NAMBU SYSTEM','남부시스템','유가은, 노현우'} } }">
+                            <td th:text="${t[0]}">200145</td>
+                            <td th:text="${t[1]}">HANMED</td>
+                            <td th:text="${t[2]}">한메드</td>
+                            <td class="a-left" th:text="${t[3]}">김도현, 이준서</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <div id="grid_1"></div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/assets/vendor/handsontable-6.2.2/handsontable.full.min.js}"></script>
+    <script th:src="@{/assets/vendor/handsontable-6.2.2/languages/ko-KR.min.js}"></script>
+    <script th:src="@{/assets/js/oh-handsontable.js}"></script>
+    <script th:inline="none">
+        (function () {
+            const SEQ = Array.from({ length: 10 }, (_, i) => 'emplName' + String(i + 1).padStart(2, '0'));
+            // 샘플 데이터 (원본 ${jsonData}): 파트너사 / 파트너사명 / REGION / 순번-1~10
+            const data = [
+                ['200145', 'HANMED', 'SG', '김도현|이준서|박서연'],
+                ['200145', 'HANMED', 'BS', '최민호'],
+                ['200178', 'KMS', 'DG', '오승현|강다인'],
+                ['200178', 'KMS', 'DJ', '윤태경'],
+                ['200231', 'DAEJIN MEDICAL', 'GJ', '임채원|조하람|배성우|신동혁'],
+                ['200231', 'DAEJIN MEDICAL', 'JJ', ''],
+                ['200306', 'NAMBU SYSTEM', 'JI', '유가은|노현우']
+            ].map(([no, nm, region, names]) => {
+                const row = { vendor_no: no, vendor_nm: nm, region_cd: region };
+                const list = names ? names.split('|') : [];
+                SEQ.forEach((k, i) => { row[k] = list[i] || ''; });
+                return row;
+            });
+
+            const hot = oh.grid('#grid_1', {
+                data: data,
+                columns: [
+                    { data: 'vendor_no', width: 120 },
+                    { data: 'vendor_nm', width: 180 },
+                    { data: 'region_cd', width: 120 },
+                    ...SEQ.map(k => ({ data: k, width: 100 }))
+                ],
+                height: 487,
+                colHeaders: ['파트너사', '파트너사명', 'REGION', ...SEQ.map((_, i) => '순번-' + (i + 1))],
+                contextMenu: ['row_above', 'row_below']
+            });
+
+            document.getElementById('btnSave').addEventListener('click', () => {
+                oh.confirm('저장하시겠습니까?', { okText: '저장' }).then(ok => { if (ok) oh.toast('저장 되었습니다.'); });
+            });
+
+            // 순번 복사 모달은 기준일 표에 데이터가 있어야 함 (원본 hot.getData() 확인)
+            window.vendorAssignDxHasData = () => hot.getData().some(r => r.some(v => v != null && v !== ''));
+
+            ['btnCopy', 'btnExcel'].forEach(id => document.getElementById(id)
+                .addEventListener('click', e => oh.modal.open(e.currentTarget.dataset.modalUrl)));
+        })();
+    </script>
+</th:block>
+</body>
+</html>

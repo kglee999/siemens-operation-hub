@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}">
+    <title layout:title-pattern="$CONTENT_TITLE | Operation Hub">Operation Hub</title>
+
+    <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}">
+<link rel="stylesheet" th:href="@{/assets/vendor/bootstrap-5.3.8/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendor/bootstrap-icons-1.13.2/bootstrap-icons.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+    <!-- 화면별 CSS는 각 페이지 <head>에 <link>로 두면 여기 뒤에 합쳐짐 -->
+</head>
+<body class="nav-md">
+<div class="main_container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div class="sidebar-backdrop"></div>
+    <div th:replace="~{fragments/topnav :: topnav}"></div>
+
+    <main class="right_col" role="main" layout:fragment="content"></main>
+</div>
+
+<script th:src="@{/assets/vendor/bootstrap-5.3.8/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/assets/js/common.js}"></script>
+<th:block layout:fragment="script"></th:block>
+</body>
+</html>

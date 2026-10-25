@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>모달 등록 화면 샘플</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <div class="page-title">
+        <h3>모달 등록 화면 샘플</h3>
+    </div>
+
+    <!-- 추가하기 또는 사용자 NO를 누르면 서버에서 등록/수정 폼을 받아 모달로 띄웁니다. 저장은 AJAX로 처리하고, 성공하면 목록만 다시 그립니다. (샘플 데이터는 서버 재시작 시 초기화) -->
+
+    <div class="d-flex justify-content-end mb-2">
+        <button type="button" class="btn btn-success" th:attr="data-modal-url=@{/sample/modal/form(mode='add')}">추가하기
+        </button>
+    </div>
+    <div class="x_panel">
+        <div class="table-responsive">
+            <table class="table table-striped jambo_table mb-0">
+                <thead>
+                <tr>
+                    <th>사용자 NO</th>
+                    <th>사용자명</th>
+                    <th>조직</th>
+                    <th>권한</th>
+                    <th>Mobile</th>
+                    <th>E-mail</th>
+                    <th>사용</th>
+                    <th>최근 로그인</th>
+                </tr>
+                </thead>
+                <tbody id="userRows" th:fragment="rows">
+                <tr th:each="u : ${users}">
+                    <td>
+                        <a href="#" th:text="${u.emplNo}"
+                           th:attr="data-modal-url=@{/sample/modal/form(mode='modify',emplNo=${u.emplNo})}">E0001</a>
+                    </td>
+                    <td th:text="${u.name}">홍길동</td>
+                    <td th:text="${u.team}">운영1팀</td>
+                    <td th:text="${u.gradeName()}">일반</td>
+                    <td th:text="${u.phone}">010-0000-0000</td>
+                    <td class="a-left" th:text="${u.email}">user@example.com</td>
+                    <td><th:block th:text="${u.useYn} ? 'Y' : 'N'">Y</th:block></td>
+                    <td th:text="${u.lastLogin}">2026-10-24 09:00</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(users)}">
+                    <td colspan="8">등록된 사용자가 없습니다.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 서버에서 받은 모달이 들어가는 자리 -->
+    <div id="modal_area"></div>
+</main>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        (function () {
+            var rowsUrl = /*[[@{/sample/modal/rows}]]*/ '/sample/modal/rows';
+
+            // 추가하기 버튼과 목록의 사용자 NO 링크 모두 처리 (목록이 다시 그려져도 동작하도록 위임)
+            document.addEventListener('click', function (e) {
+                var trigger = e.target.closest('[data-modal-url]');
+                if (!trigger) return;
+                e.preventDefault();
+                oh.modal.open(trigger.getAttribute('data-modal-url')).then(bindForm);
+            });
+
+            function bindForm(modalEl) {
+                var form = modalEl.querySelector('form');
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    form.classList.add('was-validated');
+                    if (!form.checkValidity()) return;
+
+                    oh.ajax.postForm(form.action, form).then(function (res) {
+                        if (res.result !== 'OK') {
+                            showFieldError(form, res);
+                            return;
+                        }
+                        bootstrap.Modal.getInstance(modalEl).hide();
+                        oh.toast(res.message, 'success');
+                        reloadRows();
+                    }).catch(function () {
+                        oh.toast('처리 중 오류가 발생했습니다.', 'danger');
+                    });
+                });
+            }
+
+            // 서버 검증 실패: 해당 입력칸에 메시지 표시
+            function showFieldError(form, res) {
+                var input = res.field && form.elements[res.field];
+                if (!input) {
+                    oh.toast(res.message, 'danger');
+                    return;
+                }
+                input.setCustomValidity(res.message);
+                var feedback = input.parentElement.querySelector('.invalid-feedback');
+                if (feedback) feedback.textContent = res.message;
+                input.addEventListener('input', function clear() {
+                    input.setCustomValidity('');
+                    input.removeEventListener('input', clear);
+                });
+                input.focus();
+            }
+
+            function reloadRows() {
+                fetch(rowsUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(function (r) { return r.text(); })
+                    .then(function (html) { document.getElementById('userRows').outerHTML = html; });
+            }
+        })();
+    </script>
+</th:block>
+</body>
+</html>

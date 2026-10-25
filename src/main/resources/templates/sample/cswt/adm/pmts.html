@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>PM/TS 그룹 관리(DI)</title>
+    <link rel="stylesheet" th:href="@{/assets/vendor/handsontable-6.2.2/handsontable.full.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/cswt/adm.css}">
+</head>
+<body>
+<!-- CS Webtool adm/adm_pmts.jsp: 연도/Modality/지역/그룹 + 검색하기 / 저장하기·엑셀업로드 /
+     Handsontable 6.2.2 (사번·CSE 읽기 전용 + 1~12월 PM/TS 드롭다운, 높이 650, 우클릭 메뉴로 행 위/아래 삽입). -->
+<main layout:fragment="content">
+    <div class="page-title">
+        <h3>PM/TS 그룹 관리(DI)</h3>
+    </div>
+
+    <form id="searchForm" method="get" th:action="@{/sample/cswt/adm/pmts}">
+        <input type="hidden" name="grid_data" id="grid_data" value="">
+        <div class="x_panel">
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-auto col-sm-6 search-pair">
+                        <label class="search-label" for="searchType1">연도</label>
+                        <select class="form-select" id="searchType1" name="searchType1">
+                            <option th:each="y : ${#numbers.sequence(2027, 2023, -1)}" th:value="${y}" th:text="${y}" th:selected="${y == 2026}">2026</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-auto col-sm-6 search-pair">
+                        <label class="search-label" for="searchType2">Modality</label>
+                        <select class="form-select" id="searchType2" name="searchType2">
+                            <option value="">전체</option>
+                            <option value="E65310">AX</option>
+                            <option value="E65340">CT</option>
+                            <option value="E65330">MR</option>
+                            <option value="E65352">MI</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-auto col-sm-6 search-pair">
+                        <label class="search-label" for="searchType3">지역</label>
+                        <select class="form-select" id="searchType3" name="searchType3">
+                            <option value="">전체</option>
+                            <option value="SG">SG</option>
+                            <option value="RE">RE</option>
+                            <option value="RW">RW</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-auto col-sm-6 search-pair">
+                        <label class="search-label" for="searchType4">그룹</label>
+                        <select class="form-select" id="searchType4" name="searchType4">
+                            <option value="">전체</option>
+                            <option value="PM">PM</option>
+                            <option value="TS">TS</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-auto col-12 btn-row center">
+                        <button class="btn btn-success" type="submit">검색하기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="btn-row end mb-1">
+        <button class="btn btn-success" type="button" id="btnSave">저장하기</button>
+        <button class="btn btn-success" type="button" id="btnExcelUpload"
+                th:attr="data-modal-url=@{/sample/cswt/adm/modal/pmts-excel}">엑셀업로드</button>
+    </div>
+    <div class="x_panel">
+        <div class="x_content">
+            <div id="grid_1"></div>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/assets/vendor/handsontable-6.2.2/handsontable.full.min.js}"></script>
+    <script th:src="@{/assets/vendor/handsontable-6.2.2/languages/ko-KR.min.js}"></script>
+    <script th:src="@{/assets/js/oh-handsontable.js}"></script>
+    <script th:inline="none">
+        (function () {
+            const source = ['PM', 'TS'];
+            // 샘플 데이터 (CS Webtool 은 서버의 jsonData). 월 문자열: P=PM, T=TS, -=빈칸
+            const raw = [
+                ['P58100231', '홍길동', 'PPPPPPTTTTTT'], ['P58100245', '김철수', 'TTTTTTPPPPPP'],
+                ['P58100318', '이영희', 'PPPTTTPPPTTT'], ['P58100402', '박민수', 'PPPPPPPPPPPP'],
+                ['P58100417', '최지원', 'TTTTTTTTTTTT'], ['P58100533', '정하늘', 'PTPTPTPTPTPT'],
+                ['P58100611', '오세훈', 'PPPPPPTTTT--'], ['P58100624', '서다은', 'TTTPPPTTTPPP'],
+                ['P58100702', '한예린', 'PPTTPPTTPPTT'], ['P58100715', '강민재', '------PPPPPP'],
+                ['P58100728', '송유나', 'TTTTPPPPTTTT'], ['P58100736', '배준호', 'PPPPPPPPPTTT'],
+                ['P58100744', '문가영', 'PPPPTTTTPPPP'], ['P58100751', '장현우', 'TTPPTTPPTTPP'],
+                ['P58100769', '조서윤', 'PPPPPPPPPPPP']
+            ];
+            const data = raw.map(([emplNumP58, cse, m]) => {
+                const row = { emplNumP58: emplNumP58, cse: cse };
+                [...m].forEach((c, i) => { row['month' + (i + 1)] = c === 'P' ? 'PM' : c === 'T' ? 'TS' : ''; });
+                return row;
+            });
+            const months = Array.from({ length: 12 }, (_, i) => (
+                { data: 'month' + (i + 1), width: 100, className: 'htCenter htMiddle', type: 'dropdown', source: source }
+            ));
+
+            const hot = oh.grid('#grid_1', {
+                data: data,
+                columns: [
+                    { data: 'emplNumP58', width: 120, className: 'htCenter htMiddle', editor: false, readOnly: true },
+                    { data: 'cse', width: 200, className: 'htCenter htMiddle', editor: false, readOnly: true }
+                ].concat(months),
+                height: 650,
+                rowHeaders: true,
+                colHeaders: ['사번', 'CSE', '1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+                contextMenu: ['row_above', 'row_below'],
+                cells: oh.grid.emptyRowCells()
+            });
+
+            document.getElementById('btnSave').addEventListener('click', () => {
+                oh.confirm('저장하시겠습니까?', { okText: '저장' }).then(ok => {
+                    if (!ok) return;
+                    document.getElementById('grid_data').value = JSON.stringify(hot.getData());
+                    oh.toast('저장 되었습니다.');
+                });
+            });
+            document.getElementById('btnExcelUpload').addEventListener('click', e => oh.modal.open(e.currentTarget.dataset.modalUrl));
+            document.getElementById('searchForm').addEventListener('submit', e => {
+                e.preventDefault();
+                oh.toast('검색 조건이 적용되었습니다. (샘플)', 'info');
+            });
+        })();
+    </script>
+</th:block>
+</body>
+</html>

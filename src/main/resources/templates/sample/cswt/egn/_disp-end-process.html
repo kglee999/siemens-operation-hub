@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 724 마감처리 (CS Webtool egn/disp/call_end_process.jsp). TSC 처리 건의 수정. mode=update 면 저장된 값으로 채움 -->
+<div class="modal fade" tabindex="-1" aria-labelledby="dispEndProcessTitle" aria-hidden="true" th:fragment="modal"
+     th:with="upd=${param.mode != null and param.mode[0] == 'update'}">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" novalidate>
+            <div class="modal-header">
+                <h5 class="modal-title" id="dispEndProcessTitle">724 마감처리</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-sm-3"><label class="col-form-label text-sm-end d-block" for="epCloseStat">처리결과</label></div>
+                    <div class="col-sm-9">
+                        <select class="form-select" id="epCloseStat" name="close_stat">
+                            <option value="OPN">Open</option>
+                            <option value="CLS" th:selected="${upd}">Close</option>
+                            <option value="N2F">Need to Follow</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row g-2">
+                    <div class="col-sm-3"><label class="col-form-label text-sm-end d-block" for="epOsrRem">특기사항</label></div>
+                    <div class="col-sm-9">
+                        <textarea class="form-control" rows="10" id="epOsrRem" name="osr_rem" placeholder="처리내역을 입력하세요"
+                                  th:text="${upd} ? 'TSC 원격 접속하여 Coil 인식 오류 조치. 재부팅 후 검사 정상 진행 확인.' : ''"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+                <button type="submit" class="btn btn-success">저장하기</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            var modal = document.currentScript.closest('.modal');
+            var form = modal.querySelector('form');
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                bootstrap.Modal.getInstance(modal).hide();
+                oh.toast('저장이 완료되었습니다.', 'success');
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

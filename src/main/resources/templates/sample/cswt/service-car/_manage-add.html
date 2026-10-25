@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 차량 등록/수정 모달 (CS Webtool serviceCar/serviceCar_manage_add.jsp).
+     파라미터: mode=modify 이면 수정 (carNumber, carType, carOwn C/P, limitYn Y/N, contractStart, contractEnd 로 채움)
+     사용자 검색: 이름/사번을 검색해 확인완료가 되어야 저장 가능 (비워두면 사용자 없이 저장) -->
+<div class="modal fade" tabindex="-1" aria-labelledby="svcCarAddTitle" aria-hidden="true" th:fragment="modal"
+     th:with="modify=${#strings.equals(param.mode, 'modify')}">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" id="svcCarAddForm" novalidate th:attr="data-mode=${modify} ? 'modify' : 'add'">
+            <input type="hidden" name="empl_num">
+            <div class="modal-header">
+                <h5 class="modal-title" id="svcCarAddTitle" th:text="${modify} ? '차량 수정' : '차량 등록'">차량 등록</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-sm-4"><label class="col-form-label" for="svcCarNumber">차량번호</label></div>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="svcCarNumber" name="car_number" required
+                               th:value="${param.carNumber}" placeholder="차량번호를 입력하세요">
+                        <div class="invalid-feedback">차량번호를 입력하세요.</div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-sm-4"><label class="col-form-label" for="svcCarType">차종</label></div>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="svcCarType" name="car_type" required
+                               th:value="${param.carType}" placeholder="차종을 입력하세요">
+                        <div class="invalid-feedback">차종을 입력하세요.</div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-sm-4"><label class="col-form-label" for="svcContractStart">계약기간</label></div>
+                    <div class="col-sm-8">
+                        <div class="input-group">
+                            <input type="date" class="form-control" id="svcContractStart" name="contract_start_date" th:value="${param.contractStart}">
+                            <span class="input-group-text">~</span>
+                            <input type="date" class="form-control" name="contract_end_date" th:value="${param.contractEnd}" aria-label="계약 종료일">
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-sm-4"><label class="col-form-label">차량구분</label></div>
+                    <div class="col-sm-8">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="car_own" id="svcCarOwnC" value="C"
+                                   th:checked="${!#strings.equals(param.carOwn, 'P')}">
+                            <label class="form-check-label" for="svcCarOwnC">회사</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="car_own" id="svcCarOwnP" value="P"
+                                   th:checked="${#strings.equals(param.carOwn, 'P')}">
+                            <label class="form-check-label" for="svcCarOwnP">개인</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center">
+                    <div class="col-sm-4"><label class="col-form-label">입력제한(1개월)</label></div>
+                    <div class="col-sm-8">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="limit_yn" id="svcLimitY" value="Y"
+                                   th:checked="${!#strings.equals(param.limitYn, 'N')}">
+                            <label class="form-check-label" for="svcLimitY">제한</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="limit_yn" id="svcLimitN" value="N"
+                                   th:checked="${#strings.equals(param.limitYn, 'N')}">
+                            <label class="form-check-label" for="svcLimitN">미제한</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ln_solid"></div>
+
+                <div class="row g-2 align-items-start mb-2">
+                    <div class="col-sm-4"><label class="col-form-label" for="svcEgnNm">사용자 검색</label></div>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="svcEgnNm" name="egn_nm" placeholder="이름 또는 사번" autocomplete="off">
+                        <div class="invalid-feedback">사용자가 확인되지 않았습니다.</div>
+                    </div>
+                    <div class="col-sm-2"><button type="button" class="btn btn-success w-100" id="svcUserSearch">검색</button></div>
+                    <div class="col-sm-2"><span class="col-form-label d-block check-status text-danger" id="svcUserStatus">미확인</span></div>
+                </div>
+                <div class="row g-2 align-items-center">
+                    <div class="col-sm-4"><label class="col-form-label" for="svcAssgnStart">취득/개시일</label></div>
+                    <div class="col-sm-8">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                            <input type="date" class="form-control" id="svcAssgnStart" name="assgn_start_date" value="2026-10-24">
+                        </div>
+                    </div>
+                </div>
+                <p class="form-text mb-0">샘플 사용자: 홍길동(E10012), 김민준(E10231), 이서연(E10544), 박지훈(E10388), 최유진(E10790)</p>
+            </div>
+            <div class="modal-footer">
+                <th:block th:if="${modify}">
+                    <button type="submit" class="btn btn-success">수정하기</button>
+                    <button type="button" class="btn btn-danger" id="svcCarDelete">차량정보 삭제</button>
+                </th:block>
+                <button type="submit" class="btn btn-success" th:unless="${modify}">등록하기</button>
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            const form = document.getElementById('svcCarAddForm');
+            const name = form.egn_nm;
+            const status = document.getElementById('svcUserStatus');
+            const modify = form.dataset.mode === 'modify';
+            // 샘플 사용자 (실제 화면은 /egn/disp/callEgn/getEmplNumBoth 로 확인)
+            const users = { '홍길동': 'E10012', '김민준': 'E10231', '이서연': 'E10544', '박지훈': 'E10388', '최유진': 'E10790' };
+
+            function setChecked(emplNo) {
+                form.empl_num.value = emplNo || '';
+                status.textContent = emplNo ? '확인완료' : '미확인';
+                status.className = 'col-form-label d-block check-status ' + (emplNo ? 'text-confirm' : 'text-danger');
+                // 이름을 넣었으면 확인완료여야 저장 가능
+                name.setCustomValidity(name.value.trim() && !emplNo ? 'unchecked' : '');
+            }
+
+            function search() {
+                const q = name.value.trim();
+                if (!q) { oh.toast('사용자명을 입력해주세요.', 'warning'); name.focus(); return; }
+                const emplNo = users[q] || Object.values(users).find(v => v === q.toUpperCase());
+                setChecked(emplNo);
+                if (submitted) mark();
+                oh.toast(emplNo ? '사용자가 확인되었습니다.' : '사용자가 확인되지 않습니다.', emplNo ? 'success' : 'warning');
+            }
+
+            setChecked(null);
+            document.getElementById('svcUserSearch').addEventListener('click', search);
+            name.addEventListener('input', () => setChecked(null));
+            name.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); search(); } });
+
+            // 검증 대상 입력칸만 is-invalid 로 표시 (was-validated 를 쓰면 라디오까지 '유효' 표시가 붙음)
+            const checked = [form.car_number, form.car_type, name];
+            const mark = () => checked.forEach(el => el.classList.toggle('is-invalid', !el.checkValidity()));
+            let submitted = false;
+            checked.forEach(el => el.addEventListener('input', () => { if (submitted) mark(); }));
+
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                submitted = true;
+                mark();
+                if (!form.checkValidity()) { form.querySelector(':invalid').focus(); return; }
+                bootstrap.Modal.getInstance(form.closest('.modal')).hide();
+                oh.toast(modify ? '차량이 수정되었습니다.' : '차량이 추가되었습니다.', 'success');
+            });
+
+            const del = document.getElementById('svcCarDelete');
+            if (del) del.addEventListener('click', () => {
+                oh.confirm('삭제하시겠습니까?', { okText: '삭제' }).then(ok => {
+                    if (!ok) return;
+                    bootstrap.Modal.getInstance(form.closest('.modal')).hide();
+                    oh.toast('차량이 삭제되었습니다.', 'success');
+                });
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

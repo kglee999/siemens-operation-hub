@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>운행기록부</title>
+    <link rel="stylesheet" th:href="@{/assets/css/cswt/service-car.css}">
+</head>
+<body>
+<!-- CS Webtool serviceCar/serviceCar_record.jsp + serviceCar_record_list.jsp (목록 조각은 화면 안에 바로 그림) -->
+<main layout:fragment="content">
+    <div class="page-title">
+        <h3>운행기록부</h3>
+    </div>
+
+    <form id="searchForm" method="get" th:action="@{/sample/cswt/service-car/record}">
+        <div class="x_panel">
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-1 col-md-2"><label class="search-label" for="carArray">차량선택</label></div>
+                    <div class="col-lg-3 col-md-4">
+                        <select class="form-select" id="carArray" name="car_array">
+                            <option value="">차량선택</option>
+                            <option value="C0012_1" selected>12가 3456</option>
+                            <option value="C0027_2">34나 7890</option>
+                        </select>
+                    </div>
+                    <div class="w-100 d-lg-none"></div>
+                    <div class="col-lg-1 col-md-2"><label class="search-label" for="firstDate">기간설정</label></div>
+                    <div class="col-lg-7 col-md-10">
+                        <div class="svc-date-pair">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                                <input type="date" class="form-control" id="firstDate" name="firstDate" value="2026-10-01">
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                                <input type="date" class="form-control" id="lastDate" name="lastDate" value="2026-10-24" aria-label="기간 종료일">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="x_content">
+                <div class="btn-row center">
+                    <button class="btn btn-success" type="button" id="btnSearch">검색하기</button>
+                    <button class="btn btn-success" type="button" id="btnExcel">다운로드</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="btn-row end mb-1">
+        <button class="btn btn-success" type="button" id="btnExcelUpload"
+                th:attr="data-modal-url=@{/sample/cswt/service-car/modal/record-excel}">엑셀 업로드</button>
+    </div>
+    <div class="x_panel">
+        <div class="x_content">
+            <!-- freeze-table 대신 table-freeze: 헤더와 첫 열(사용일자) 고정 -->
+            <div class="table-freeze svc-record-freeze">
+                <table class="table table-striped jambo_table svc-record-table" id="tableList"
+                       th:attr="data-modal-url=@{/sample/cswt/service-car/modal/record-add}">
+                    <thead>
+                    <tr>
+                        <th class="col-date">사용일자</th>
+                        <th class="col-dept">부서</th>
+                        <th class="col-name">성명</th>
+                        <th>주행 전 계기판<br>거리(km)</th>
+                        <th>주행 후 계기판<br>거리(km)</th>
+                        <th>주행거리(km)</th>
+                        <th>출/퇴근용(km)</th>
+                        <th>일반업무용(km)</th>
+                        <th>개인업무용(km)</th>
+                        <th class="col-remark">비고</th>
+                        <th class="col-btn"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr data-id="20261001"><td>2026.10.01 (목)</td><td>DI 서울</td><td>홍길동</td><td>48,215</td><td>48,275</td><td>60</td><td>22</td><td>38</td><td>0</td><td class="a-left"></td><td><button type="button" class="btn btn-info btn-record-input">입력</button></td></tr>
+                    <tr data-id="20261002"><td>2026.10.02 (금)</td><td>DI 서울</td><td>홍길동</td><td>48,275</td><td>48,407</td><td>132</td><td>20</td><td>112</td><td>0</td><td class="a-left">세브란스병원 정기점검</td><td><button type="button" class="btn btn-info btn-record-input">입력</button></td></tr>
+                    <tr data-id="20261003"><td>2026.10.03 (토)</td><td>DI 서울</td><td>홍길동</td><td></td><td></td><td>0</td><td></td><td></td><td></td><td class="a-left"></td><td><button type="button" class="btn btn-info btn-record-input">입력</button></td></tr>
+                    <tr data-id="20261004"><td>2026.10.04 (일)</td><td>DI 서울</td><td>홍길동</td><td></td><td></td><td>0</td><td></td><td></td><td></td><td class="a-left"></td><td><button type="button" class="btn btn-info btn-record-input">입력</button></td></tr>
+                    <tr data-id="20261005"><td>2026.10.05 (월)</td><td>DI 서울</td><td>홍길동</td><td>48,407</td><td>48,482</td><td>75</td><td>18</td><td>57</td><td>0</td><td class="a-left"></td><td><button type="button" class="btn btn-info btn-record-input">입력</button></td></tr>
+                    <tr data-id="20261006"><td>2026.10.06 (화)</td><td>DI 서울</td><td>홍길동</td><td>48,482</td><td>48,597</td><td>115</td><td>22</td><td>93</td><td>0</td><td class="a-left">삼성서울병원 MRI 장애 출동</td><td><button type="button" class="btn btn-info btn-record-input">입력</button></td></tr>
+                    <tr data-id="20261007"><td>2026.10.07 (수)</td><td>DI 서울</td><td>홍길동</td><td>48,597</td><td>48,681</td><td>84</td><td>20</td><td>64</td><td>0</td><td class="a-left"></td><td><button type="button" class="btn btn-info btn-record-input">입력</button></td></tr>
+                    <tr data-id="20261008"><td>2026.10.08 (목)</td><td>DI 서울</td><td>홍길동</td><td>48,681</td><td>48,755</td><td>74</td><td>24</td><td>38</td><td>12</td><td class="a-left">서울대학교병원 CT 설치</td><td><button type="button" class="btn btn-info btn-record-input">입력</button></td></tr>
+                    <tr data-id="20261009"><td>2026.10.09 (금)</td><td>DI 서울</td><td>홍길동</td><td></td><td></td><td>0</td><td></td><td></td><td></td><td class="a-left"></td><td><button type="button" class="btn btn-info btn-record-input">입력</button></td></tr>
+                    <tr data-id="20261010"><td>2026.10.10 (토)</td><td>DI 서울</td><td>홍길동</td><td></td><td></td><td>0</td><td></td><td></td><td></td><td class="a-left"></td><td><button type="button" class="btn btn-info btn-record-input">입력</button></td></tr>
+                    <tr data-id="20261011"><td>2026.10.11 (일)</td><td>DI 서울</td><td>홍길동</td><td></td><td></td><td>0</td><td></td><td></td><td></td><td class="a-left"></td><td><button type="button" class="btn btn-info btn-record-input">입력</button></td></tr>
+                    <tr data-id="20261012"><td>2026.10.12 (월)</td><td>DI 서울</td><td>홍길동</td><td>48,755</td><td>48,844</td><td>89</td><td>20</td><td>57</td><td>12</td><td class="a-left"></td><td><button type="button" class="btn btn-info btn-record-input">입력</button></td></tr>
+                    <tr data-id="20261013"><td>2026.10.13 (화)</td><td>DI 서울</td><td>홍길동</td><td>48,844</td><td>48,961</td><td>117</td><td>24</td><td>93</td><td>0</td><td class="a-left">분당서울대병원 PM</td><td><button type="button" class="btn btn-info btn-record-input">입력</button></td></tr>
+                    <tr data-id="20261014"><td>2026.10.14 (수)</td><td>DI 서울</td><td>홍길동</td><td>48,961</td><td>49,043</td><td>82</td><td>18</td><td>64</td><td>0</td><td class="a-left"></td><td><button type="button" class="btn btn-info btn-record-input">입력</button></td></tr>
+                    <tr data-id="20261015"><td>2026.10.15 (목)</td><td>DI 서울</td><td>홍길동</td><td>49,043</td><td>49,099</td><td>56</td><td>18</td><td>38</td><td>0</td><td class="a-left"></td><td><button type="button" class="btn btn-info btn-record-input">입력</button></td></tr>
+                    <tr data-id="20261016"><td>2026.10.16 (금)</td><td>DI 서울</td><td>홍길동</td><td>49,099</td><td>49,245</td><td>146</td><td>22</td><td>112</td><td>12</td><td class="a-left">아산병원 Atellica 교육</td><td><button type="button" class="btn btn-info btn-record-input">입력</button></td></tr>
+                    <tr data-id="20261017"><td>2026.10.17 (토)</td><td>DI 서울</td><td>홍길동</td><td></td><td></td><td>0</td><td></td><td></td><td></td><td class="a-left"></td><td><button type="button" class="btn btn-info btn-record-input">입력</button></td></tr>
+                    <tr data-id="20261018"><td>2026.10.18 (일)</td><td>DI 서울</td><td>홍길동</td><td></td><td></td><td>0</td><td></td><td></td><td></td><td class="a-left"></td><td><button type="button" class="btn btn-info btn-record-input">입력</button></td></tr>
+                    <tr data-id="20261019"><td>2026.10.19 (월)</td><td>DI 서울</td><td>홍길동</td><td>49,245</td><td>49,320</td><td>75</td><td>18</td><td>57</td><td>0</td><td class="a-left"></td><td><button type="button" class="btn btn-info btn-record-input">입력</button></td></tr>
+                    <tr data-id="20261020"><td>2026.10.20 (화)</td><td>DI 서울</td><td>홍길동</td><td>49,320</td><td>49,443</td><td>123</td><td>18</td><td>93</td><td>12</td><td class="a-left"></td><td><button type="button" class="btn btn-info btn-record-input">입력</button></td></tr>
+                    <tr data-id="20261021"><td>2026.10.21 (수)</td><td>DI 서울</td><td>홍길동</td><td>49,443</td><td>49,529</td><td>86</td><td>22</td><td>64</td><td>0</td><td class="a-left">고대안암병원 긴급 출동</td><td><button type="button" class="btn btn-info btn-record-input">입력</button></td></tr>
+                    <tr data-id="20261022"><td>2026.10.22 (목)</td><td>DI 서울</td><td>홍길동</td><td>49,529</td><td>49,587</td><td>58</td><td>20</td><td>38</td><td>0</td><td class="a-left"></td><td><button type="button" class="btn btn-info btn-record-input">입력</button></td></tr>
+                    <tr data-id="20261023"><td>2026.10.23 (금)</td><td>DI 서울</td><td>홍길동</td><td>49,587</td><td>49,723</td><td>136</td><td>24</td><td>112</td><td>0</td><td class="a-left">주유</td><td><button type="button" class="btn btn-info btn-record-input">입력</button></td></tr>
+                    <tr data-id="20261024"><td>2026.10.24 (토)</td><td>DI 서울</td><td>홍길동</td><td></td><td></td><td>0</td><td></td><td></td><td></td><td class="a-left"></td><td><button type="button" class="btn btn-info btn-record-input">입력</button></td></tr>
+                    <tr class="row-total svc-sum">
+                        <td colspan="3" rowspan="2"></td>
+                        <td colspan="3">과세기간 총 주행거리(km)</td>
+                        <td colspan="3">과세기간 업무용 사용거리(km)</td>
+                        <td colspan="2">업무사용비율(%)</td>
+                    </tr>
+                    <tr class="svc-sum svc-sum-value">
+                        <td colspan="3" id="sumDriving">1,508</td>
+                        <td colspan="3" id="sumWork">1,460</td>
+                        <td colspan="2" id="sumRate">96.82 %</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script>
+        (function () {
+            const table = document.getElementById('tableList');
+            const car = document.getElementById('carArray');
+            const first = document.getElementById('firstDate');
+            const last = document.getElementById('lastDate');
+
+            // 시작일/종료일은 서로 2년 이내 (CS Webtool picker minDate/maxDate)
+            function shift(value, years) {
+                const d = new Date(value);
+                d.setFullYear(d.getFullYear() + years);
+                return d.toISOString().slice(0, 10);
+            }
+            function syncRange() {
+                if (first.value) { last.min = first.value; last.max = shift(first.value, 2); }
+                if (last.value) { first.max = last.value; first.min = shift(last.value, -2); }
+            }
+            syncRange();
+            [first, last, car].forEach(el => el.addEventListener('change', () => { syncRange(); oh.toast('조회되었습니다.'); }));
+
+            document.getElementById('btnSearch').addEventListener('click', () => oh.toast('조회되었습니다.'));
+            document.getElementById('btnExcel').addEventListener('click', () => oh.toast('엑셀 파일을 내려받습니다.'));
+            document.getElementById('btnExcelUpload').addEventListener('click', e => oh.modal.open(e.currentTarget.dataset.modalUrl));
+
+            // 입력 -> 운행기록부 입력 모달 (사용일자/차량번호/현재 값 전달)
+            table.addEventListener('click', e => {
+                const btn = e.target.closest('.btn-record-input');
+                if (!btn) return;
+                if (!car.value) { oh.toast('차량을 선택해주세요', 'warning'); return; }
+                const tr = btn.closest('tr');
+                const c = tr.cells;
+                oh.modal.open(table.dataset.modalUrl, {
+                    useDate: tr.dataset.id,
+                    carNumber: car.options[car.selectedIndex].text,
+                    workKm: c[6].textContent, cWorkKm: c[7].textContent, pWorkKm: c[8].textContent,
+                    remark: c[9].textContent
+                });
+            });
+
+            // 모달 저장 후 호출 (_record-add.html): 해당 줄 값 갱신
+            window.serviceCarRecordUpdate = function (useDate, v) {
+                const tr = table.querySelector('tr[data-id="' + useDate + '"]');
+                if (!tr) return;
+                const c = tr.cells;
+                const num = s => Number(String(s).replace(/,/g, '')) || 0;
+                const drive = num(v.work_km) + num(v.c_work_km) + num(v.p_work_km);
+                c[5].textContent = drive.toLocaleString();
+                c[6].textContent = v.work_km;
+                c[7].textContent = v.c_work_km;
+                c[8].textContent = v.p_work_km;
+                c[9].textContent = v.remark;
+
+                // 합계 다시 계산: 업무용 = 출/퇴근용 + 일반업무용
+                let dSum = 0, wSum = 0;
+                table.querySelectorAll('tbody tr[data-id]').forEach(r => {
+                    dSum += num(r.cells[5].textContent);
+                    wSum += num(r.cells[6].textContent) + num(r.cells[7].textContent);
+                });
+                document.getElementById('sumDriving').textContent = dSum.toLocaleString();
+                document.getElementById('sumWork').textContent = wSum.toLocaleString();
+                document.getElementById('sumRate').textContent = (dSum ? (wSum / dSum * 100).toFixed(2) : '0') + ' %';
+            };
+        })();
+    </script>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>로그인 | Operation Hub</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}">
+<link rel="stylesheet" th:href="@{/assets/vendor/bootstrap-5.3.8/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendor/bootstrap-icons-1.13.2/bootstrap-icons.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+</head>
+<body class="login">
+<!-- CS Webtool 로그인 화면과 같은 구성: SSO 버튼 / 안내 / 계정 등록 / 아이디·비밀번호 / 약관 링크 -->
+<div class="login_wrapper">
+    <section class="login_content">
+        <form th:action="@{/sample/login}" method="post">
+            <h1>Operation Hub</h1>
+            <h2>운영 지원 시스템 내부 직원<br>전용 페이지입니다.</h2>
+
+            <button type="button" class="btn btn-default btn-lg">SSO LOGIN</button>
+            <p class="login-notice">사내 SSO 계정으로 로그인할 수 있습니다.</p>
+            <hr class="button-line">
+            <a href="#" class="login-account">계정 등록이 필요하신가요?</a>
+
+            <div class="alert alert-danger login-message mt-3" th:if="${param.error}">
+                아이디 또는 비밀번호를 다시 확인해주세요.
+            </div>
+
+            <input type="text" name="username" class="form-control mt-2" placeholder="사번 입력" autocomplete="username" required>
+            <input type="password" name="password" class="form-control" placeholder="비밀번호 입력" autocomplete="current-password" required>
+            <button type="submit" class="btn btn-default btn-lg">LOGIN</button>
+            <hr class="button-line">
+
+            <div class="login-links">
+                <a href="#" class="btn-private">개인 정보 취급 방침</a>
+                <br>
+                <a href="#" class="btn-private">Terms of Use</a>
+            </div>
+        </form>
+    </section>
+</div>
+</body>
+</html>

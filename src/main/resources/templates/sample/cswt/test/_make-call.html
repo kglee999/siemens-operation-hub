@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- TEST 콜 생성 모달 (CS Webtool test/make_call.jsp).
+     SYSTEM_ID 유무 Y -> SYSTEM_ID 입력, N -> 전화번호 국번 + GG 입력 -->
+<div class="modal fade" tabindex="-1" aria-labelledby="makeCallTitle" aria-hidden="true" th:fragment="modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" id="makeCallForm" novalidate>
+            <div class="modal-header">
+                <h5 class="modal-title" id="makeCallTitle">TEST 콜 생성</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-sm-4"><span class="col-form-label d-block fw-bold">SYSTEM_ID 유무</span></div>
+                    <div class="col-sm-8">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="call_type" id="makeCallType1" value="1" checked>
+                            <label class="form-check-label" for="makeCallType1">Y</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="call_type" id="makeCallType2" value="2">
+                            <label class="form-check-label" for="makeCallType2">N</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center mb-2" data-call-type="1">
+                    <div class="col-sm-4"><label class="col-form-label" for="makeCallSystemId">SYSTEM_ID</label></div>
+                    <div class="col-sm-8"><input type="text" class="form-control" id="makeCallSystemId" name="system_id" placeholder="400-123456"></div>
+                </div>
+                <div class="row g-2 align-items-center mb-2" data-call-type="2" hidden>
+                    <div class="col-sm-4"><label class="col-form-label" for="makeCallTelRegionNo">전화번호 국번</label></div>
+                    <div class="col-sm-8"><input type="text" class="form-control" id="makeCallTelRegionNo" name="tel_region_no" inputmode="numeric" placeholder="02"></div>
+                </div>
+                <div class="row g-2 align-items-center mb-2" data-call-type="2" hidden>
+                    <div class="col-sm-4"><label class="col-form-label" for="makeCallGg">GG</label></div>
+                    <div class="col-sm-8"><input type="text" class="form-control" id="makeCallGg" name="gg" placeholder="CT"></div>
+                </div>
+                <div class="row g-2 align-items-center mb-2">
+                    <div class="col-sm-4"><label class="col-form-label" for="makeCallVendorNo">파트너사번호 인입 (0~9)</label></div>
+                    <div class="col-sm-8"><input type="text" class="form-control" id="makeCallVendorNo" name="vendor_no" inputmode="numeric" maxlength="1" value="0"></div>
+                </div>
+                <div class="row g-2 align-items-center">
+                    <div class="col-sm-4"><span class="col-form-label d-block fw-bold">IVR SYSTEM ID 인증여부</span></div>
+                    <div class="col-sm-8">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="verify_system" id="makeCallVerifyY" value="Y" checked>
+                            <label class="form-check-label" for="makeCallVerifyY">Y</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="verify_system" id="makeCallVerifyC" value="C">
+                            <label class="form-check-label" for="makeCallVerifyC">C</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="verify_system" id="makeCallVerifyN" value="N">
+                            <label class="form-check-label" for="makeCallVerifyN">N</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">닫기</button>
+                <button type="submit" class="btn btn-success">저장하기</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        (function () {
+            const form = document.getElementById('makeCallForm');
+
+            // SYSTEM_ID 유무에 따라 입력 줄 전환
+            form.querySelectorAll('input[name=call_type]').forEach(r => r.addEventListener('change', () => {
+                form.querySelectorAll('[data-call-type]').forEach(row => { row.hidden = row.dataset.callType !== r.value; });
+            }));
+
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                bootstrap.Modal.getInstance(form.closest('.modal')).hide();
+                oh.toast('저장이 완료되었습니다.');
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

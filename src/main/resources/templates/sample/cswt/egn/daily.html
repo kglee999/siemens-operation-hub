@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>CSE/Apps 일별 현황</title>
+    <link rel="stylesheet" th:href="@{/assets/css/cswt/egn-status.css}">
+</head>
+<body>
+<!-- CS Webtool egn/egn_daily.jsp
+     조직설정 · 엔지니어명 / 기간(최대 2개월) / 날짜별 정상·연장 2줄 헤더 · 첫 열 고정 -->
+<main layout:fragment="content">
+    <div class="page-title"><h3>CSE/Apps 일별 현황</h3></div>
+
+    <form id="searchForm" onsubmit="return false;">
+        <div class="x_panel">
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-1 col-md-2"><span class="search-label">조직설정</span></div>
+                    <div class="col-lg-6 col-md-10">
+                        <div class="row g-1">
+                            <div class="col">
+                                <select class="form-select" id="searchType" name="searchType" aria-label="Plant">
+                                    <option value="">전체</option>
+                                    <option value="96E6">DI</option>
+                                    <option value="94E6">DX</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select class="form-select" id="searchType2" name="searchType2" aria-label="Team">
+                                    <option value="">전체</option>
+                                    <option>CSE</option>
+                                    <option>APP</option>
+                                    <option>RSC</option>
+                                    <option>CH</option>
+                                </select>
+                            </div>
+                            <div class="col" id="modality-area">
+                                <select class="form-select" id="modality" name="modality" aria-label="Modality">
+                                    <option value="">전체</option>
+                                    <option>CT</option>
+                                    <option>MR</option>
+                                    <option>AX</option>
+                                    <option>XP</option>
+                                    <option>US</option>
+                                    <option>MI</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select class="form-select" id="searchType3" name="searchType3" aria-label="Region">
+                                    <option value="">전체</option>
+                                    <option>서울</option>
+                                    <option>경기</option>
+                                    <option>강원</option>
+                                    <option>충청</option>
+                                    <option>영남</option>
+                                    <option>호남</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-1 col-md-2"><label class="search-label" for="searchNum">엔지니어명</label></div>
+                    <div class="col-lg-4 col-md-4">
+                        <input type="text" class="form-control" id="searchNum" name="searchNum" placeholder="엔지니어명 입력">
+                    </div>
+                </div>
+            </div>
+            <div class="x_content">
+                <div class="row g-2 align-items-center">
+                    <div class="col-lg-1 col-md-2"><label class="search-label" for="firstDate">기간</label></div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="input-group">
+                            <input type="date" class="form-control" id="firstDate" name="firstDate" required>
+                            <span class="input-group-text">~</span>
+                            <input type="date" class="form-control" id="lastDate" name="lastDate" aria-label="기간 종료" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="x_content">
+                <div class="btn-row center">
+                    <button class="btn btn-success" type="button" id="btnSearch">검색하기</button>
+                    <button class="btn btn-success" type="button" id="btnExcel">엑셀받기</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="alert-line">RPA 문제가 발생하여 업무 시간이 제대로 업데이트되지 않을 수 있습니다.</div>
+    <div class="x_panel">
+        <div class="x_content">
+            <!-- 헤더 + 첫 열(사번(이름)) 고정 -->
+            <div class="table-freeze" id="freezeBox" style="max-height: 600px;">
+                <table class="table table-striped jambo_table" id="tableList">
+                    <thead>
+                    <tr id="headRow1"></tr>
+                    <tr id="headRow2"></tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script th:inline="none">
+        (function () {
+            const $ = id => document.getElementById(id);
+            const pad = n => String(n).padStart(2, '0');
+            const iso = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+            const WEEK = ['일', '월', '화', '수', '목', '금', '토'];
+
+            // 기본 기간: 이번 달 1일 ~ 말일 (원본 EgnDailyController)
+            const today = new Date();
+            $('firstDate').value = iso(new Date(today.getFullYear(), today.getMonth(), 1));
+            $('lastDate').value = iso(new Date(today.getFullYear(), today.getMonth() + 1, 0));
+
+            // 샘플 엔지니어 [사번, 이름, Plant, Team, Region]
+            const ENGINEERS = [
+                ['10230145', '김민수', 'DI', 'CSE', '서울'],
+                ['10230212', '이준호', 'DI', 'CSE', '서울'],
+                ['10231087', '박성진', 'DI', 'CSE', '경기'],
+                ['10232264', '최영훈', 'DI', 'CSE', '영남'],
+                ['10233391', '정대현', 'DI', 'CSE', '호남'],
+                ['10234410', '한지은', 'DI', 'APP', '서울'],
+                ['10235528', '오세영', 'DI', 'APP', '경기'],
+                ['10240173', '강동원', 'DX', 'CSE', '서울'],
+                ['10241306', '임재범', 'DX', 'CSE', '영남'],
+                ['10242459', '배수지', 'DX', 'APP', '서울']
+            ];
+
+            // 날짜 / 엔지니어별로 항상 같은 값이 나오는 샘플 근무시간
+            function hours(ei, d) {
+                if (d > today) return [0, 0];
+                const n = (ei * 31 + d.getDate() * 7 + d.getMonth() * 3) % 17;
+                const weekend = d.getDay() === 0 || d.getDay() === 6;
+                if (weekend) return n === 3 ? [4, 0] : n === 9 ? [8, 1.5] : [0, 0];
+                if (n === 5) return [0, 0];                       // 휴가
+                const b = n === 2 ? 4 : n === 11 ? 6.5 : 8;
+                const e = b < 8 ? 0 : [0, 0, 0, 0.5, 0, 1, 0, 2, 0, 0, 1.5, 0, 3.5, 0, 0, 2.5, 0][n];
+                return [b, e];
+            }
+
+            function render() {
+                const from = new Date($('firstDate').value + 'T00:00'), to = new Date($('lastDate').value + 'T00:00');
+                const days = [];
+                for (const d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) days.push(new Date(d));
+
+                $('headRow1').innerHTML = '<th rowspan="2">사번(이름)</th>'
+                    + days.map(d => '<th colspan="2">' + iso(d) + '<br>(' + WEEK[d.getDay()] + ')</th>').join('');
+                $('headRow2').innerHTML = days.map(() => '<th>정상</th><th>연장</th>').join('');
+
+                const plant = { '96E6': 'DI', '94E6': 'DX' }[$('searchType').value];
+                const team = $('searchType2').value, region = $('searchType3').value, name = $('searchNum').value.trim();
+                const rows = ENGINEERS.map((e, i) => [e, i]).filter(([e]) =>
+                    (!plant || e[2] === plant) && (!team || e[3] === team) && (!region || e[4] === region) && (!name || e[1].includes(name)));
+
+                $('tableBody').innerHTML = rows.length ? rows.map(([e, i]) => '<tr><td>' + e[0] + ' (' + e[1] + ')</td>'
+                    + days.map(d => hours(i, d).map(h => '<td>' + h.toFixed(2) + '</td>').join('')).join('') + '</tr>').join('')
+                    : '<tr class="no-data"><td colspan="' + (days.length * 2 + 1) + '">목록이 없습니다.</td></tr>';
+
+                // 2줄 헤더: 둘째 줄 고정 위치를 첫 줄 높이에 맞춤
+                $('freezeBox').style.setProperty('--oh-freeze-head1', $('headRow1').getBoundingClientRect().height + 'px');
+            }
+
+            // 기간 검사 (원본 daterangepicker dateLimit: 2개월)
+            function valid() {
+                const f = $('firstDate').value, l = $('lastDate').value;
+                if (!f || !l) { oh.toast('기간을 입력하세요.', 'warning'); return false; }
+                if (f > l) { oh.toast('시작일이 종료일보다 늦습니다.', 'warning'); return false; }
+                const limit = new Date(f + 'T00:00');
+                limit.setMonth(limit.getMonth() + 2);
+                if (new Date(l + 'T00:00') > limit) { oh.toast('기간은 최대 2개월까지 조회할 수 있습니다.', 'warning'); return false; }
+                return true;
+            }
+
+            $('searchType').addEventListener('change', () => {
+                const dx = $('searchType').value === '94E6';
+                if (dx) $('modality').value = '';
+                $('modality-area').hidden = dx;
+            });
+            $('btnSearch').addEventListener('click', () => {
+                if (!valid()) return;
+                oh.loading.show();
+                setTimeout(() => { render(); oh.loading.hide(); }, 200);
+            });
+            $('searchNum').addEventListener('keydown', e => { if (e.key === 'Enter') $('btnSearch').click(); });
+            $('btnExcel').addEventListener('click', () => oh.toast('엑셀 파일을 다운로드합니다.', 'success'));
+
+            render();
+        })();
+    </script>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>Handsontable 샘플</title>
+    <link rel="stylesheet" th:href="@{/assets/vendor/handsontable-6.2.2/handsontable.full.min.css}">
+</head>
+<body>
+<!-- Handsontable 6.2.2 (CS Webtool 과 같은 버전, MIT). 엑셀처럼 칸을 직접 고치는 화면용
+     (CS Webtool: 724 당직 관리 (DI CT-SG), 엔지니어 순번관리 (DX), 파트너사 순번관리 (DX), PM/TS 그룹 관리).
+     일반 목록은 기본 표(일반 테이블 샘플)를 쓴다. -->
+<main layout:fragment="content">
+    <div class="page-title">
+        <h3>Handsontable 샘플</h3>
+    </div>
+
+    <div class="x_panel">
+        <div class="x_content">
+            <div class="row g-2 align-items-center">
+                <div class="col-auto"><label class="search-label" for="hotMonth">기간설정</label></div>
+                <div class="col-auto">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                        <input type="month" class="form-control" id="hotMonth" value="2026-10" style="width: 200px;">
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <div class="form-check form-switch mb-0">
+                        <input class="form-check-input" type="checkbox" role="switch" id="hotReadOnly">
+                        <label class="form-check-label" for="hotReadOnly">읽기 전용 (관리자 아님)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="guide-text">
+        날짜 · 지역 칸은 고칠 수 없습니다 (빨간 글자). 순번 칸을 누르고 목록에서 엔지니어를 고르거나 직접 입력하세요.<br>
+        순번이 하나도 없는 줄은 노란색으로 표시됩니다. 줄 위에서 마우스 오른쪽 버튼을 누르면 위/아래에 줄을 추가할 수 있습니다.
+    </div>
+
+    <div class="btn-row end mb-1">
+        <button type="button" class="btn btn-success" id="btnHotSave">저장하기</button>
+        <button type="button" class="btn btn-success" id="btnHotExcel">엑셀받기</button>
+    </div>
+
+    <div class="x_panel">
+        <div class="x_content">
+            <div class="table-responsive">
+                <div id="dutyGrid"></div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/assets/vendor/handsontable-6.2.2/handsontable.full.min.js}"></script>
+    <script th:src="@{/assets/vendor/handsontable-6.2.2/languages/ko-KR.min.js}"></script>
+    <script th:src="@{/assets/js/oh-handsontable.js}"></script>
+    <!-- th:inline="none": 배열 리터럴 [[...]] 을 Thymeleaf 가 해석하지 않도록 -->
+    <script th:inline="none">
+        (function () {
+            const ENGINEERS = ['홍길동', '김철수', '이영희', '박민수', '최지원', '정하늘', '강서준', '윤지우', '임도윤', '한예린'];
+            const REGIONS = ['서울', '경기', '강원'];
+            const WEEK = ['일', '월', '화', '수', '목', '금', '토'];
+
+            // 샘플 데이터: 10월 1~14일 x 지역 3곳, 일부 줄은 비워 둠
+            const data = [];
+            for (let d = 1; d <= 14; d++) {
+                const date = new Date(2026, 9, d);
+                const label = `10-${String(d).padStart(2, '0')}(${WEEK[date.getDay()]})`;
+                REGIONS.forEach((region, r) => {
+                    const empty = (d + r) % 7 === 0;
+                    const pick = i => empty ? '' : ENGINEERS[(d * 3 + r * 4 + i) % ENGINEERS.length];
+                    data.push([label, region, pick(0), pick(1), pick(2) && (d + r) % 3 ? pick(2) : '']);
+                });
+            }
+
+            const hot = oh.grid('#dutyGrid', {
+                data: data,
+                colHeaders: ['날짜', '지역', '순번-1', '순번-2', '순번-3'],
+                columns: [
+                    { readOnly: true },
+                    { readOnly: true },
+                    { type: 'dropdown', source: ENGINEERS },
+                    { type: 'dropdown', source: ENGINEERS },
+                    { type: 'dropdown', source: ENGINEERS }
+                ],
+                colWidths: [110, 90, 160, 160, 160],
+                height: 487,
+                cells: oh.grid.emptyRowCells()
+            });
+
+            document.getElementById('hotReadOnly').addEventListener('change', e => {
+                hot.updateSettings({ readOnly: e.target.checked, contextMenu: !e.target.checked && ['row_above', 'row_below'] });
+            });
+
+            document.getElementById('btnHotSave').addEventListener('click', () => {
+                const rows = hot.getData();
+                const empty = rows.filter(r => !r[2] && !r[3] && !r[4]).length;
+                oh.confirm(`${rows.length}줄을 저장하시겠습니까?` + (empty ? ` (순번 없는 줄 ${empty}개)` : ''), { okText: '저장' })
+                    .then(ok => ok && oh.toast('저장이 완료되었습니다.'));
+            });
+            document.getElementById('btnHotExcel').addEventListener('click', () => {
+                // 내장 내보내기 플러그인으로 CSV 저장 (엑셀에서 열림)
+                hot.getPlugin('exportFile').downloadFile('csv', {
+                    filename: '순번관리_' + document.getElementById('hotMonth').value,
+                    columnHeaders: true, rowHeaders: false, bom: true
+                });
+            });
+        })();
+    </script>
+</th:block>
+</body>
+</html>
